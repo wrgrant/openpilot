@@ -3,12 +3,12 @@ from types import SimpleNamespace as NS
 from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui.elements import CurveSpeedElement, SteeringTorquePercentElement
 
 
-def sm_for(v_ego=25.0, rate=None, vel=None, torque=0.0, lat_active=True):
+def sm_for(v_ego=25.0, rate=None, vel=None, torque=0.0, lat_active=True, steering_pressed=False):
   n = 33
   rate = [0.0] * n if rate is None else rate
   vel = [v_ego] * n if vel is None else vel
   return {
-    'carState': NS(vEgo=v_ego),
+    'carState': NS(vEgo=v_ego, steeringPressed=steering_pressed),
     'modelV2': NS(orientationRate=NS(z=rate), velocity=NS(x=vel)),
     'carOutput': NS(actuatorsOutput=NS(torque=torque)),
     'carControl': NS(latActive=lat_active),
@@ -52,3 +52,6 @@ class TestSteeringTorquePercent:
 
   def test_inactive(self):
     assert SteeringTorquePercentElement().update(sm_for(torque=0.5, lat_active=False), False).value == "-"
+
+  def test_blank_while_driver_overrides(self):
+    assert SteeringTorquePercentElement().update(sm_for(torque=1.0, steering_pressed=True), False).value == "-"

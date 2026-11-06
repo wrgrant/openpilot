@@ -36,7 +36,8 @@ class HudRendererSP(HudRenderer):
     self.turn_signal_controller = TurnSignalController()
     self.circular_alerts_renderer = CircularAlertsRenderer()
     self.speed_renderer = SpeedRenderer()
-    self._torque_bar = TorqueBar(scale=3.0, always=True)
+    # sunnypilot Odyssey: one thickness at every torque (colour alone shows effort) and no centre dot
+    self._torque_bar = TorqueBar(scale=3.0, always=True, fixed_height=20, center_dot=False)
 
     self.pcm_cruise_speed: bool = True
     self.show_icbm_status: bool = False

@@ -20,6 +20,35 @@ from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.widgets import Widget
 
 
+RIGHT_COLUMN_WIDTH = 236  # wide enough for a label and its unit side by side
+
+
+def _digit_advance(font: rl.Font, size: int) -> float:
+  return max(measure_text_cached(font, d, size, 0).x for d in "0123456789")
+
+
+def draw_tabular_right(font: rl.Font, text: str, right_x: float, y: float, size: int, color: rl.Color) -> None:
+  """Draw text right-aligned at right_x, giving every digit the same width (tabular figures)."""
+  digit_w = _digit_advance(font, size)
+  x = right_x
+  for ch in reversed(text):
+    ch_w = measure_text_cached(font, ch, size, 0).x
+    cell_w = digit_w if ch.isdigit() else ch_w
+    x -= cell_w
+    rl.draw_text_ex(font, ch, rl.Vector2(x + (cell_w - ch_w) / 2, y), size, 0, color)
+
+
+def draw_unit(font: rl.Font, unit: str, right_x: float, y: float, size: int, color: rl.Color) -> None:
+  """Draw a unit right-aligned at right_x; a trailing ^2 becomes a raised small 2."""
+  base, sup = (unit[:-2], unit[-1]) if unit.endswith("^2") else (unit, "")
+  sup_size = int(size * 0.65)
+  sup_w = measure_text_cached(font, sup, sup_size, 0).x if sup else 0
+  base_w = measure_text_cached(font, base, size, 0).x
+  rl.draw_text_ex(font, base, rl.Vector2(right_x - sup_w - base_w, y), size, 0, color)
+  if sup:
+    rl.draw_text_ex(font, sup, rl.Vector2(right_x - sup_w, y - size * 0.15), sup_size, 0, color)
+
+
 def get_bottom_dev_ui_offset():
   if ui_state.developer_ui in (DeveloperUiState.BOTTOM, DeveloperUiState.BOTH):
     return 60
@@ -81,7 +110,7 @@ class DeveloperUiRenderer(Widget):
     controls_state = sm['controlsState']
 
     UI_BORDER_SIZE = 20
-    container_width = 184
+    container_width = RIGHT_COLUMN_WIDTH
     x = int(rect.x + rect.width - container_width - UI_BORDER_SIZE * 2)
     y = int(rect.y + UI_BORDER_SIZE * 1.5)
 
@@ -106,29 +135,20 @@ class DeveloperUiRenderer(Widget):
       current_y += self._draw_right_dev_ui_element(x, current_y, element)
 
   def _draw_right_dev_ui_element(self, x: int, y: int, element: UiElement) -> int:
-    x += 0
+    # sunnypilot Odyssey: label and unit read upright on one line, and the value is right-aligned with
+    # fixed-width digits, so the decimal point and last digit stay put as numbers change
     y += 230
-    container_width = 184
-    label_size = 28
+    container_width = RIGHT_COLUMN_WIDTH
+    label_size = 26
     value_size = 60
-    unit_size = 28
-    label_width = measure_text_cached(self._font_bold, element.label, label_size, 0).x
-    centered_label_x = x + (container_width - label_width) / 2
-    rl.draw_text_ex(self._font_bold, element.label, rl.Vector2(centered_label_x, y), label_size, 0, rl.WHITE)
+    label_color = rl.Color(255, 255, 255, 230)
+    unit_color = rl.Color(255, 255, 255, 150)
 
-    y += 45
-    value_width = measure_text_cached(self._font_bold, element.value, value_size, 0).x
-    centered_value_x = x + (container_width - value_width) / 2
-    rl.draw_text_ex(self._font_bold, element.value, rl.Vector2(centered_value_x, y), value_size, 0, element.color)
-
+    rl.draw_text_ex(self._font_bold, element.label, rl.Vector2(x, y), label_size, 0, label_color)
     if element.unit:
-      units_height = measure_text_cached(self._font_bold, element.unit, unit_size, 0).x
+      draw_unit(self._font_semi_bold, element.unit, x + container_width, y, label_size, unit_color)
 
-      units_x = x + container_width
-      units_y = y + (value_size / 2) + (units_height / 2)
-
-      rl.draw_text_pro(self._font_bold, element.unit, rl.Vector2(units_x, units_y), rl.Vector2(0, 0), -90.0, unit_size, 0, rl.WHITE)
-
+    draw_tabular_right(self._font_bold, element.value, x + container_width, y + 34, value_size, element.color)
     return 130
 
   def _draw_bottom_dev_ui(self, rect: rl.Rectangle) -> None:

@@ -357,7 +357,8 @@ class SteeringTorquePercentElement:
   def update(self, sm, is_metric: bool) -> UiElement:
     lat_active = sm['carControl'].latActive
     pct = abs(sm['carOutput'].actuatorsOutput.torque) * 100.0
-    if not lat_active:
+    # blank while the driver is steering: the number is openpilot's request, not what's turning the wheel
+    if not lat_active or sm['carState'].steeringPressed:
       return UiElement("-", "STEER TRQ", self.unit, rl.WHITE)
     if pct >= 85:
       color = rl.Color(255, 0, 0, 255)

@@ -148,11 +148,15 @@ DEFAULT_MAX_LAT_ACCEL = 3.0  # m/s^2
 
 
 class TorqueBar(Widget):
-  def __init__(self, demo: bool = False, scale: float = 1.0, always: bool = False):
+  def __init__(self, demo: bool = False, scale: float = 1.0, always: bool = False,
+               fixed_height: float | None = None, center_dot: bool = True):
     super().__init__()
     self._demo = demo
     self._scale = scale
     self._always = always
+    # fixed_height (unscaled px): keep the arc one thickness instead of swelling as torque rises past 50%
+    self._fixed_height = fixed_height
+    self._center_dot = center_dot
     self._torque_filter = FirstOrderFilter(0, 0.1, 1 / gui_app.target_fps)
     self._torque_line_alpha_filter = FirstOrderFilter(0.0, 0.1, 1 / gui_app.target_fps)
 
@@ -191,8 +195,12 @@ class TorqueBar(Widget):
 
   def _render(self, rect: rl.Rectangle) -> None:
     # adjust y pos with torque
-    torque_line_offset = np.interp(abs(self._torque_filter.x), [0.5, 1], [22 * self._scale, 26 * self._scale])
-    torque_line_height = np.interp(abs(self._torque_filter.x), [0.5, 1], [14 * self._scale, 56 * self._scale])
+    if self._fixed_height is not None:
+      torque_line_offset = 22 * self._scale
+      torque_line_height = self._fixed_height * self._scale
+    else:
+      torque_line_offset = np.interp(abs(self._torque_filter.x), [0.5, 1], [22 * self._scale, 26 * self._scale])
+      torque_line_height = np.interp(abs(self._torque_filter.x), [0.5, 1], [14 * self._scale, 56 * self._scale])
 
     # animate alpha and angle span
     if not self._demo:
@@ -262,7 +270,7 @@ class TorqueBar(Widget):
     draw_polygon(rect, sl_pts, gradient=gradient)
 
     # draw center torque bar dot
-    if abs(self._torque_filter.x) < 0.5:
+    if self._center_dot and abs(self._torque_filter.x) < 0.5:
       dot_y = self._rect.y + self._rect.height - torque_line_offset - torque_line_height / 2
       rl.draw_circle(int(cx), int(dot_y), (10 // 2 * self._scale),
                      rl.Color(182, 182, 182, int(255 * 0.9 * self._torque_line_alpha_filter.x)))
