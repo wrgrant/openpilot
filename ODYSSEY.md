@@ -27,6 +27,11 @@ Two repos, five commits in total.
 4. The `HondaEnforceStockLongitudinal` param key goes in `openpilot/common/params_keys.h` and the car-interface param list (`openpilot/sunnypilot/selfdrive/car/interfaces.py`). There is also a Vehicle → Honda toggle, "Nidec: Enforce Factory Longitudinal Control" (`openpilot/selfdrive/ui/sunnypilot/layouts/settings/vehicle/brands/honda.py`). It can only be changed offroad, it has a confirm dialog, it is disabled on Bosch, and it uses `gui_app.push_widget`.
 5. This file.
 
+**`wrgrant/openpilot`, branch `odyssey-ui`** (on top of `odyssey-stock-long`), UI additions:
+
+6. *Lead chevron with factory longitudinal.* `openpilot/selfdrive/ui/onroad/model_renderer.py` draws the lead chevron and Chevron Info (distance, speed, time-to-collision) whenever `radarState` is valid. Upstream only draws them when openpilot does longitudinal.
+7. *Steering position indicator.* `openpilot/selfdrive/ui/sunnypilot/onroad/steering_position.py` draws a bar under the speed showing the wheel between learned full-left and full-right lock. The learned values are stored in `SteerExtentLeftDeg`/`SteerExtentRightDeg`, and the Visuals → Steering Position toggle turns it on and off. Tests are in `openpilot/selfdrive/ui/sunnypilot/onroad/tests/test_steering_position.py`.
+
 The param key matches mvl-boston's fork, so a device that already has it set carries the setting over.
 
 ## Rebasing onto a new sunnypilot release
