@@ -39,12 +39,6 @@ class VisualsLayout(Widget):
         tr("Display steering arc on the driving screen when lateral control is enabled."),
         None,
       ),
-      "SteeringPosition": (
-        lambda: tr("Steering Position"),
-        tr("Show where the steering wheel is between full left and full right lock, under the speed. " +
-           "Full lock on each side is learned from your own steering and remembered."),
-        None,
-      ),
       "RainbowMode": (
         lambda: tr("Enable Tesla Rainbow Mode"),
         tr("A beautiful rainbow effect on the path the model wants to take. " +
