@@ -103,7 +103,8 @@ class ModelRenderer(Widget, ChevronMetrics, ModelRendererSP):
     model = sm['modelV2']
     radar_state = sm['radarState'] if sm.valid['radarState'] else None
     lead_one = radar_state.leadOne if radar_state else None
-    render_lead_indicator = self._longitudinal_control and radar_state is not None
+    # sunnypilot Odyssey: also draw the lead (and its chevron metrics) when the stock ACC does longitudinal
+    render_lead_indicator = radar_state is not None
 
     # Update model data when needed
     model_updated = sm.updated['modelV2']
