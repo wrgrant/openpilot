@@ -9,6 +9,7 @@ from enum import IntEnum
 import pyray as rl
 from openpilot.selfdrive.ui.ui_state import ui_state
 from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui.elements import (
+  SteeringTorquePercentElement, CurveSpeedElement,
   UiElement, RelDistElement, RelSpeedElement, SteeringAngleElement,
   DesiredLateralAccelElement, ActualLateralAccelElement, DesiredSteeringAngleElement,
   AEgoElement, LeadSpeedElement, FrictionCoefficientElement, LatAccelFactorElement,
@@ -53,6 +54,8 @@ class DeveloperUiRenderer(Widget):
     self.steering_torque_elem = SteeringTorqueEpsElement()
     self.bearing_elem = BearingDegElement()
     self.altitude_elem = AltitudeElement()
+    self.steer_torque_pct_elem = SteeringTorquePercentElement()
+    self.curve_speed_elem = CurveSpeedElement()
 
   def _update_state(self) -> None:
     self.dev_ui_mode = ui_state.developer_ui
@@ -82,9 +85,11 @@ class DeveloperUiRenderer(Widget):
     x = int(rect.x + rect.width - container_width - UI_BORDER_SIZE * 2)
     y = int(rect.y + UI_BORDER_SIZE * 1.5)
 
+    # sunnypilot Odyssey: lead distance/speed are on the chevron, so this column shows steering torque and
+    # the curve speed ahead in their place
     elements = [
-      self.rel_dist_elem.update(sm, ui_state.is_metric),
-      self.rel_speed_elem.update(sm, ui_state.is_metric),
+      self.curve_speed_elem.update(sm, ui_state.is_metric),
+      self.steer_torque_pct_elem.update(sm, ui_state.is_metric),
       self.steering_angle_elem.update(sm, ui_state.is_metric),
     ]
     if controls_state.lateralControlState.which() == 'torqueState':

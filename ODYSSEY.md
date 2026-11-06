@@ -30,7 +30,7 @@ Two repos, five commits in total.
 **`wrgrant/openpilot`, branch `odyssey-ui`** (on top of `odyssey-stock-long`), UI additions:
 
 6. *Lead chevron with factory longitudinal.* `openpilot/selfdrive/ui/onroad/model_renderer.py` draws the lead chevron and Chevron Info (distance, speed, time-to-collision) whenever `radarState` is valid. Upstream only draws them when openpilot does longitudinal.
-7. *Steering position indicator.* `openpilot/selfdrive/ui/sunnypilot/onroad/steering_position.py` draws a bar under the speed showing the wheel between learned full-left and full-right lock. The learned values are stored in `SteerExtentLeftDeg`/`SteerExtentRightDeg`, and the Visuals → Steering Position toggle turns it on and off. Tests are in `openpilot/selfdrive/ui/sunnypilot/onroad/tests/test_steering_position.py`.
+7. *Side panel and Steering Arc.* The right-hand developer column (`DevUIInfo`) shows CURVE SPD, STEER TRQ (commanded torque as a % of the car's max, the same signal the Steering Arc draws), steering angle, and desired/actual lateral accel. Lead distance and speed moved to the chevron. The Steering Arc (`TorqueBar`) is on by default. Code: `openpilot/selfdrive/ui/sunnypilot/onroad/developer_ui/elements.py`. Tests: `developer_ui/tests/test_odyssey_elements.py`.
 
 The param key matches mvl-boston's fork, so a device that already has it set carries the setting over.
 

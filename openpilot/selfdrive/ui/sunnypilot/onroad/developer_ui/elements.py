@@ -4,6 +4,7 @@ Copyright (c) 2021-, Haibin Wen, sunnypilot, and a number of other contributors.
 This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
+import numpy as np
 import pyray as rl
 from dataclasses import dataclass
 
@@ -346,3 +347,60 @@ class AltitudeElement(GpsInfoElement):
 
     value = f"{altitude:.1f}" if gps_accuracy != 0.0 else "-"
     return UiElement(value, "ALT.", self.unit, rl.WHITE)
+
+
+class SteeringTorquePercentElement:
+  """The steering torque openpilot is commanding, as a percent of the car's max (the same signal as the Steering Arc)."""
+  def __init__(self):
+    self.unit = "%"
+
+  def update(self, sm, is_metric: bool) -> UiElement:
+    lat_active = sm['carControl'].latActive
+    pct = abs(sm['carOutput'].actuatorsOutput.torque) * 100.0
+    if not lat_active:
+      return UiElement("-", "STEER TRQ", self.unit, rl.WHITE)
+    if pct >= 85:
+      color = rl.Color(255, 0, 0, 255)
+    elif pct >= 60:
+      color = rl.Color(255, 188, 0, 255)
+    else:
+      color = rl.Color(0, 255, 0, 255)
+    return UiElement(f"{pct:.0f}", "STEER TRQ", self.unit, color)
+
+
+CURVE_COMFORT_LAT_ACCEL = 2.0  # m/s^2, same comfort limit as sunnypilot's vision turn speed control
+CURVE_SHOW_LAT_ACCEL = 1.3     # only call it a curve once the predicted lateral accel passes this (vision SCC "entering")
+CURVE_MIN_SPEED = 5.0          # m/s
+
+
+class CurveSpeedElement:
+  """Comfortable speed for the sharpest curve the driving model sees ahead.
+
+  Same estimate as sunnypilot's vision turn speed control: the 97th-percentile predicted lateral
+  acceleration over the model's plan, turned into a curvature at the current speed, then the speed
+  that keeps lateral acceleration at 2 m/s^2. The stock ACC won't slow for curves, so this is advice.
+  """
+  def __init__(self):
+    self.unit = "mph"
+
+  @staticmethod
+  def curve_speed(rate_plan, vel_plan, v_ego: float) -> float | None:
+    if v_ego < CURVE_MIN_SPEED or len(rate_plan) == 0 or len(rate_plan) != len(vel_plan):
+      return None
+    pred_lat_accels = np.abs(np.asarray(rate_plan, dtype=float)) * np.asarray(vel_plan, dtype=float)
+    max_pred_lat_acc = float(np.percentile(pred_lat_accels, 97))
+    if max_pred_lat_acc < CURVE_SHOW_LAT_ACCEL:
+      return None
+    max_curve = max_pred_lat_acc / v_ego ** 2
+    return float((CURVE_COMFORT_LAT_ACCEL / max_curve) ** 0.5)
+
+  def update(self, sm, is_metric: bool) -> UiElement:
+    self.unit = "km/h" if is_metric else "mph"
+    conversion = CV.MS_TO_KPH if is_metric else CV.MS_TO_MPH
+    v_ego = sm['carState'].vEgo
+    model = sm['modelV2']
+    v_curve = self.curve_speed(model.orientationRate.z, model.velocity.x, v_ego)
+    if v_curve is None or v_curve >= v_ego:
+      return UiElement("-", "CURVE SPD", self.unit, rl.WHITE)
+    color = rl.Color(255, 0, 0, 255) if v_curve < v_ego - 2.2 else rl.Color(255, 188, 0, 255)  # red when >5 mph over
+    return UiElement(f"{v_curve * conversion:.0f}", "CURVE SPD", self.unit, color)
