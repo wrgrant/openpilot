@@ -16,6 +16,7 @@ from openpilot.selfdrive.ui.sunnypilot.onroad.smart_cruise_control import SmartC
 from openpilot.selfdrive.ui.sunnypilot.onroad.turn_signal import TurnSignalController
 from openpilot.selfdrive.ui.sunnypilot.onroad.circular_alerts import CircularAlertsRenderer
 from openpilot.selfdrive.ui.sunnypilot.onroad.speed_renderer import SpeedRenderer
+from openpilot.selfdrive.ui.sunnypilot.onroad.steering_position import SteeringPositionIndicator
 from openpilot.selfdrive.ui.ui_state import ui_state, UIStatus
 from openpilot.selfdrive.ui.onroad.hud_renderer import HudRenderer, UI_CONFIG, FONT_SIZES, COLORS, CRUISE_DISABLED_CHAR
 from openpilot.system.ui.lib.application import gui_app
@@ -37,6 +38,7 @@ class HudRendererSP(HudRenderer):
     self.circular_alerts_renderer = CircularAlertsRenderer()
     self.speed_renderer = SpeedRenderer()
     self._torque_bar = TorqueBar(scale=3.0, always=True)
+    self.steering_position = SteeringPositionIndicator()
 
     self.pcm_cruise_speed: bool = True
     self.show_icbm_status: bool = False
@@ -136,6 +138,9 @@ class HudRendererSP(HudRenderer):
       if ui_state.developer_ui in (DeveloperUiState.BOTTOM, DeveloperUiState.BOTH):
         torque_rect = rl.Rectangle(rect.x, rect.y, rect.width, rect.height - get_bottom_dev_ui_offset())
       self._torque_bar.render(torque_rect)
+
+    if ui_state.steering_position:
+      self.steering_position.render(rect)
 
     self.developer_ui.render(rect)
     self.road_name_renderer.render(rect)
