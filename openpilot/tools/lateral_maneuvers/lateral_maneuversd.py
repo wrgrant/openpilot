@@ -108,7 +108,12 @@ def main():
   sm = messaging.SubMaster(['carState', 'carControl', 'controlsState', 'selfdriveState', 'modelV2'], poll='modelV2')
   pm = messaging.PubMaster(['lateralManeuverPlan', 'alertDebug'])
 
-  maneuvers = iter(MANEUVERS)
+  suite = params.get("LateralManeuverSuite", return_default=True)
+  if suite == "odyssey":
+    from openpilot.tools.lateral_maneuvers.odyssey_suite import maneuvers as odyssey_maneuvers
+    maneuvers = iter(odyssey_maneuvers())
+  else:
+    maneuvers = iter(MANEUVERS)
   maneuver = None
   complete_cnt = 0
   aborted_cnt = 0
