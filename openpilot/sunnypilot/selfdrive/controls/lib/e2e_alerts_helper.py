@@ -15,6 +15,9 @@ from openpilot.sunnypilot.selfdrive.selfdrived.events import EventsSP
 GREEN_LIGHT_X_THRESHOLD = 30
 LEAD_DEPART_DIST_THRESHOLD = 1.0
 TRIGGER_TIMER_THRESHOLD = 0.3
+# GreenLightAlertDelay (button index) -> seconds to wait after the light turns green before chiming. Lifting
+# off the brake, pressing the gas or moving in that time means the driver has noticed, so there is no chime.
+GREEN_LIGHT_DELAYS = (0.0, 0.5, 1.0, 1.5)
 
 
 class E2EStates:
@@ -34,6 +37,10 @@ class E2EAlertsHelper:
 
     self.green_light_alert = False
     self.green_light_alert_enabled = self._params.get_bool("GreenLightAlert")
+    self.green_light_delay = self._read_green_light_delay()
+    self.green_light_go_timer = 0
+    self.green_light_brake_at_go = False
+    self.green_light_driver_reacted = False
     self.lead_depart_alert = False
     self.lead_depart_alert_enabled = self._params.get_bool("LeadDepartAlert")
 
@@ -50,9 +57,14 @@ class E2EAlertsHelper:
     self.lead_depart_confirmed_lead = False
     self.lead_depart_armed = False
 
+  def _read_green_light_delay(self) -> float:
+    idx = self._params.get("GreenLightAlertDelay", return_default=True)
+    return GREEN_LIGHT_DELAYS[idx] if isinstance(idx, int) and 0 <= idx < len(GREEN_LIGHT_DELAYS) else 0.0
+
   def _read_params(self) -> None:
     if self.frame % int(PARAMS_UPDATE_PERIOD / DT_MDL) == 0:
       self.green_light_alert_enabled = self._params.get_bool("GreenLightAlert")
+      self.green_light_delay = self._read_green_light_delay()
       self.lead_depart_alert_enabled = self._params.get_bool("LeadDepartAlert")
 
   def update_alert_trigger(self, sm: messaging.SubMaster):
@@ -82,9 +94,20 @@ class E2EAlertsHelper:
         self.green_light_trigger_timer = 0
 
       if self.green_light_trigger_timer * DT_MDL > TRIGGER_TIMER_THRESHOLD:
-        green_light_trigger = True
+        # the light has turned green: give the driver green_light_delay to react on their own first
+        if self.green_light_go_timer == 0:
+          self.green_light_brake_at_go = CS.brakePressed
+        self.green_light_go_timer += 1
+        if self.green_light_brake_at_go and not CS.brakePressed:
+          self.green_light_driver_reacted = True
+        green_light_trigger = not self.green_light_driver_reacted and \
+                              (self.green_light_go_timer - 1) * DT_MDL >= self.green_light_delay - 1e-6
+      else:
+        self.green_light_go_timer = 0
     elif self.green_light_state != E2EStates.ARMED:
       self.green_light_trigger_timer = 0
+      self.green_light_go_timer = 0
+      self.green_light_driver_reacted = False
 
     # Lead Departure Alert
     close_lead_valid = self.has_lead and lead_dRel < 8.0

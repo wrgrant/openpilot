@@ -112,6 +112,14 @@ class VisualsLayout(Widget):
       param="ChevronInfo",
       inline=False
     )
+    self._green_light_delay = multiple_button_item_sp(
+      title=lambda: tr("Green Light Chime Delay"),
+      description=lambda: tr("How long to wait after the light turns green before chiming. " +
+                             "Lifting off the brake, pressing the gas or moving in that time skips the chime."),
+      buttons=[lambda: tr("Off"), lambda: tr("0.5 s"), lambda: tr("1 s"), lambda: tr("1.5 s")],
+      param="GreenLightAlertDelay",
+      inline=False
+    )
     self._dev_ui_info = multiple_button_item_sp(
       title=lambda: tr("Developer UI"),
       description=lambda: tr("Display real-time parameters and metrics from various sources."),
@@ -121,7 +129,9 @@ class VisualsLayout(Widget):
       inline=False
     )
 
-    items = list(self._toggles.values()) + [
+    toggles = list(self._toggles.values())
+    green = list(self._toggles).index("GreenLightAlert") + 1
+    items = toggles[:green] + [self._green_light_delay] + toggles[green:] + [
       self._chevron_info,
       self._dev_ui_info,
     ]
@@ -134,6 +144,8 @@ class VisualsLayout(Widget):
       self._toggles[param].action_item.set_state(self._params.get_bool(param))
 
     self._dev_ui_info.action_item.set_selected_button(ui_state.params.get("DevUIInfo", return_default=True))
+    self._green_light_delay.action_item.set_selected_button(ui_state.params.get("GreenLightAlertDelay", return_default=True))
+    self._green_light_delay.action_item.set_enabled(self._params.get_bool("GreenLightAlert"))
 
     if ui_state.has_longitudinal_control:
       self._chevron_info.set_description(tr(CHEVRON_INFO_DESCRIPTION["enabled"]))
