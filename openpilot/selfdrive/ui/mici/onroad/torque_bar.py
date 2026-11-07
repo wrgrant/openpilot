@@ -150,17 +150,17 @@ def arc_bar_pts(r_mid: float, thickness: float,
 
 DEFAULT_MAX_LAT_ACCEL = 3.0  # m/s^2
 
-# Meter style: zones along each half of the arc, as fractions of the end stop, like the LED bands on a VU meter.
+# Meter style: zones along each half of the arc, as fractions of the end stop, like the colour bands on a VU meter.
 METER_ZONES = (
-  (0.0, 0.6, (255, 255, 255), 0.22, 0),  # (start, end, colour, alpha of the unlit track, LEDs with led_zones)
-  (0.6, 0.85, (255, 200, 0), 0.28, 3),
-  (0.85, 1.0, (255, 60, 0), 0.32, 2),
+  (0.0, 0.6, (255, 255, 255), 0.22),  # (start, end, colour, alpha of the unlit track)
+  (0.6, 0.85, (255, 200, 0), 0.28),
+  (0.85, 1.0, (255, 60, 0), 0.32),
 )
 
 
 class TorqueBar(Widget):
   def __init__(self, demo: bool = False, scale: float = 1.0, always: bool = False,
-               fixed_height: float | None = None, center_dot: bool = True, meter: bool = False, leds: int = 0, led_zones: bool = False):
+               fixed_height: float | None = None, center_dot: bool = True, meter: bool = False):
     super().__init__()
     self._demo = demo
     self._scale = scale
@@ -168,12 +168,9 @@ class TorqueBar(Widget):
     # fixed_height (unscaled px): keep the arc one thickness instead of swelling as torque rises past 50%
     self._fixed_height = fixed_height
     self._center_dot = center_dot
-    # meter: draw the arc as separate white, yellow and red zones with hard edges; the unlit track shows
-    # where each zone starts. leds > 0 further splits each half into that many LEDs that light whole.
+    # meter: draw the arc as separate white, yellow and red zones with square seams; the unlit track shows
+    # where each zone starts, and the fill runs through each zone in its colour to the actual value.
     self._meter = meter
-    self._leds = leds
-    # led_zones: the white zone fills smoothly and the yellow and red zones light as whole LEDs
-    self._led_zones = led_zones
     self._torque_filter = FirstOrderFilter(0, 0.1, 1 / gui_app.target_fps)
     self._torque_line_alpha_filter = FirstOrderFilter(0.0, 0.1, 1 / gui_app.target_fps)
 
@@ -301,7 +298,7 @@ class TorqueBar(Widget):
     level = abs(x)
     side = 1 if x >= 0 else -1
     span_px = np.deg2rad(half_span) * mid_r  # arc length of one half, in px
-    g = 1 * self._scale / span_px  # half the gap between zones/LEDs, as a fraction of the half span
+    g = 1 * self._scale / span_px  # half the gap between zones, as a fraction of the half span
     round_cap = 7 * self._scale
     square = 0.5  # px: a square end
 
@@ -323,46 +320,23 @@ class TorqueBar(Widget):
       pts = arc_bar_pts.__wrapped__(mid_r, height, a0, a1, cap_left=cl, cap_right=cr) + offset
       draw_polygon(rect, pts, color=rl.Color(*color, int(255 * a * alpha)))
 
-    if self._leds > 0:
-      for s in (-1, 1):
-        for i in range(self._leds):
-          lo, hi = i / self._leds, (i + 1) / self._leds
-          _, _, color, track_a, _ = next(z for z in METER_ZONES if (lo + hi) / 2 <= z[1])
-          lit = engaged and s == side and level >= (lo + hi) / 2
-          piece(s * (lo + g), s * (hi - g), color, 0.9 if lit else track_a)
-      return
-
     def bounds(lo: float, hi: float):
       # inner edges sit half a gap from each zone boundary; the centre and the outer stops get no gap
       return (lo + g if lo > 0 else 0.0), (hi - g if hi < 1 else 1.0)
 
-    lit_a = 0.9 if engaged else 0.35
-
-    def fill_color(color):
-      return color if engaged else (255, 255, 255)
-
-    # unlit track: one white piece across the middle, then the outer zones on each side
-    for lo, hi, color, track_a, n in METER_ZONES:
+    # unlit track: one white piece across the middle, then the yellow and red zones on each side
+    for lo, hi, color, track_a in METER_ZONES:
       start, end = bounds(lo, hi)
       if lo == 0:
         piece(-end, end, color, track_a)
-      elif self._led_zones and n > 0:
-        for i in range(n):
-          c0, c1 = lo + (hi - lo) * i / n, lo + (hi - lo) * (i + 1) / n
-          c0, c1 = c0 + g, (c1 - g if c1 < 1 else 1.0)
-          lit = level >= (c0 + c1) / 2
-          for s in (-1, 1):
-            on = lit and s == side
-            piece(s * c0, s * c1, fill_color(color) if on else color, lit_a if on else track_a, rounded=True)
       else:
         piece(-start, -end, color, track_a, rounded=True)
         piece(start, end, color, track_a, rounded=True)
 
-    # lit part: fills from the centre, zone by zone, in each zone's own colour
-    for lo, hi, color, _, n in METER_ZONES:
+    # lit part: fills from the centre, zone by zone, in each zone's own colour, to the actual value
+    for lo, hi, color, _ in METER_ZONES:
       start, end = bounds(lo, hi)
       if level <= start:
         break
-      if self._led_zones and n > 0:
-        continue  # drawn whole above
-      piece(side * start, side * min(level, end), fill_color(color), lit_a, rounded=True)
+      fill = color if engaged else (255, 255, 255)
+      piece(side * start, side * min(level, end), fill, 0.9 if engaged else 0.35, rounded=True)
