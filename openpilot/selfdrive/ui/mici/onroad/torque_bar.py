@@ -6,7 +6,6 @@ from collections import OrderedDict
 import numpy as np
 import pyray as rl
 from opendbc.car import ACCELERATION_DUE_TO_GRAVITY
-from openpilot.selfdrive.ui.mici.onroad import blend_colors
 from openpilot.selfdrive.ui.ui_state import ui_state, UIStatus
 from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.ui.lib.shader_polygon import draw_polygon, Gradient
@@ -235,36 +234,31 @@ class TorqueBar(Widget):
     a1s = a0s + torque_bg_angle_span / 2 * self._torque_filter.x
     sl_pts = arc_bar_pts(mid_r, torque_line_height, a0s, a1s, cap_radius=7 * self._scale) + offset
 
-    # draw beautiful gradient from center to 65% of the bg torque bar width
-    start_grad_pt = cx / rect.width
-    if self._torque_filter.x < 0:
-      end_grad_pt = (cx * (1 - 0.65) + (min(bg_pts[:, 0]) * 0.65)) / rect.width
-    else:
-      end_grad_pt = (cx * (1 - 0.65) + (max(bg_pts[:, 0]) * 0.65)) / rect.width
-
-    # fade to orange as we approach max torque
-    start_color = blend_colors(
-      rl.Color(255, 255, 255, int(255 * 0.9 * self._torque_line_alpha_filter.x)),
-      rl.Color(255, 200, 0, int(255 * self._torque_line_alpha_filter.x)),  # yellow
-      max(0, abs(self._torque_filter.x) - 0.75) * 4,
-    )
-    end_color = blend_colors(
-      rl.Color(255, 255, 255, int(255 * 0.9 * self._torque_line_alpha_filter.x)),
-      rl.Color(255, 115, 0, int(255 * self._torque_line_alpha_filter.x)),  # orange
-      max(0, abs(self._torque_filter.x) - 0.75) * 4,
-    )
+    # Colour by position along the arc, not by overall effort: the normal range near the centre
+    # stays white and only the part of the bar that reaches out past it warms to yellow, then a
+    # deep orange at the end stop, so the darkest colour is always at the tip.
+    tip_x = min(bg_pts[:, 0]) if self._torque_filter.x < 0 else max(bg_pts[:, 0])
+    alpha = self._torque_line_alpha_filter.x
+    colors = [
+      rl.Color(255, 255, 255, int(255 * 0.9 * alpha)),  # centre: normal effort
+      rl.Color(255, 255, 255, int(255 * 0.9 * alpha)),
+      rl.Color(255, 200, 0, int(255 * alpha)),  # yellow
+      rl.Color(255, 90, 0, int(255 * alpha)),  # deep orange at the end stop
+    ]
+    stops = [0.0, 0.5, 0.75, 1.0]
 
     if ui_state.status not in (UIStatus.ENGAGED, UIStatus.LAT_ONLY) and not self._demo:
-      start_color = end_color = rl.Color(255, 255, 255, int(255 * 0.35 * self._torque_line_alpha_filter.x))
+      colors = [rl.Color(255, 255, 255, int(255 * 0.35 * alpha))] * 2
+      stops = [0.0, 1.0]
 
+    # The shader puts colors[0] at `end` and the last colour at `start`, and it measures in screen
+    # pixels from origin_rect's corner, so pass the tip as start and the centre as end, both
+    # relative to rect.
     gradient = Gradient(
-      start=(start_grad_pt, 0),
-      end=(end_grad_pt, 0),
-      colors=[
-        start_color,
-        end_color,
-      ],
-      stops=[0.0, 1.0],
+      start=((tip_x - rect.x) / rect.width, 0),
+      end=((cx - rect.x) / rect.width, 0),
+      colors=colors,
+      stops=stops,
     )
 
     draw_polygon(rect, sl_pts, gradient=gradient)
