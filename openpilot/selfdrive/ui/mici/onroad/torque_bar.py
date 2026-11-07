@@ -47,13 +47,10 @@ def quantized_lru_cache(maxsize=128):
 def arc_bar_pts(r_mid: float, thickness: float,
                 a0_deg: float, a1_deg: float,
                 *, max_points: int = 100, cap_segs: int = 10,
-                cap_radius: float = 7, px_per_seg: float = 2.0,
-                cap_left: float | None = None, cap_right: float | None = None) -> np.ndarray:
-  """Return Nx2 np.float32 points for a single closed polygon (rounded thick arc), centered at origin.
+                cap_radius: float = 7, px_per_seg: float = 2.0) -> np.ndarray:
+  """Return Nx2 np.float32 points for a single closed polygon (rounded thick arc), centered at origin."""
 
-  cap_left/cap_right override cap_radius at the lower-angle/higher-angle end; a tiny radius gives a square end."""
-
-  def get_cap(left: bool, a_deg: float, cap_radius: float):
+  def get_cap(left: bool, a_deg: float):
     # end cap at a1: center (a1), sweep a1→a1+180 (skip endpoints to avoid dupes)
     # quarter arc (outer corner) at a1 with fixed pixel radius cap_radius
 
@@ -104,8 +101,6 @@ def arc_bar_pts(r_mid: float, thickness: float,
   half = thickness * 0.5
 
   cap_radius = min(cap_radius, half)
-  cap_left = cap_radius if cap_left is None else min(cap_left, half)
-  cap_right = cap_radius if cap_right is None else min(cap_right, half)
 
   span = max(1e-3, a1_deg - a0_deg)
 
@@ -121,7 +116,7 @@ def arc_bar_pts(r_mid: float, thickness: float,
                 np.sin(ang_o) * (r_mid + half)]
 
   # end cap at a1
-  cap_end = get_cap(False, a1_deg, cap_right)
+  cap_end = get_cap(False, a1_deg)
 
   # inner arc a1→a0
   ang_i = np.deg2rad(np.linspace(a1_deg, a0_deg, arc_segs + 1))
@@ -129,7 +124,7 @@ def arc_bar_pts(r_mid: float, thickness: float,
                 np.sin(ang_i) * (r_mid - half)]
 
   # start cap at a0
-  cap_start = get_cap(True, a0_deg, cap_left)
+  cap_start = get_cap(True, a0_deg)
 
   pts = np.vstack((outer, cap_end, inner, cap_start, outer[:1])).astype(np.float32)
 
@@ -171,6 +166,7 @@ class TorqueBar(Widget):
     # meter: draw the arc as separate white, yellow and red zones with square seams; the unlit track shows
     # where each zone starts, and the fill runs through each zone in its colour to the actual value.
     self._meter = meter
+    self._at_limit = False  # commanded effort is pinned at 100%, the state that leads to the take-over alert
     self._torque_filter = FirstOrderFilter(0, 0.1, 1 / gui_app.target_fps)
     self._torque_line_alpha_filter = FirstOrderFilter(0.0, 0.1, 1 / gui_app.target_fps)
 
@@ -201,11 +197,13 @@ class TorqueBar(Widget):
       max_lateral_acceleration = ui_state.CP.maxLateralAccel if ui_state.CP else DEFAULT_MAX_LAT_ACCEL
 
       if not car_control.latActive:
-        self._torque_filter.update(0.0)
+        raw = 0.0
       else:
-        self._torque_filter.update(np.clip((lateral_acceleration + accel_diff) / max_lateral_acceleration, -1, 1))
+        raw = (lateral_acceleration + accel_diff) / max_lateral_acceleration
     else:
-      self._torque_filter.update(-ui_state.sm['carOutput'].actuatorsOutput.torque)
+      raw = -ui_state.sm['carOutput'].actuatorsOutput.torque
+    self._at_limit = abs(raw) >= 0.999
+    self._torque_filter.update(float(np.clip(raw, -1, 1)))
 
   def _render(self, rect: rl.Rectangle) -> None:
     # adjust y pos with torque
@@ -299,26 +297,33 @@ class TorqueBar(Widget):
     side = 1 if x >= 0 else -1
     span_px = np.deg2rad(half_span) * mid_r  # arc length of one half, in px
     g = 1 * self._scale / span_px  # half the gap between zones, as a fraction of the half span
-    round_cap = 7 * self._scale
-    square = 0.5  # px: a square end
+    half = height / 2
+    corner = min(7 * self._scale, half)  # radius of the rounded corners at the two outer stops
 
-    def piece(f0: float, f1: float, color: tuple[int, int, int], a: float, rounded: bool = False):
-      """Draw the arc between signed fractions f0..f1 of the half span (negative = left).
-
-      Ends at the outer stops (|f| == 1) are rounded when `rounded`; every other end is square."""
+    def ribbon(f0: float, f1: float, t0: float | None = None, t1: float | None = None) -> np.ndarray:
+      """Points for the zone shape between signed fractions f0..f1 of the half span (negative = left),
+      drawn only from t0 to t1 within it. Corners are rounded only where the shape meets an outer stop,
+      and a part cut short inside a rounded end follows that rounding. Returns [outer..., inner reversed...]
+      as draw_polygon expects."""
       f0, f1 = sorted((f0, f1))
-      length = (f1 - f0) * span_px
-      if length < 1:
-        return
-      cap = min(round_cap, length / 2)
-      cl = cap if rounded and f0 <= -1 else square
-      cr = cap if rounded and f1 >= 1 else square
-      # arc_bar_pts draws each end cap px past its angle, so pull each end in by its cap
-      a0 = top_angle + half_span * (f0 + cl / span_px)
-      a1 = top_angle + half_span * max(f0 + cl / span_px, f1 - cr / span_px)
-      # skip arc_bar_pts' cache: it snaps angles to 0.1° (~6 px here), which makes the seams uneven
-      pts = arc_bar_pts.__wrapped__(mid_r, height, a0, a1, cap_left=cl, cap_right=cr) + offset
-      draw_polygon(rect, pts, color=rl.Color(*color, int(255 * a * alpha)))
+      t0, t1 = sorted((f0 if t0 is None else max(f0, t0), f1 if t1 is None else min(f1, t1)))
+      if (t1 - t0) * span_px < 1:
+        return np.empty((0, 2), dtype=np.float32)
+      s = np.linspace(t0, t1, max(8, int((t1 - t0) * span_px / 3)) + 1) * span_px  # arc length from the centre, px
+      inset = np.zeros_like(s)
+      for stop, rounded in ((f0 * span_px, f0 <= -1), (f1 * span_px, f1 >= 1)):
+        if rounded:
+          d = np.clip(corner - np.abs(s - stop), 0, corner)  # how far into the corner each sample is
+          inset = np.maximum(inset, corner - np.sqrt(corner ** 2 - d ** 2))
+      ang = np.deg2rad(top_angle + half_span * s / span_px)
+      r_out, r_in = mid_r + half - inset, mid_r - half + inset
+      outer = np.c_[np.cos(ang) * r_out, np.sin(ang) * r_out]
+      inner = np.c_[np.cos(ang) * r_in, np.sin(ang) * r_in][::-1]
+      return (np.vstack((outer, inner)) + offset).astype(np.float32)
+
+    def fill(pts: np.ndarray, color: tuple[int, int, int], a: float):
+      if len(pts):
+        draw_polygon(rect, pts, color=rl.Color(*color, int(255 * a * alpha)))
 
     def bounds(lo: float, hi: float):
       # inner edges sit half a gap from each zone boundary; the centre and the outer stops get no gap
@@ -328,15 +333,23 @@ class TorqueBar(Widget):
     for lo, hi, color, track_a in METER_ZONES:
       start, end = bounds(lo, hi)
       if lo == 0:
-        piece(-end, end, color, track_a)
+        fill(ribbon(-end, end), color, track_a)
       else:
-        piece(-start, -end, color, track_a, rounded=True)
-        piece(start, end, color, track_a, rounded=True)
+        fill(ribbon(-end, -start), color, track_a)
+        fill(ribbon(start, end), color, track_a)
 
-    # lit part: fills from the centre, zone by zone, in each zone's own colour, to the actual value
+    # lit part: each zone's own shape, filled from the centre to the actual value, in that zone's colour
     for lo, hi, color, _ in METER_ZONES:
       start, end = bounds(lo, hi)
       if level <= start:
         break
-      fill = color if engaged else (255, 255, 255)
-      piece(side * start, side * min(level, end), fill, 0.9 if engaged else 0.35, rounded=True)
+      zone = (-end, -start) if side < 0 else (start, end)
+      cut = (-level, 0.0) if side < 0 else (0.0, level)
+      fill(ribbon(*zone, *cut), color if engaged else (255, 255, 255), 0.9 if engaged else 0.35)
+
+    # pinned at 100%: outline the whole bar in red
+    at_limit = level >= 0.999 if self._demo else self._at_limit
+    if at_limit and engaged:
+      pts = ribbon(-1.0, 1.0)
+      loop = [rl.Vector2(float(px), float(py)) for px, py in np.vstack((pts, pts[:1]))]
+      rl.draw_spline_linear(loop, len(loop), 2 * self._scale, rl.Color(255, 40, 0, int(255 * alpha)))
