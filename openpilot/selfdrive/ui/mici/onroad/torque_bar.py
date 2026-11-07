@@ -145,10 +145,17 @@ def arc_bar_pts(r_mid: float, thickness: float,
 
 DEFAULT_MAX_LAT_ACCEL = 3.0  # m/s^2
 
+# Meter style: zones along each half of the arc, as fractions of the end stop, like the LED bands on a VU meter.
+METER_ZONES = (
+  (0.0, 0.6, (255, 255, 255), 0.22),  # (start, end, colour, alpha of the unlit track)
+  (0.6, 0.85, (255, 200, 0), 0.28),
+  (0.85, 1.0, (255, 60, 0), 0.32),
+)
+
 
 class TorqueBar(Widget):
   def __init__(self, demo: bool = False, scale: float = 1.0, always: bool = False,
-               fixed_height: float | None = None, center_dot: bool = True):
+               fixed_height: float | None = None, center_dot: bool = True, meter: bool = False, leds: int = 0):
     super().__init__()
     self._demo = demo
     self._scale = scale
@@ -156,6 +163,10 @@ class TorqueBar(Widget):
     # fixed_height (unscaled px): keep the arc one thickness instead of swelling as torque rises past 50%
     self._fixed_height = fixed_height
     self._center_dot = center_dot
+    # meter: draw the arc as separate white, yellow and red zones with hard edges; the unlit track shows
+    # where each zone starts. leds > 0 further splits each half into that many LEDs that light whole.
+    self._meter = meter
+    self._leds = leds
     self._torque_filter = FirstOrderFilter(0, 0.1, 1 / gui_app.target_fps)
     self._torque_line_alpha_filter = FirstOrderFilter(0.0, 0.1, 1 / gui_app.target_fps)
 
@@ -225,6 +236,11 @@ class TorqueBar(Widget):
     cy = rect.y + rect.height + torque_line_radius - torque_line_offset
     offset = np.array([cx, cy], dtype=np.float32)
 
+    if self._meter:
+      engaged = self._demo or ui_state.status in (UIStatus.ENGAGED, UIStatus.LAT_ONLY)
+      self._draw_meter(rect, offset, mid_r, torque_line_height, top_angle, torque_bg_angle_span / 2, engaged)
+      return
+
     # draw bg torque indicator line
     bg_pts = arc_bar_pts(mid_r, torque_line_height, torque_start_angle, torque_end_angle, cap_radius=7 * self._scale) + offset
     draw_polygon(rect, bg_pts, color=torque_line_bg_color)
@@ -268,3 +284,52 @@ class TorqueBar(Widget):
       dot_y = self._rect.y + self._rect.height - torque_line_offset - torque_line_height / 2
       rl.draw_circle(int(cx), int(dot_y), (10 // 2 * self._scale),
                      rl.Color(182, 182, 182, int(255 * 0.9 * self._torque_line_alpha_filter.x)))
+
+  def _draw_meter(self, rect: rl.Rectangle, offset: np.ndarray, mid_r: float, height: float,
+                  top_angle: float, half_span: float, engaged: bool) -> None:
+    alpha = self._torque_line_alpha_filter.x
+    if half_span <= 0:
+      return
+    x = float(self._torque_filter.x)
+    level = abs(x)
+    side = 1 if x >= 0 else -1
+    span_px = np.deg2rad(half_span) * mid_r  # arc length of one half, in px
+    g = 1.5 * self._scale / span_px  # half the gap between zones/LEDs, as a fraction of the half span
+
+    def piece(f0: float, f1: float, color: tuple[int, int, int], a: float):
+      """Draw the arc between signed fractions f0..f1 of the half span (negative = left)."""
+      f0, f1 = sorted((f0, f1))
+      length = (f1 - f0) * span_px
+      if length < 1:
+        return
+      # arc_bar_pts draws each rounded end cap_radius past its angle, so pull the ends in by that much
+      cap = min(7 * self._scale, length / 2)
+      inset = cap / span_px
+      a0 = top_angle + half_span * (f0 + inset)
+      a1 = top_angle + half_span * max(f0 + inset, f1 - inset)
+      pts = arc_bar_pts(mid_r, height, a0, a1, cap_radius=cap) + offset
+      draw_polygon(rect, pts, color=rl.Color(*color, int(255 * a * alpha)))
+
+    if self._leds > 0:
+      for s in (-1, 1):
+        for i in range(self._leds):
+          lo, hi = i / self._leds, (i + 1) / self._leds
+          _, _, color, track_a = next(z for z in METER_ZONES if (lo + hi) / 2 <= z[1])
+          lit = engaged and s == side and level >= (lo + hi) / 2
+          piece(s * (lo + g), s * (hi - g), color, 0.9 if lit else track_a)
+      return
+
+    # unlit track: one white piece across the middle, then the yellow and red zones on each side
+    for lo, hi, color, track_a in METER_ZONES:
+      if lo == 0:
+        piece(-(hi - g), hi - g, color, track_a)
+      else:
+        piece(-(lo + g), -(hi - g), color, track_a)
+        piece(lo + g, hi - g, color, track_a)
+
+    # lit part: fills from the centre, zone by zone, in each zone's own colour
+    for lo, hi, color, _ in METER_ZONES:
+      if level <= lo + g:
+        break
+      start = lo + g if lo > 0 else 0.0
+      piece(side * start, side * min(level, hi - g), color if engaged else (255, 255, 255), 0.9 if engaged else 0.35)
