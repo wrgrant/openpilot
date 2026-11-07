@@ -47,10 +47,13 @@ def quantized_lru_cache(maxsize=128):
 def arc_bar_pts(r_mid: float, thickness: float,
                 a0_deg: float, a1_deg: float,
                 *, max_points: int = 100, cap_segs: int = 10,
-                cap_radius: float = 7, px_per_seg: float = 2.0) -> np.ndarray:
-  """Return Nx2 np.float32 points for a single closed polygon (rounded thick arc), centered at origin."""
+                cap_radius: float = 7, px_per_seg: float = 2.0,
+                cap_left: float | None = None, cap_right: float | None = None) -> np.ndarray:
+  """Return Nx2 np.float32 points for a single closed polygon (rounded thick arc), centered at origin.
 
-  def get_cap(left: bool, a_deg: float):
+  cap_left/cap_right override cap_radius at the lower-angle/higher-angle end; a tiny radius gives a square end."""
+
+  def get_cap(left: bool, a_deg: float, cap_radius: float):
     # end cap at a1: center (a1), sweep a1→a1+180 (skip endpoints to avoid dupes)
     # quarter arc (outer corner) at a1 with fixed pixel radius cap_radius
 
@@ -101,6 +104,8 @@ def arc_bar_pts(r_mid: float, thickness: float,
   half = thickness * 0.5
 
   cap_radius = min(cap_radius, half)
+  cap_left = cap_radius if cap_left is None else min(cap_left, half)
+  cap_right = cap_radius if cap_right is None else min(cap_right, half)
 
   span = max(1e-3, a1_deg - a0_deg)
 
@@ -116,7 +121,7 @@ def arc_bar_pts(r_mid: float, thickness: float,
                 np.sin(ang_o) * (r_mid + half)]
 
   # end cap at a1
-  cap_end = get_cap(False, a1_deg)
+  cap_end = get_cap(False, a1_deg, cap_right)
 
   # inner arc a1→a0
   ang_i = np.deg2rad(np.linspace(a1_deg, a0_deg, arc_segs + 1))
@@ -124,7 +129,7 @@ def arc_bar_pts(r_mid: float, thickness: float,
                 np.sin(ang_i) * (r_mid - half)]
 
   # start cap at a0
-  cap_start = get_cap(True, a0_deg)
+  cap_start = get_cap(True, a0_deg, cap_left)
 
   pts = np.vstack((outer, cap_end, inner, cap_start, outer[:1])).astype(np.float32)
 
@@ -294,20 +299,25 @@ class TorqueBar(Widget):
     level = abs(x)
     side = 1 if x >= 0 else -1
     span_px = np.deg2rad(half_span) * mid_r  # arc length of one half, in px
-    g = 1.5 * self._scale / span_px  # half the gap between zones/LEDs, as a fraction of the half span
+    g = 1 * self._scale / span_px  # half the gap between zones/LEDs, as a fraction of the half span
+    round_cap = 7 * self._scale
+    square = 0.5  # px: a square end
 
-    def piece(f0: float, f1: float, color: tuple[int, int, int], a: float):
-      """Draw the arc between signed fractions f0..f1 of the half span (negative = left)."""
+    def piece(f0: float, f1: float, color: tuple[int, int, int], a: float, rounded: bool = False):
+      """Draw the arc between signed fractions f0..f1 of the half span (negative = left).
+
+      Ends at the outer stops (|f| == 1) are rounded when `rounded`; every other end is square."""
       f0, f1 = sorted((f0, f1))
       length = (f1 - f0) * span_px
       if length < 1:
         return
-      # arc_bar_pts draws each rounded end cap_radius past its angle, so pull the ends in by that much
-      cap = min(7 * self._scale, length / 2)
-      inset = cap / span_px
-      a0 = top_angle + half_span * (f0 + inset)
-      a1 = top_angle + half_span * max(f0 + inset, f1 - inset)
-      pts = arc_bar_pts(mid_r, height, a0, a1, cap_radius=cap) + offset
+      cap = min(round_cap, length / 2)
+      cl = cap if rounded and f0 <= -1 else square
+      cr = cap if rounded and f1 >= 1 else square
+      # arc_bar_pts draws each end cap px past its angle, so pull each end in by its cap
+      a0 = top_angle + half_span * (f0 + cl / span_px)
+      a1 = top_angle + half_span * max(f0 + cl / span_px, f1 - cr / span_px)
+      pts = arc_bar_pts(mid_r, height, a0, a1, cap_left=cl, cap_right=cr) + offset
       draw_polygon(rect, pts, color=rl.Color(*color, int(255 * a * alpha)))
 
     if self._leds > 0:
@@ -319,17 +329,22 @@ class TorqueBar(Widget):
           piece(s * (lo + g), s * (hi - g), color, 0.9 if lit else track_a)
       return
 
+    def bounds(lo: float, hi: float):
+      # inner edges sit half a gap from each zone boundary; the centre and the outer stops get no gap
+      return (lo + g if lo > 0 else 0.0), (hi - g if hi < 1 else 1.0)
+
     # unlit track: one white piece across the middle, then the yellow and red zones on each side
     for lo, hi, color, track_a in METER_ZONES:
+      start, end = bounds(lo, hi)
       if lo == 0:
-        piece(-(hi - g), hi - g, color, track_a)
+        piece(-end, end, color, track_a)
       else:
-        piece(-(lo + g), -(hi - g), color, track_a)
-        piece(lo + g, hi - g, color, track_a)
+        piece(-start, -end, color, track_a, rounded=True)
+        piece(start, end, color, track_a, rounded=True)
 
     # lit part: fills from the centre, zone by zone, in each zone's own colour
     for lo, hi, color, _ in METER_ZONES:
-      if level <= lo + g:
+      start, end = bounds(lo, hi)
+      if level <= start:
         break
-      start = lo + g if lo > 0 else 0.0
-      piece(side * start, side * min(level, hi - g), color if engaged else (255, 255, 255), 0.9 if engaged else 0.35)
+      piece(side * start, side * min(level, end), color if engaged else (255, 255, 255), 0.9 if engaged else 0.35, rounded=True)
