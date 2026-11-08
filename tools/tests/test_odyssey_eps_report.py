@@ -20,3 +20,14 @@ def test_breakaway_found_after_coasting():
   (direction, _, torque), = analyze_run(d, np.arange(n), 0.0)["breakaway"]
   assert direction == -1
   assert threshold <= torque <= threshold + 0.01
+
+
+def test_fine_angle_sees_motion_between_ticks():
+  from tools.odyssey_eps_report import fine_angle
+  rng = np.random.default_rng(0)
+  t = np.arange(3000) / 100
+  true = 0.15 * np.sin(2 * np.pi * t / 10)  # slow +-0.15 degree wheel motion
+  rate = np.round((np.gradient(true) * 100 + rng.normal(0, 0.05, len(t))) / 0.1) * 0.1  # 0.1 deg/s steps, noisy
+  reading = np.round(true / 0.1) * 0.1
+  fine = fine_angle(reading, rate)
+  assert np.std(fine - true) < 0.5 * np.std(reading - true)

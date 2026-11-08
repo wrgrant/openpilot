@@ -4,6 +4,10 @@
 Decodes the van's own steering signals from the logged CAN bus at 100 Hz (openpilot's torque command, the EPS motor
 torque, wheel angle and rate, driver torque, the VSA's lateral accel) and, for each maneuver run, measures:
 
+The wheel angle on CAN reads in 0.1 degree steps, but the EPS also reports the wheel's rate in 0.1 deg/s steps, and that
+rate moves before the angle ticks over (it comes from a finer sensor than the angle). fine_angle() integrates the rate
+and keeps it inside the 0.1 degree reading, so the wheel's first ~0.02 degrees of motion are visible.
+
   delay      request change -> motor torque -> wheel angle -> van lateral accel
   breakaway  the command at which the wheel starts to move after each direction change, split left/right and
              away-from-straight / back-toward-straight (is the steering one-sided?)
@@ -22,7 +26,8 @@ import numpy as np
 
 DBC = "honda_odyssey_exl_2018_generated"
 STEER_MAX = 4096
-COLS = ("t", "v", "angle", "rate", "drv_tq", "motor_tq", "cmd_tq", "vsa_lat", "req_la", "maneuver", "pressed")
+COLS = ("t", "v", "angle", "rate", "drv_tq", "motor_tq", "cmd_tq", "vsa_lat", "req_la", "model_la", "maneuver", "pressed")
+MOVED_DEG = 0.02  # wheel motion that counts as "moving", on the fine angle
 
 
 def load(route_dir: str) -> tuple[dict[str, np.ndarray], list[str]]:
@@ -52,6 +57,8 @@ def load(route_dir: str) -> tuple[dict[str, np.ndarray], list[str]]:
           st["cmd_tq"] = cmd.vl["STEERING_CONTROL"]["STEER_TORQUE"]
       elif w == "carState":
         st.update(v=m.carState.vEgo, pressed=float(m.carState.steeringPressed))
+      elif w == "modelV2":
+        st["model_la"] = m.modelV2.action.desiredCurvature * max(st["v"], 1.0) ** 2
       elif w == "alertDebug":
         text = m.alertDebug.alertText2
       elif w == "lateralManeuverPlan":
@@ -63,7 +70,21 @@ def load(route_dir: str) -> tuple[dict[str, np.ndarray], list[str]]:
         else:
           st["maneuver"], st["req_la"] = -1, 0.0
   data = np.array(rows, dtype=float)
-  return {c: data[:, i] for i, c in enumerate(COLS)}, names
+  d = {c: data[:, i] for i, c in enumerate(COLS)}
+  d["fine"] = fine_angle(d["angle"], d["rate"])
+  # the suite rides on lane keeping: the maneuver is the plan minus what the model asked for
+  d["man_la"] = np.where(d["maneuver"] >= 0, d["req_la"] - d["model_la"], 0.0)
+  return d, names
+
+
+def fine_angle(angle: np.ndarray, rate: np.ndarray, dt: float = 0.01) -> np.ndarray:
+  """Wheel angle finer than the 0.1 degree reading: integrate the EPS rate, held inside the reading's step."""
+  out = np.empty_like(angle)
+  x = angle[0]
+  for i in range(len(angle)):
+    x = min(max(x + rate[i] * dt, angle[i] - 0.05), angle[i] + 0.05)
+    out[i] = x
+  return out
 
 
 def runs(d: dict[str, np.ndarray]) -> list[np.ndarray]:
@@ -86,9 +107,13 @@ def reversed_by(x: np.ndarray, direction: float, amount: float) -> np.ndarray:
 
 
 def analyze_run(d: dict[str, np.ndarray], r: np.ndarray, center: float) -> dict:
-  t, req, cmd, ang = d["t"][r], d["req_la"][r], -d["cmd_tq"][r], d["angle"][r]  # -cmd: + = toward +angle (left)
+  fine = "fine" in d
+  t, cmd = d["t"][r], -d["cmd_tq"][r]  # -cmd: + = toward +angle (left)
+  req = d["man_la"][r] if "man_la" in d else d["req_la"][r]
+  ang = d["fine"][r] if fine else d["angle"][r]
+  moved = MOVED_DEG if fine else 0.1
   mot, lat = d["motor_tq"][r], d["vsa_lat"][r]
-  out = {"delays": [], "breakaway": []}
+  out = {"delays": [], "breakaway": [], "mph": float(np.median(d["v"][r]) * 2.237) if "v" in d else float("nan")}
   # direction changes of the request (the steps and the slow crossings)
   sgn = np.sign(np.where(np.abs(req) > 0.01, req, 0))
   changes = [i for i in range(1, len(sgn)) if sgn[i] != 0 and sgn[i] != sgn[i - 1]]
@@ -96,7 +121,7 @@ def analyze_run(d: dict[str, np.ndarray], r: np.ndarray, center: float) -> dict:
     direction = sgn[i0]
     i_mot = first_after((np.sign(cmd) == direction) & (mot >= 3), i0)
     # the wheel (and van) may coast on the old way first: measure the turn-around from the furthest point reached
-    i_ang = first_after(np.r_[np.zeros(i0, bool), reversed_by(ang[i0:], direction, 0.1)], i0)
+    i_ang = first_after(np.r_[np.zeros(i0, bool), reversed_by(ang[i0:], direction, moved)], i0)
     i_lat = first_after(np.r_[np.zeros(i0, bool), reversed_by(lat[i0:], direction, 0.03)], i0)
     out["delays"].append([(i - i0) / 100 if i is not None else np.nan for i in (i_mot, i_ang, i_lat)])
     if i_ang is not None:
@@ -123,14 +148,14 @@ def main():
   if not rs:
     print("no lateralManeuverPlan in this drive: was Lateral Maneuver Mode on with LateralManeuverSuite=odyssey?")
     return
-  center = float(np.median(d["angle"][d["maneuver"] >= 0]))
+  center = float(np.median(d["angle"][d["v"] > 20]))  # straight ahead: the median wheel angle at highway speed
   by_name: dict[str, list[dict]] = defaultdict(list)
   for r in rs:
     by_name[names[int(d["maneuver"][r[0]])]].append(analyze_run(d, r, center))
 
   all_delays, brk = [], defaultdict(list)
-  print(f"\nstraight-ahead wheel angle during maneuvers: {center:.2f} deg")
-  print(f"{'maneuver':36s} {'runs':>4} {'motor':>6} {'wheel':>6} {'van':>6}  {'breakaway torque (fraction of max)':>34} {'hyst':>6}")
+  print(f"\nstraight-ahead wheel angle at highway speed: {center:.2f} deg")
+  print(f"{'maneuver':36s} {'runs':>4} {'mph':>4} {'motor':>6} {'wheel':>6} {'van':>6}  {'breakaway torque (fraction of max)':>34} {'hyst':>6}")
   for name, res in by_name.items():
     dl = np.array([x for r in res for x in r["delays"]]) if any(r["delays"] for r in res) else np.full((1, 3), np.nan)
     all_delays.append(dl)
@@ -139,9 +164,10 @@ def main():
       brk[(x[0], x[1])].append(x[2])
     bs = f"{np.median([x[2] for x in b]):+.3f} (n={len(b)})" if b else "-"
     hy = [r["hysteresis"] for r in res if "hysteresis" in r]
-    print(f"{name:36s} {len(res):4d} {np.nanmedian(dl[:, 0]):6.2f} {np.nanmedian(dl[:, 1]):6.2f} {np.nanmedian(dl[:, 2]):6.2f}"
+    mph = np.median([r["mph"] for r in res])
+    print(f"{name:36s} {len(res):4d} {mph:4.0f} {np.nanmedian(dl[:, 0]):6.2f} {np.nanmedian(dl[:, 1]):6.2f} {np.nanmedian(dl[:, 2]):6.2f}"
           + f"  {bs:>34} {np.median(hy) if hy else np.nan:6.3f}")
-  print("  (delays in s from the request changing direction to: motor torque, wheel moving 0.1 deg, van lateral accel 0.03)")
+  print(f"  (delays in s from the request changing direction to: motor torque, wheel moving {MOVED_DEG} deg, van lateral accel 0.03)")
 
   print("\nbreakaway torque by direction (median fraction of max torque, n):")
   for (direction, kind), vals in sorted(brk.items()):
@@ -170,7 +196,7 @@ def main():
     for ax, (name, _) in zip(axes[0], by_name.items(), strict=True):
       for r in rs:
         if names[int(d["maneuver"][r[0]])] == name:
-          ax.plot(d["angle"][r] - center, -d["cmd_tq"][r] / STEER_MAX, lw=0.8)
+          ax.plot(d["fine"][r] - center, -d["cmd_tq"][r] / STEER_MAX, lw=0.8)
       ax.set_title(name, fontsize=8)
       ax.set_xlabel("wheel angle from straight (deg)")
       ax.set_ylabel("command (fraction of max)")

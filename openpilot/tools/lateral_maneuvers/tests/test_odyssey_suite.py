@@ -2,6 +2,7 @@
 import numpy as np
 import pytest
 
+from openpilot.common.constants import CV
 from openpilot.common.realtime import DT_MDL
 from openpilot.tools.lateral_maneuvers.odyssey_suite import maneuvers
 
@@ -29,7 +30,27 @@ def test_small_and_returns_to_line(m):
   assert abs(vel[-1]) < 0.01 and abs(pos[-1]) < 0.05, "should end on its line at its starting heading"
 
 
-def test_both_directions_and_speeds():
+def test_both_directions():
   names = [m.description for m in maneuvers()]
   assert any("left first" in n for n in names) and any("right first" in n for n in names)
-  assert {n.split()[-1] for n in names} == {"50mph", "65mph"}
+  assert len(set(names)) == len(names), "names key the progress saved across drives"
+  assert all(m.follow_lane for m in maneuvers()), "rides on lane keeping, so the road needn't be straight"
+
+
+def frames_to_start(m, speeds_mph) -> int | None:
+  for i, mph in enumerate(speeds_mph):
+    m.get_accel(mph * CV.MPH_TO_MS, True, 0.0, 0.0)
+    if m.active:
+      return i
+  return None
+
+
+@pytest.mark.parametrize("mph", [47, 58, 72])
+def test_starts_at_any_steady_highway_speed(mph):
+  i = frames_to_start(maneuvers()[0], [mph] * 100)
+  assert i is not None and i * DT_MDL < 2.5
+
+
+def test_waits_while_speed_changes_or_too_slow():
+  assert frames_to_start(maneuvers()[0], np.linspace(50, 70, 200)) is None  # accelerating ~1 mph/s
+  assert frames_to_start(maneuvers()[0], [35] * 200) is None
