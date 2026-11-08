@@ -31,3 +31,23 @@ def test_fine_angle_sees_motion_between_ticks():
   reading = np.round(true / 0.1) * 0.1
   fine = fine_angle(reading, rate)
   assert np.std(fine - true) < 0.5 * np.std(reading - true)
+
+
+def test_torque_pulses_find_the_deadband():
+  from openpilot.common.realtime import DT_MDL
+  from openpilot.tools.lateral_maneuvers.odyssey_suite import PULSE_LEVELS, pulse_train
+  from tools.odyssey_eps_report import analyze_pulses
+  (action,) = pulse_train(PULSE_LEVELS, 0.2, 1.0)
+  t = np.arange(0, action.time_bp[-1], 0.01)
+  probe = np.interp(np.floor(t / DT_MDL) * DT_MDL, action.time_bp, action.accel_bp)  # held at 20 Hz like the plan
+  threshold, ang, a = 0.045, np.zeros(len(t)), 0.0
+  for i in range(len(t)):  # the wheel turns only while the pulse is past the deadband
+    if abs(probe[i]) > threshold:
+      a += np.sign(probe[i]) * 0.003
+    ang[i] = a
+  d = {"probe": probe, "fine": ang, "cmd_tq": -probe * STEER_MAX, "vsa_lat": ang * 0.05}
+  pulses = analyze_pulses(d, np.arange(len(t)), 0.0)
+  assert len(pulses) == 2 * len(PULSE_LEVELS)
+  moved = sorted({p["level"] for p in pulses if p["moved"]})
+  assert moved == [lv for lv in PULSE_LEVELS if lv > threshold]
+  assert {p["direction"] for p in pulses if p["moved"]} == {1.0, -1.0}

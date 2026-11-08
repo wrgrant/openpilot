@@ -1223,6 +1223,7 @@ struct DriverAssistance {
 
 struct LateralManeuverPlan {
   desiredCurvature @0 :Float32;  # 1/m
+  torqueOffset @1 :Float32;  # added to the steering torque command (fraction of max), for steering characterization
 }
 
 struct LongitudinalPlan @0xe00b5b3eba12876c {

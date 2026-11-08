@@ -20,7 +20,7 @@ def run_once(m) -> np.ndarray:
       return np.array(out)
 
 
-@pytest.mark.parametrize("m", maneuvers(), ids=lambda m: m.description)
+@pytest.mark.parametrize("m", [m for m in maneuvers() if not m.torque], ids=lambda m: m.description)
 def test_small_and_returns_to_line(m):
   accel = run_once(m)
   vel = np.cumsum(accel) * DT_MDL
@@ -54,3 +54,22 @@ def test_starts_at_any_steady_highway_speed(mph):
 def test_waits_while_speed_changes_or_too_slow():
   assert frames_to_start(maneuvers()[0], np.linspace(50, 70, 200)) is None  # accelerating ~1 mph/s
   assert frames_to_start(maneuvers()[0], [35] * 200) is None
+
+
+@pytest.mark.parametrize("m", [m for m in maneuvers() if m.torque], ids=lambda m: m.description)
+def test_torque_pulses_small_balanced_and_sharp(m):
+  tq = run_once(m)
+  assert np.abs(tq).max() <= 0.08 + 1e-9, "stays well below what the driver would notice as a tug"
+  assert abs(tq.sum() * DT_MDL) < 1e-6, "net torque zero, so the van isn't pushed off its line"
+  assert tq[-1] == 0.0
+  vals, counts = np.unique(np.round(np.abs(tq), 4), return_counts=True)
+  levels = vals[(vals > 0) & (counts >= 4)]  # pulse plateaus, not the one-frame edges
+  assert len(levels) == 6 and levels.min() < 0.037 < levels.max(), "brackets the measured deadband"
+
+
+@pytest.mark.parametrize("m", [m for m in maneuvers() if m.torque], ids=lambda m: m.description)
+def test_torque_pulses_last_their_width(m):
+  on = np.abs(run_once(m)) > 0
+  edges = np.flatnonzero(np.diff(np.r_[0, on.astype(int), 0]))
+  widths = (edges[1::2] - edges[::2]) * DT_MDL
+  assert np.allclose(widths, float(m.description.split()[2].rstrip("s")))

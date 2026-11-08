@@ -151,6 +151,9 @@ class Controls(ControlsExt):
                                                      self.steer_limited_by_safety, self.desired_curvature,
                                                      self.calibrated_pose, curvature_limited, lat_delay)
     actuators.torque = float(steer)
+    if self.sm.valid['lateralManeuverPlan'] and CC.latActive:
+      # steering characterization: a short torque pulse on top of lane keeping (tools/lateral_maneuvers/odyssey_suite.py)
+      actuators.torque = float(min(max(steer + self.sm["lateralManeuverPlan"].torqueOffset, -1.0), 1.0))
     if self.CP.steerControlType == car.CarParams.SteerControlType.curvature:
       actuators.curvature = float(lateral_output)
     else:

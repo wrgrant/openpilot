@@ -21,6 +21,7 @@ TIMER = 2.0 # sec stable conditions before starting maneuver
 class Maneuver(_Maneuver):
   _baseline_curvature: float = 0.0
   follow_lane: bool = False  # add the maneuver to the model's live curvature instead of the curvature at the start
+  torque: bool = False  # the actions are steering torque (fraction of max) added to lane keeping, not lateral accel
 
   def get_accel(self, v_ego: float, lat_active: bool, curvature: float, roll: float) -> float:
     self._run_completed = False
@@ -167,6 +168,8 @@ def main():
         if maneuver.description.startswith('sine'):
           freq = maneuver.description.split()[1]
           alert_msg.alertDebug.alertText1 = f'Active sine {freq} {max(action_remaining, 0):.1f}s'
+        elif maneuver.torque:
+          alert_msg.alertDebug.alertText1 = f'Active torque pulses {max(action_remaining, 0):.1f}s'
         else:
           alert_msg.alertDebug.alertText1 = f'Active {accel:+.1f}m/s² {max(action_remaining, 0):.1f}s'
         alert_msg.alertDebug.alertText2 = maneuver.description
@@ -206,7 +209,11 @@ def main():
     plan_send.valid = maneuver is not None and maneuver.active and complete_cnt == 0
     if plan_send.valid:
       base = sm['modelV2'].action.desiredCurvature if maneuver.follow_lane else maneuver._baseline_curvature
-      plan_send.lateralManeuverPlan.desiredCurvature = base + accel / max(v_ego, MIN_SPEED) ** 2
+      if maneuver.torque:
+        plan_send.lateralManeuverPlan.desiredCurvature = base
+        plan_send.lateralManeuverPlan.torqueOffset = accel
+      else:
+        plan_send.lateralManeuverPlan.desiredCurvature = base + accel / max(v_ego, MIN_SPEED) ** 2
     pm.send('lateralManeuverPlan', plan_send)
 
     if maneuver is not None and maneuver.finished and complete_cnt == 0:
