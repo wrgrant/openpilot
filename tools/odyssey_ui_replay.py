@@ -15,7 +15,7 @@ import sys
 import time
 
 import numpy as np
-import pyray as rl
+import raylib_nb as rl
 
 FPS = 20
 CAM_W, CAM_H = 1928, 1208  # road camera resolution; qcamera is a 526x330 downscale of it

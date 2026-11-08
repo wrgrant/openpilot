@@ -4,7 +4,7 @@ from functools import wraps
 from collections import OrderedDict
 
 import numpy as np
-import pyray as rl
+import raylib_nb as rl
 from opendbc.car import ACCELERATION_DUE_TO_GRAVITY
 from openpilot.selfdrive.ui.ui_state import ui_state, UIStatus
 from openpilot.system.ui.lib.application import gui_app
@@ -154,10 +154,9 @@ METER_ZONES = (
 
 
 class TorqueBar(Widget):
-  def __init__(self, demo: bool = False, scale: float = 1.0, always: bool = False,
+  def __init__(self, scale: float = 1.0, always: bool = False,
                fixed_height: float | None = None, center_dot: bool = True, meter: bool = False):
     super().__init__()
-    self._demo = demo
     self._scale = scale
     self._always = always
     # fixed_height (unscaled px): keep the arc one thickness instead of swelling as torque rises past 50%
@@ -170,14 +169,7 @@ class TorqueBar(Widget):
     self._torque_filter = FirstOrderFilter(0, 0.1, 1 / gui_app.target_fps)
     self._torque_line_alpha_filter = FirstOrderFilter(0.0, 0.1, 1 / gui_app.target_fps)
 
-  def update_filter(self, value: float):
-    """Update the torque filter value (for demo mode)."""
-    self._torque_filter.update(value)
-
   def _update_state(self):
-    if self._demo:
-      return
-
     # torque line
     if ui_state.sm['controlsState'].lateralControlState.which() in ('angleState', 'curvatureState'):
       controls_state = ui_state.sm['controlsState']
@@ -215,14 +207,11 @@ class TorqueBar(Widget):
       torque_line_height = np.interp(abs(self._torque_filter.x), [0.5, 1], [14 * self._scale, 56 * self._scale])
 
     # animate alpha and angle span
-    if not self._demo:
-      self._torque_line_alpha_filter.update(ui_state.status not in (UIStatus.DISENGAGED, UIStatus.LONG_ONLY))
-    else:
-      self._torque_line_alpha_filter.update(1.0)
+    self._torque_line_alpha_filter.update(ui_state.status not in (UIStatus.DISENGAGED, UIStatus.LONG_ONLY))
 
     torque_line_bg_alpha = np.interp(abs(self._torque_filter.x), [0.5, 1.0], [0.25, 0.5])
     torque_line_bg_color = rl.Color(255, 255, 255, int(255 * torque_line_bg_alpha * self._torque_line_alpha_filter.x))
-    if ui_state.status not in (UIStatus.ENGAGED, UIStatus.LAT_ONLY) and not self._demo:
+    if ui_state.status not in (UIStatus.ENGAGED, UIStatus.LAT_ONLY):
       torque_line_bg_color = rl.Color(255, 255, 255, int(255 * 0.15 * self._torque_line_alpha_filter.x))
 
     # draw curved line polygon torque bar
@@ -239,7 +228,7 @@ class TorqueBar(Widget):
     offset = np.array([cx, cy], dtype=np.float32)
 
     if self._meter:
-      engaged = self._demo or ui_state.status in (UIStatus.ENGAGED, UIStatus.LAT_ONLY)
+      engaged = ui_state.status in (UIStatus.ENGAGED, UIStatus.LAT_ONLY)
       self._draw_meter(rect, offset, mid_r, torque_line_height, top_angle, torque_bg_angle_span / 2, engaged)
       return
 
@@ -265,7 +254,7 @@ class TorqueBar(Widget):
     ]
     stops = [0.0, 0.5, 0.75, 1.0]
 
-    if ui_state.status not in (UIStatus.ENGAGED, UIStatus.LAT_ONLY) and not self._demo:
+    if ui_state.status not in (UIStatus.ENGAGED, UIStatus.LAT_ONLY):
       colors = [rl.Color(255, 255, 255, int(255 * 0.35 * alpha))] * 2
       stops = [0.0, 1.0]
 
@@ -348,7 +337,7 @@ class TorqueBar(Widget):
       fill(ribbon(*zone, *cut), color if engaged else (255, 255, 255), 0.9 if engaged else 0.35)
 
     # pinned at 100%: outline the whole bar in red
-    at_limit = level >= 0.999 if self._demo else self._at_limit
+    at_limit = self._at_limit
     if at_limit and engaged:
       pts = ribbon(-1.0, 1.0)
       loop = [rl.Vector2(float(px), float(py)) for px, py in np.vstack((pts, pts[:1]))]

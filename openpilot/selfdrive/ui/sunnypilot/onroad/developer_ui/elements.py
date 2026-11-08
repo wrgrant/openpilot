@@ -5,7 +5,7 @@ This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
 import numpy as np
-import pyray as rl
+import raylib_nb as rl
 from dataclasses import dataclass
 
 from openpilot.common.constants import CV

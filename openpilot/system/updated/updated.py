@@ -192,6 +192,12 @@ def finalize_update() -> None:
   cloudlog.info("done finalizing overlay")
 
 
+def agnos_version_changes() -> bool:
+  """Whether the update moves to a different AGNOS than the one running."""
+  new = run(["bash", "-c", r"unset AGNOS_VERSION && source launch_env.sh && echo -n $AGNOS_VERSION"], OVERLAY_MERGED).strip()
+  return new != HARDWARE.get_os_version()
+
+
 def handle_agnos_update() -> None:
   from openpilot.common.hardware.comma.agnos import flash_agnos_update, get_target_slot_number
 
@@ -375,19 +381,29 @@ class Updater:
     cloudlog.info("git fetch success: %s", git_fetch_output)
 
     cloudlog.info("git reset in progress")
+    # Check out without running the installed LFS client, the new checkout installs its own below
+    nolfs = ["-c", "filter.lfs.process=", "-c", "filter.lfs.required=false", "-c", "core.hooksPath=/dev/null"]
     cmds = [
-      ["git", "checkout", "--force", "--no-recurse-submodules", "-B", branch, "FETCH_HEAD"],
+      ["git", *nolfs, "checkout", "--force", "--no-recurse-submodules", "-B", branch, "FETCH_HEAD"],
       ["git", "branch", "--set-upstream-to", f"origin/{branch}"],
-      ["git", "reset", "--hard"],
+      ["git", *nolfs, "reset", "--hard"],
       # keep ignored build products (-d, not -xd), so the first boot of the update rebuilds only what changed instead
-      # of everything; untracked files like the prebuilt marker still go, so that boot does build
+      # of everything; untracked files like the prebuilt marker still go, so that boot does build. An AGNOS change
+      # (new compiler and libraries) still gets a clean tree, below.
       ["git", "clean", "-dff"],
       ["git", "submodule", "sync"],
       ["git", "submodule", "update", "--init", "--recursive"],
       ["git", "submodule", "foreach", "--recursive", "git", "reset", "--hard"],
     ]
     r = [run(cmd, OVERLAY_MERGED) for cmd in cmds]
+    if AGNOS and agnos_version_changes():
+      r.append(run(["git", "clean", "-xdff"], OVERLAY_MERGED))
     cloudlog.info("git reset success: %s", '\n'.join(r))
+
+    # Only checkouts with LFS files need a client, so release updates don't depend on git-lfs
+    if run(["git", "ls-files", ":(attr:filter=lfs)"], OVERLAY_MERGED):
+      lfs = os.path.join(OVERLAY_MERGED, "tools/lfs.sh")
+      run([lfs, "pull"] if os.path.isfile(lfs) else ["git", "lfs", "pull"], OVERLAY_MERGED)
 
     # TODO: show agnos download progress
     if AGNOS:
