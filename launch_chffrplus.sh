@@ -90,6 +90,9 @@ function launch {
   # write tmux scrollback to a file
   tmux capture-pane -pq -S-1000 > /tmp/launch_log
 
+  # Odyssey: tailnet access over a phone hotspot (no-op unless installed in /data/tailscale)
+  "$DIR/tools/odyssey_tailscale.sh" start || true
+
   # start manager
   cd openpilot/system/manager
   if [ ! -f "$DIR/prebuilt" ]; then
