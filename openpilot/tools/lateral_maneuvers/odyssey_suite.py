@@ -18,7 +18,7 @@ from openpilot.tools.longitudinal_maneuvers.maneuversd import Action
 from openpilot.tools.lateral_maneuvers.lateral_maneuversd import MAX_SPEED_DEV, Maneuver
 
 SETTLE_S = 3.0  # lane keeping only between runs, so each run starts from rest
-MIN_MPH, MAX_MPH = 45.0, 80.0
+MIN_MPH, MAX_MPH = 38.0, 80.0
 
 
 def push_pull(accel: float, lobe_s: float, ramp_s: float) -> list[Action]:

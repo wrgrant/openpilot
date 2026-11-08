@@ -45,7 +45,7 @@ def frames_to_start(m, speeds_mph) -> int | None:
   return None
 
 
-@pytest.mark.parametrize("mph", [47, 58, 72])
+@pytest.mark.parametrize("mph", [40, 47, 58, 72])
 def test_starts_at_any_steady_highway_speed(mph):
   i = frames_to_start(maneuvers()[0], [mph] * 100)
   assert i is not None and i * DT_MDL < 2.5
