@@ -1,10 +1,11 @@
 """Green light chime delay: after the light turns green, the chime waits GreenLightAlertDelay and is
 skipped if the driver lifts off the brake (or drives away) in that time."""
 from types import SimpleNamespace as NS
+from unittest import mock
 
-import pytest
-
+from openpilot.common.parameterized import parameterized
 from openpilot.common.realtime import DT_MDL
+from openpilot.common.test import OpenpilotTestCase
 from openpilot.sunnypilot.selfdrive.controls.lib import e2e_alerts_helper as h
 
 
@@ -36,9 +37,9 @@ def sm_for(go: bool, brake: bool, moving: bool = False):
   }
 
 
-def make_helper(monkeypatch, delay_index):
-  monkeypatch.setattr(h, "Params", lambda: FakeParams({"GreenLightAlert": True, "GreenLightAlertDelay": delay_index}))
-  return h.E2EAlertsHelper()
+def make_helper(delay_index):
+  with mock.patch.object(h, "Params", lambda: FakeParams({"GreenLightAlert": True, "GreenLightAlertDelay": delay_index})):
+    return h.E2EAlertsHelper()
 
 
 def run(helper, events, seconds, **sm_kwargs):
@@ -58,32 +59,30 @@ def stopped_at_red(helper, events, brake=True):
   assert run(helper, events, 3.0, go=False, brake=brake) is None
 
 
-@pytest.mark.parametrize("delay_index", range(len(h.GREEN_LIGHT_DELAYS)))
-def test_chimes_after_the_delay_when_driver_stays_on_the_brake(monkeypatch, delay_index):
-  helper, events = make_helper(monkeypatch, delay_index), FakeEvents()
-  stopped_at_red(helper, events)
-  t = run(helper, events, 3.0, go=True, brake=True)
-  expected = h.TRIGGER_TIMER_THRESHOLD + h.GREEN_LIGHT_DELAYS[delay_index]
-  assert t is not None and expected - 0.11 <= t <= expected + 0.11
+class TestGreenLightDelay(OpenpilotTestCase):
+  @parameterized.expand(range(len(h.GREEN_LIGHT_DELAYS)))
+  def test_chimes_after_the_delay_when_driver_stays_on_the_brake(self, delay_index):
+    helper, events = make_helper(delay_index), FakeEvents()
+    stopped_at_red(helper, events)
+    t = run(helper, events, 3.0, go=True, brake=True)
+    expected = h.TRIGGER_TIMER_THRESHOLD + h.GREEN_LIGHT_DELAYS[delay_index]
+    assert t is not None and expected - 0.11 <= t <= expected + 0.11
 
+  def test_no_chime_when_driver_lifts_off_the_brake_in_time(self):
+    helper, events = make_helper(1), FakeEvents()  # 0.5 s
+    stopped_at_red(helper, events)
+    assert run(helper, events, 0.5, go=True, brake=True) is None  # light just went green, still on the brake
+    assert run(helper, events, 3.0, go=True, brake=False) is None  # foot off the brake within the delay
 
-def test_no_chime_when_driver_lifts_off_the_brake_in_time(monkeypatch):
-  helper, events = make_helper(monkeypatch, 1), FakeEvents()  # 0.5 s
-  stopped_at_red(helper, events)
-  assert run(helper, events, 0.5, go=True, brake=True) is None  # light just went green, still on the brake
-  assert run(helper, events, 3.0, go=True, brake=False) is None  # foot off the brake within the delay
+  def test_brake_hold_still_chimes_after_the_delay(self):
+    # Brake Hold: the foot is already off the pedal, so there is no lift to see; chime after the delay
+    helper, events = make_helper(1), FakeEvents()
+    stopped_at_red(helper, events, brake=False)
+    t = run(helper, events, 3.0, go=True, brake=False)
+    assert t is not None and abs(t - (h.TRIGGER_TIMER_THRESHOLD + 0.5)) <= 0.11
 
-
-def test_brake_hold_still_chimes_after_the_delay(monkeypatch):
-  # Brake Hold: the foot is already off the pedal, so there is no lift to see; chime after the delay
-  helper, events = make_helper(monkeypatch, 1), FakeEvents()
-  stopped_at_red(helper, events, brake=False)
-  t = run(helper, events, 3.0, go=True, brake=False)
-  assert t is not None and t == pytest.approx(h.TRIGGER_TIMER_THRESHOLD + 0.5, abs=0.11)
-
-
-def test_off_keeps_the_original_timing(monkeypatch):
-  helper, events = make_helper(monkeypatch, 0), FakeEvents()
-  stopped_at_red(helper, events)
-  t = run(helper, events, 3.0, go=True, brake=True)
-  assert t == pytest.approx(h.TRIGGER_TIMER_THRESHOLD, abs=0.11)
+  def test_off_keeps_the_original_timing(self):
+    helper, events = make_helper(0), FakeEvents()
+    stopped_at_red(helper, events)
+    t = run(helper, events, 3.0, go=True, brake=True)
+    assert t is not None and abs(t - h.TRIGGER_TIMER_THRESHOLD) <= 0.11
