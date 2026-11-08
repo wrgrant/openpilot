@@ -2,22 +2,19 @@
 """Report on an Odyssey steering-characterization drive (openpilot/tools/lateral_maneuvers/odyssey_suite.py).
 
 Decodes the van's own steering signals from the logged CAN bus at 100 Hz (openpilot's torque command, the EPS motor
-torque, wheel angle and rate, driver torque, the VSA's lateral accel) and, for each maneuver run, measures:
+torque, wheel angle and rate, driver torque, the VSA's lateral accel).
 
 The wheel angle on CAN reads in 0.1 degree steps, but the EPS also reports the wheel's rate in 0.1 deg/s steps, and that
 rate moves before the angle ticks over (it comes from a finer sensor than the angle). fine_angle() integrates the rate
 and keeps it inside the 0.1 degree reading, so the wheel's first ~0.02 degrees of motion are visible.
 
-  delay      request change -> motor torque -> wheel angle -> van lateral accel
-  breakaway  the command at which the wheel starts to move after each direction change, split left/right and
-             away-from-straight / back-toward-straight (is the steering one-sided?)
-  pulses     for the torque-pulse maneuvers, which pulse sizes move the wheel at all, how far and how fast, left vs
-             right and away vs toward straight: the deadband measured directly
-  hysteresis for the slow sweeps, how much more command it takes to move the wheel one way than to hold it on the way
-             back (the friction band the deadband kick has to clear)
+For each held pulse (odyssey_suite), aligned on the maneuver's own schedule, it measures how far the wheel turns and
+the van moves compared with holds that had no pulse, by pulse size, width and direction. The smallest pulse that does
+anything is the deadband the SteerDeadbandComp kick has to clear; left vs right shows whether the steering is
+one-sided.
 
-  PYTHONPATH=$PWD .venv/bin/python tools/odyssey_eps_report.py ~/comma-logs/<dongle>_<route> [--plot out.png]
-It also prints fitted values for tools/odyssey_lateral_sim.py (--deadband, --friction, --lag, --bias).
+  PYTHONPATH=$PWD .venv/bin/python tools/odyssey_eps_report.py ~/comma-logs/<dongle>_<route>
+It also prints the deadband to give tools/odyssey_lateral_sim.py (--deadband).
 """
 import argparse
 import glob
@@ -29,7 +26,6 @@ import numpy as np
 DBC = "honda_odyssey_exl_2018_generated"
 STEER_MAX = 4096
 COLS = ("t", "v", "angle", "rate", "drv_tq", "motor_tq", "cmd_tq", "vsa_lat", "req_la", "model_la", "probe", "maneuver", "pressed")
-MOVED_DEG = 0.02  # wheel motion that counts as "moving", on the fine angle
 
 
 def load(route_dir: str) -> tuple[dict[str, np.ndarray], list[str]]:
@@ -98,109 +94,89 @@ def runs(d: dict[str, np.ndarray]) -> list[np.ndarray]:
   return [r for r in np.split(idx, split) if len(r) > 300]
 
 
-def first_after(mask: np.ndarray, start: int) -> int | None:
-  hits = np.where(mask[start:])[0]
-  return int(start + hits[0]) if len(hits) else None
+def schedule(name: str):
+  """The maneuver's request (lateral accel or torque) as a function of time from the run start, and its hold windows."""
+  from openpilot.tools.lateral_maneuvers.odyssey_suite import maneuvers
+  m = next((m for m in maneuvers() if m.description == name), None)
+  if m is None:
+    return None
+  a = m.actions[0]
+  return (lambda t: np.interp(t, a.time_bp, a.accel_bp)), m
 
 
-def reversed_by(x: np.ndarray, direction: float, amount: float) -> np.ndarray:
-  """True from where x has moved `amount` in `direction` back from the furthest it got the other way."""
-  back = np.minimum.accumulate(direction * x)
-  return direction * x - back >= amount - 1e-6
+PULSE_WINDOW_S = 1.5  # after each pulse starts
 
 
-def analyze_run(d: dict[str, np.ndarray], r: np.ndarray, center: float) -> dict:
-  fine = "fine" in d
-  t, cmd = d["t"][r], -d["cmd_tq"][r]  # -cmd: + = toward +angle (left)
-  req = d["man_la"][r] if "man_la" in d else d["req_la"][r]
-  ang = d["fine"][r] if fine else d["angle"][r]
-  moved = MOVED_DEG if fine else 0.1
-  mot, lat = d["motor_tq"][r], d["vsa_lat"][r]
-  out = {"delays": [], "breakaway": [], "mph": float(np.median(d["v"][r]) * 2.237) if "v" in d else float("nan")}
-  # direction changes of the request (the steps and the slow crossings)
-  sgn = np.sign(np.where(np.abs(req) > 0.01, req, 0))
-  changes = [i for i in range(1, len(sgn)) if sgn[i] != 0 and sgn[i] != sgn[i - 1]]
-  for i0 in changes:
-    direction = sgn[i0]
-    i_mot = first_after((np.sign(cmd) == direction) & (mot >= 3), i0)
-    # the wheel (and van) may coast on the old way first: measure the turn-around from the furthest point reached
-    i_ang = first_after(np.r_[np.zeros(i0, bool), reversed_by(ang[i0:], direction, moved)], i0)
-    i_lat = first_after(np.r_[np.zeros(i0, bool), reversed_by(lat[i0:], direction, 0.03)], i0)
-    out["delays"].append([(i - i0) / 100 if i is not None else np.nan for i in (i_mot, i_ang, i_lat)])
-    if i_ang is not None:
-      off = ang[i_ang] - center
-      kind = straightness(off, direction)
-      out["breakaway"].append((direction, kind, direction * cmd[i_ang] / STEER_MAX))
-  # hysteresis: command needed to move the wheel one way vs the other at the same angle (slow sweeps)
-  moving = np.abs(np.gradient(ang) * 100) >= 0.3
-  up, dn = moving & (np.gradient(ang) > 0), moving & (np.gradient(ang) < 0)
-  if up.sum() > 20 and dn.sum() > 20:
-    out["hysteresis"] = float(np.median(cmd[up]) - np.median(cmd[dn])) / STEER_MAX
-  out["peak_motor_lag"] = float(t[np.argmax(np.abs(mot))] - t[np.argmax(np.abs(req))]) if np.abs(req).max() > 0 else np.nan
-  return out
-
-
-def straightness(off: float, direction: float) -> str:
-  if abs(off) <= 0.15:
-    return "at straight"
-  return "toward straight" if np.sign(off) != direction else "away from straight"
-
-
-def analyze_pulses(d: dict[str, np.ndarray], r: np.ndarray, center: float) -> list[dict]:
-  """One row per torque pulse: its size, direction, the torque lane keeping was already sending, and the wheel's
-  response over the next second on the fine angle."""
-  probe = d["probe"][r]
-  ang = d["fine"][r] if "fine" in d else d["angle"][r]
-  cmd = -d["cmd_tq"][r] / STEER_MAX
-  lat = d["vsa_lat"][r]
-  on = np.abs(probe) > 1e-4
+def held_pulses(d, by_name: dict[str, list[np.ndarray]]) -> list[dict]:
+  """One row per pulse in the held-pulse maneuvers: wheel, motor and van response relative to the pulse start."""
   out = []
-  for i0 in np.where(on[1:] & ~on[:-1])[0] + 1:
-    if i0 < 5 or i0 + 100 > len(r):
+  for name, rs in by_name.items():
+    if not name.startswith("held pulses"):
       continue
-    direction = float(np.sign(probe[i0]))
-    width = int(np.argmin(on[i0:])) if not on[i0:].all() else len(on) - i0
-    dx = direction * (ang[i0:i0 + 100] - ang[i0])
-    moved = np.where(dx >= MOVED_DEG - 1e-9)[0]
-    out.append({"level": round(float(np.abs(probe[i0:i0 + width]).max()), 3), "direction": direction, "width": width / 100,
-                "base": float(direction * cmd[i0 - 2]), "moved": bool(len(moved)), "delay": moved[0] / 100 if len(moved) else np.nan,
-                "peak_deg": float(dx.max()), "lat": float((direction * (lat[i0:i0 + 100] - lat[i0])).max()),
-                "kind": straightness(ang[i0] - center, direction)})
+    sched = schedule(name)
+    if sched is None:
+      continue
+    f, m = sched
+    a = m.actions[0]
+    width = float(name.split()[2].rstrip("s"))
+    t = np.arange(0, a.time_bp[-1], 0.01)
+    v = f(t)
+    starts = [hold[0] for hold in m.holds]
+    motor = d["motor_tq"] * np.sign(-d["cmd_tq"])  # the EPS reports magnitude only; + = left like the command
+    pre = 0.3
+    for r in rs:
+      for h0 in starts:
+        i_on = r[0] + int(round((h0 + pre) * 100))
+        lvl = float(v[int(round((h0 + pre + width / 2) * 100))])
+        n = int(PULSE_WINDOW_S * 100)
+        if i_on + n > min(r[-1] + 1, len(d["t"])):
+          continue
+        sgn = 1.0 if lvl >= 0 else -1.0
+        if abs(lvl) < 1e-6:  # the no-pulse holds alternate direction like the pulses do
+          sgn = 1.0 if starts.index(h0) % 2 == 0 else -1.0
+          sgn *= 1.0 if "left first" in name else -1.0
+        w = slice(i_on, i_on + n)
+        out.append({"level": round(abs(lvl), 3), "width": width, "direction": sgn,
+                    "wheel": sgn * (d["fine"][w] - d["fine"][i_on]), "van": sgn * (d["vsa_lat"][w] - d["vsa_lat"][i_on]),
+                    "cmd": -sgn * (d["cmd_tq"][w] - d["cmd_tq"][i_on]) / STEER_MAX, "motor": sgn * (motor[w] - motor[i_on])})
   return out
 
 
 def pulse_report(pulses: list[dict]) -> float:
-  """Print the pulse table; return the smallest pulse that moves the wheel at least half the time (nan if none)."""
-  print(f"\ntorque pulses (on top of lane keeping): wheel moved {MOVED_DEG} deg within 1 s?")
-  print(f"  {'pulse':>6} {'dir':>5} {'width':>5} {'moved':>6} {'deg':>6} {'delay':>6} {'lat':>6}   n")
-  smallest = {}
-  for (level, direction, width), grp in sorted(_group(pulses, ("level", "direction", "width")).items()):
-    frac = np.mean([p["moved"] for p in grp])
-    if frac >= 0.5:
-      smallest[direction] = min(smallest.get(direction, 1.0), level)
-    print(f"  {level:6.3f} {'left' if direction > 0 else 'right':>5} {width:5.2f} {frac:6.0%} {np.median([p['peak_deg'] for p in grp]):6.3f}"
-          + f" {np.nanmedian([p['delay'] for p in grp]) if frac else np.nan:6.2f} {np.median([p['lat'] for p in grp]):6.3f}   {len(grp)}")
-  for direction, name in ((1.0, "left"), (-1.0, "right")):
-    print(f"  smallest pulse that moves the wheel, {name}: {smallest.get(direction, float('nan')):.3f} of max torque")
-  for kind, grp in sorted(_group(pulses, ("kind",)).items()):
-    print(f"  {kind[0]:20s} moved {np.mean([p['moved'] for p in grp]):4.0%} of pulses, median {np.median([p['peak_deg'] for p in grp]):.3f} deg"
-          + f"  (n={len(grp)})")
-  print("  (pulse and its base, the torque lane keeping was already sending, are fractions of max; deg is how far the wheel"
-        + " turned in the pulse's direction; lat is the van's lateral accel response, m/s^2)")
-  return float(np.nanmean(list(smallest.values()))) if smallest else float("nan")
-
-
-def _group(rows: list[dict], keys: tuple[str, ...]) -> dict[tuple, list[dict]]:
-  out: dict[tuple, list[dict]] = defaultdict(list)
-  for row in rows:
-    out[tuple(row[k] for k in keys)].append(row)
-  return out
+  """Print the held-pulse table; return the smallest pulse whose wheel response clears the no-pulse holds."""
+  print(f"\nheld pulses (lane keeping's torque held still; response {PULSE_WINDOW_S:.1f} s after the pulse starts, minus holds with no pulse):")
+  print(f"  {'pulse':>6} {'width':>5} {'n':>3} {'command':>8} {'motor':>6} {'wheel deg':>10} {'±':>6} {'van m/s^2':>10}  left/right wheel")
+  smallest = np.nan
+  for width in sorted({p["width"] for p in pulses}):
+    ctrl = [p for p in pulses if p["width"] == width and p["level"] == 0]
+    if not ctrl:
+      continue
+    c_wheel = np.mean([p["wheel"] for p in ctrl], 0)
+    c_van = np.mean([p["van"] for p in ctrl], 0)
+    noise = np.std([p["wheel"].max() for p in ctrl])
+    end = int(min(width + 0.5, PULSE_WINDOW_S) * 100) - 1
+    for lvl in sorted({p["level"] for p in pulses if p["width"] == width}):
+      g = [p for p in pulses if p["width"] == width and p["level"] == lvl]
+      wheel = np.mean([p["wheel"] for p in g], 0) - c_wheel
+      se = noise / np.sqrt(len(g)) * np.sqrt(1 + len(g) / len(ctrl))
+      sides = []
+      for s in (1.0, -1.0):
+        gs = [p for p in g if p["direction"] == s]
+        sides.append(f"{(np.mean([p['wheel'][end] for p in gs]) - c_wheel[end]) if gs else np.nan:+.3f}")
+      cmd = np.mean([p["cmd"][min(int(width * 100) // 2, end)] for p in g])
+      mot = np.mean([p["motor"][min(int(width * 100) // 2, end)] for p in g])
+      van = np.mean([p["van"][end] for p in g]) - c_van[end]
+      print(f"  {lvl:6.3f} {width:5.1f} {len(g):3d} {cmd:+8.3f} {mot:+6.1f} {wheel[end]:+10.3f} {se:6.3f} {van:+10.4f}  {sides[0]}/{sides[1]}")
+      if lvl > 0 and wheel[end] > 3 * se and not (smallest <= lvl):
+        smallest = lvl
+  print("  (command and motor are the change mid-pulse; wheel and van are at 0.5 s after the pulse ends; ± is one standard error)")
+  print(f"  smallest pulse that turns the wheel beyond the noise (3 standard errors): {smallest:.3f} of max torque")
+  return float(smallest)
 
 
 def main():
   ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
   ap.add_argument("route_dir")
-  ap.add_argument("--plot", help="write a PNG of command vs wheel angle for each maneuver")
   args = ap.parse_args()
   d, names = load(args.route_dir)
   rs = runs(d)
@@ -208,72 +184,17 @@ def main():
   if not rs:
     print("no lateralManeuverPlan in this drive: was Lateral Maneuver Mode on with LateralManeuverSuite=odyssey?")
     return
-  center = float(np.median(d["angle"][d["v"] > 20]))  # straight ahead: the median wheel angle at highway speed
-  by_name: dict[str, list[dict]] = defaultdict(list)
-  pulses: list[dict] = []
+  by_name: dict[str, list[np.ndarray]] = defaultdict(list)
   for r in rs:
-    name = names[int(d["maneuver"][r[0]])]
-    if name.startswith("torque pulses"):
-      pulses += analyze_pulses(d, r, center)
-    else:
-      by_name[name].append(analyze_run(d, r, center))
-
-  all_delays, brk = [], defaultdict(list)
-  print(f"\nstraight-ahead wheel angle at highway speed: {center:.2f} deg")
-  print(f"{'maneuver':36s} {'runs':>4} {'mph':>4} {'motor':>6} {'wheel':>6} {'van':>6}  {'breakaway torque (fraction of max)':>34} {'hyst':>6}")
-  for name, res in by_name.items():
-    dl = np.array([x for r in res for x in r["delays"]]) if any(r["delays"] for r in res) else np.full((1, 3), np.nan)
-    all_delays.append(dl)
-    b = [x for r in res for x in r["breakaway"]]
-    for x in b:
-      brk[(x[0], x[1])].append(x[2])
-    bs = f"{np.median([x[2] for x in b]):+.3f} (n={len(b)})" if b else "-"
-    hy = [r["hysteresis"] for r in res if "hysteresis" in r]
-    mph = np.median([r["mph"] for r in res])
-    print(f"{name:36s} {len(res):4d} {mph:4.0f} {np.nanmedian(dl[:, 0]):6.2f} {np.nanmedian(dl[:, 1]):6.2f} {np.nanmedian(dl[:, 2]):6.2f}"
-          + f"  {bs:>34} {np.median(hy) if hy else np.nan:6.3f}")
-  print(f"  (delays in s from the request changing direction to: motor torque, wheel moving {MOVED_DEG} deg, van lateral accel 0.03)")
-
-  print("\nbreakaway torque by direction (median fraction of max torque, n):")
-  for (direction, kind), vals in sorted(brk.items()):
-    print(f"  {'left ' if direction > 0 else 'right'} {kind:20s} {np.median(vals):+.3f}  (n={len(vals)})")
-  away = [v for (dr, k), vals in brk.items() if k == "away from straight" for v in vals]
-  toward = [v for (dr, k), vals in brk.items() if k == "toward straight" for v in vals]
-  if away and toward:
-    print(f"  one-sidedness: moving away from straight takes {np.median(away) - np.median(toward):+.3f} more torque than returning")
-
-  pulse_deadband = pulse_report(pulses) if pulses else float("nan")
-
-  dl = np.vstack(all_delays) if all_delays else np.full((1, 3), np.nan)
-  hy_all = [r["hysteresis"] for res in by_name.values() for r in res if "hysteresis" in r]
-  deadband = float(np.median([v for vals in brk.values() for v in vals])) if brk else float("nan")
-  print("\nfor tools/odyssey_lateral_sim.py:")
-  print(f"  --deadband {deadband:.3f}   (median breakaway torque)")
-  if np.isfinite(pulse_deadband):
-    print(f"  --deadband {pulse_deadband:.3f}   (from the torque pulses: prefer this one)")
-  print(f"  --lag {np.nanmedian(dl[:, 2]) - np.nanmedian(dl[:, 1]):.2f}   (wheel moving -> van responding)")
-  if hy_all:
-    print(f"  --friction {abs(np.median(hy_all)) * 1.8 / 2:.3f}   (half the hysteresis band, in m/s^2 at latAccelFactor 1.8)")
-  if away and toward:
-    print(f"  --bias {(np.median(away) - np.median(toward)) * 1.8 / 2:+.3f}   (one-sidedness, in m/s^2)")
-
-  if args.plot:
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    if not by_name:
-      return
-    fig, axes = plt.subplots(1, len(by_name), figsize=(4 * len(by_name), 4), squeeze=False)
-    for ax, (name, _) in zip(axes[0], by_name.items(), strict=True):
-      for r in rs:
-        if names[int(d["maneuver"][r[0]])] == name:
-          ax.plot(d["fine"][r] - center, -d["cmd_tq"][r] / STEER_MAX, lw=0.8)
-      ax.set_title(name, fontsize=8)
-      ax.set_xlabel("wheel angle from straight (deg)")
-      ax.set_ylabel("command (fraction of max)")
-    fig.tight_layout()
-    fig.savefig(args.plot, dpi=110)
-    print(f"\nplot: {args.plot}")
+    by_name[names[int(d["maneuver"][r[0]])]].append(r)
+  unknown = [n for n in by_name if schedule(n) is None]
+  if unknown:
+    print(f"skipping maneuvers no longer in the suite: {', '.join(unknown)}")
+  pulses = held_pulses(d, by_name)
+  deadband = pulse_report(pulses) if pulses else float("nan")
+  if np.isfinite(deadband):
+    print("\nfor tools/odyssey_lateral_sim.py:")
+    print(f"  --deadband {deadband:.3f}   (smallest held pulse that turns the wheel)")
 
 
 if __name__ == "__main__":

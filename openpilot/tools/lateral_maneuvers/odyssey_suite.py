@@ -1,11 +1,11 @@
-"""Steering characterization maneuvers for the Odyssey: small, slow lateral-accel requests that show the steering
-motor's deadband, the torque it takes to get the wheel moving, and whether turning away from straight behaves
-differently from returning to it.
+"""Steering characterization maneuvers for the Odyssey: how big a steering torque pulse has to be before the wheel
+and the van respond, left vs right, which sets the size of the SteerDeadbandComp kick.
 
-Most maneuvers are a push-pull-push (+a, -a for twice as long, +a) of lateral accel; the torque-pulse maneuvers add
-short steering torque pulses straight to the command, rising through the motor's deadband. Both ride on top of
-openpilot's normal lane keeping, so the van stays in its lane and any highway works, curves included. Each run takes 6-20 s and starts at whatever steady
-speed the van is cruising between MIN_MPH and MAX_MPH. Finished maneuvers are remembered across drives
+Each maneuver holds lane keeping's own torque still for a moment and adds one torque pulse to it, so the wheel's
+response to the pulse alone is visible; holds with no pulse measure the noise. Between holds openpilot's normal lane
+keeping steers, so the van stays in its lane and any highway works, curves included. Lateral-accel requests on top of
+lane keeping don't work for this: the model cancels them within about a second. Each run takes 30-35 s and starts at
+whatever steady speed the van is cruising between MIN_MPH and MAX_MPH. Finished maneuvers are remembered across drives
 (LateralManeuverDone), so the suite can be done in pieces. It is the default suite on this branch
 (LateralManeuverSuite = "odyssey"; set it to "" for comma's stock maneuvers). Turn on Settings > Developer > Lateral
 Maneuver Mode while parked. Report: tools/odyssey_eps_report.py.
@@ -17,45 +17,54 @@ from openpilot.common.realtime import DT_MDL
 from openpilot.tools.longitudinal_maneuvers.maneuversd import Action
 from openpilot.tools.lateral_maneuvers.lateral_maneuversd import MAX_SPEED_DEV, Maneuver
 
-SETTLE_S = 3.0  # lane keeping only between runs, so each run starts from rest
 MIN_MPH, MAX_MPH = 38.0, 80.0
 
 
-def push_pull(accel: float, lobe_s: float, ramp_s: float) -> list[Action]:
-  """+accel for lobe_s, -accel for 2 * lobe_s, +accel for lobe_s. The two direction changes ramp over ramp_s (slow
-  ramps there show how the wheel crosses through straight); the start and end are steps so the areas cancel and the
-  request alone would leave the van on its line."""
-  a, T, r, e = accel, lobe_s, ramp_s, DT_MDL
-  t = [0, e, T - r, T + r, 3 * T - r, 3 * T + r, 4 * T - e, 4 * T]
-  v = [0, a, a, -a, -a, a, a, 0]
-  return [Action(v, t), Action([0.0], [SETTLE_S])]
+PULSE_LEVELS = (0.0, 0.03, 0.045, 0.06, 0.08)  # fraction of max torque, 0-328 of 4096; 0 is a hold with no pulse
+PULSE_WIDTHS = (0.5, 1.0)  # s
+HOLD_PRE_S, HOLD_POST_S = 0.3, 0.7  # lane keeping's torque is held from before each pulse until after it
+PULSE_GAP_S = 1.5  # normal lane keeping between holds, so the van recentres
+MAX_HOLD_CORRECTION = 0.1  # the hold never moves the command more than this from what lane keeping asks for
 
 
-PULSE_LEVELS = (0.02, 0.03, 0.04, 0.05, 0.06, 0.08)  # fraction of max torque: 82-328 of 4096, across the deadband
-PULSE_GAP_S = 1.3  # lane keeping only between pulses, so the wheel settles
-
-
-def pulse_train(levels: tuple[float, ...], width_s: float, first: float) -> list[Action]:
-  """Steering torque pulses added to lane keeping, rising through the motor's deadband: each level once each way
-  (first, then -first), width_s long. They show the smallest pulse that moves the wheel, and how far, how fast and
-  which way it goes. Net torque is zero, and each pulse moves the van about a centimetre."""
+def pulse_train(levels: tuple[float, ...], width_s: float, first: float) -> tuple[list[Action], list[tuple[float, float]]]:
+  """Steering torque pulses, each level once each way (first, then -first), width_s long, and the windows (start, end
+  in s) during which lane keeping's torque is held still around each pulse. Net torque is zero."""
   # breakpoints sit on half frames so each pulse is on for exactly width_s / DT_MDL plan frames
-  width, gap = round(width_s / DT_MDL), round(PULSE_GAP_S / DT_MDL)
-  t, v, k = [0.0], [0.0], 0
+  pre, width, post, gap = (round(x / DT_MDL) for x in (HOLD_PRE_S, width_s, HOLD_POST_S, PULSE_GAP_S))
+  t, v, holds, k = [0.0], [0.0], [], 0
   for level in levels:
     for sign in (first, -first):
-      t += [(k + 0.5) * DT_MDL, (k + 1) * DT_MDL, (k + width) * DT_MDL, (k + width + 0.5) * DT_MDL]
+      on = k + pre
+      t += [(on + 0.5) * DT_MDL, (on + 1) * DT_MDL, (on + width) * DT_MDL, (on + width + 0.5) * DT_MDL]
       v += [0.0, sign * level, sign * level, 0.0]
-      k += width + gap
+      holds.append(((k + 0.5) * DT_MDL, (on + width + post + 0.5) * DT_MDL))
+      k = on + width + post + gap
   t.append(k * DT_MDL)
   v.append(0.0)
-  return [Action(v, t)]
+  return [Action(v, t)], holds
 
 
 @dataclass
 class HighwayManeuver(Maneuver):
   """Starts at any steady speed in [MIN_MPH, MAX_MPH] and rides on top of lane keeping."""
   follow_lane: bool = True
+  holds: tuple[tuple[float, float], ...] = ()  # windows of the (single) action where lane keeping's torque is held
+  _held: float | None = None
+
+  def hold_correction(self, steer_now: float) -> float:
+    """Inside a hold window, what to add so the command stays where lane keeping's torque was when the hold began."""
+    t = max(self._action_frames - 1, 0) * DT_MDL  # _step has already advanced past the value just returned
+    if self._action_index != 0 or not any(a <= t < b for a, b in self.holds):
+      self._held = None
+      return 0.0
+    if self._held is None:
+      self._held = steer_now
+    return min(max(self._held - steer_now, -MAX_HOLD_CORRECTION), MAX_HOLD_CORRECTION)
+
+  def reset(self):
+    super().reset()
+    self._held = None
 
   def get_accel(self, v_ego: float, lat_active: bool, curvature: float, roll: float) -> float:
     in_range = MIN_MPH * CV.MPH_TO_MS <= v_ego <= MAX_MPH * CV.MPH_TO_MS
@@ -67,12 +76,9 @@ class HighwayManeuver(Maneuver):
 
 def maneuvers() -> list[Maneuver]:
   out: list[Maneuver] = []
-  for accel, lobe, ramp, name in ((0.05, 2.0, 0.3, "nudge 0.05"), (0.1, 1.5, 0.3, "nudge 0.10"), (0.04, 2.6, 1.2, "slow sweep 0.04")):
-    for first, sign in (("left", 1.0), ("right", -1.0)):  # + curvature is left in openpilot
-      out.append(HighwayManeuver(f"{name} {first} first", push_pull(sign * accel, lobe, ramp), repeat=2,
-                                 initial_speed=65 * CV.MPH_TO_MS))
-  for width in (0.2, 0.4):
-    for first, sign in (("left", 1.0), ("right", -1.0)):
-      out.append(HighwayManeuver(f"torque pulses {width}s {first} first", pulse_train(PULSE_LEVELS, width, sign), repeat=1,
-                                 initial_speed=65 * CV.MPH_TO_MS, torque=True))
+  for width in PULSE_WIDTHS:
+    for first, sign in (("left", 1.0), ("right", -1.0)):  # + torque is left in openpilot
+      actions, holds = pulse_train(PULSE_LEVELS, width, sign)
+      out.append(HighwayManeuver(f"held pulses {width}s {first} first", actions, repeat=1, initial_speed=65 * CV.MPH_TO_MS,
+                                 torque=True, holds=tuple(holds)))
   return out

@@ -12,7 +12,10 @@ it reports, in the 7-20 s band:
            itself (deadband, friction, saturation) is causing it
   lag      how far actual lateral accel trails desired, s
 
-  PYTHONPATH=$PWD .venv/bin/python tools/odyssey_wander.py ~/comma-logs/<dongle>_<route> [--min-mph 25] [--min-s 45]
+  PYTHONPATH=$PWD .venv/bin/python tools/odyssey_wander.py ~/comma-logs/<dongle>_<route> [--min-mph 25] [--min-s 45] [--ab]
+
+--ab scores a drive made with SteerDeadbandCompAB on: it splits the stretches at the kick's on/off blocks and compares
+the two sides.
 """
 import argparse
 import glob
@@ -100,15 +103,51 @@ def analyze(d: dict[str, np.ndarray], r: np.ndarray) -> dict[str, float]:
           "follow": float(np.std(des - act) / max(np.std(des), 1e-6)), "lag": float(lags[w][np.argmax(cc[w])])}
 
 
+def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> list[tuple[bool, np.ndarray]]:
+  """Cut each stretch where SteerDeadbandCompAB's kick switches on or off; keep pieces of at least min_s."""
+  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import ab_kick_on
+  out = []
+  for r in runs:
+    on = np.array([ab_kick_on(t) for t in d["t"][r]])
+    for piece in np.split(r, np.where(np.diff(on.astype(int)) != 0)[0] + 1):
+      if len(piece) >= min_s * FS:
+        out.append((bool(ab_kick_on(d["t"][piece[0]])), piece))
+  return out
+
+
+def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> None:
+  pieces = ab_split(d, runs, min_s)
+  res = {True: [], False: []}
+  print(f"{'kick':>5} {'seg':>4} {'min':>4} {'mph':>4} {'wander':>7} {'period':>7} {'follow':>7}")
+  for on, r in pieces:
+    x = analyze(d, r)
+    res[on].append(x)
+    wander = f"{x['wander']:7.1f}" if np.isfinite(x["wander"]) else f"{'-':>7}"
+    print(f"{'on' if on else 'off':>5} {int(x['seg']):>4} {x['minutes']:>4.1f} {x['mph']:>4.0f} {wander} {x['period']:>7.1f} {x['follow']:>7.2f}")
+  print()
+  means = {}
+  for on in (False, True):
+    w = np.array([x["wander"] for x in res[on] if np.isfinite(x["wander"])])
+    mins = sum(x["minutes"] for x in res[on])
+    means[on] = (w.mean() if len(w) else np.nan, w.std() / np.sqrt(len(w)) if len(w) > 1 else np.nan)
+    print(f"kick {'on ' if on else 'off'}: {mins:4.1f} min in {len(res[on])} pieces, wander {means[on][0]:.1f} ± {means[on][1]:.1f} cm rms")
+  if all(np.isfinite(means[k][0]) for k in means):
+    diff, se = means[True][0] - means[False][0], np.hypot(means[True][1], means[False][1])
+    print(f"kick changes wander by {diff:+.1f} ± {se:.1f} cm" + (" (beyond noise)" if abs(diff) > 2 * se else " (within noise: drive more)"))
+
+
 def main():
   ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
   ap.add_argument("route_dir")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
+  ap.add_argument("--ab", action="store_true", help="compare SteerDeadbandCompAB's kick-on and kick-off blocks")
   args = ap.parse_args()
 
   d = load(args.route_dir)
   runs = stretches(d, args.min_mph, args.min_s)
+  if args.ab:
+    return ab_report(d, runs, args.min_s)
   total = len(d["t"]) / FS / 60
   alone = sum(len(r) for r in runs) / FS / 60
   print(f"{total:.0f} min logged; {len(runs)} stretches of openpilot steering alone >= {args.min_s:.0f} s "

@@ -23,6 +23,10 @@ class Maneuver(_Maneuver):
   follow_lane: bool = False  # add the maneuver to the model's live curvature instead of the curvature at the start
   torque: bool = False  # the actions are steering torque (fraction of max) added to lane keeping, not lateral accel
 
+  def hold_correction(self, steer_now: float) -> float:
+    """Torque to add so the command ignores lane keeping's own changes for a moment (see odyssey_suite)."""
+    return 0.0
+
   def get_accel(self, v_ego: float, lat_active: bool, curvature: float, roll: float) -> float:
     self._run_completed = False
     # only start maneuver on straight, flat roads
@@ -211,7 +215,9 @@ def main():
       base = sm['modelV2'].action.desiredCurvature if maneuver.follow_lane else maneuver._baseline_curvature
       if maneuver.torque:
         plan_send.lateralManeuverPlan.desiredCurvature = base
-        plan_send.lateralManeuverPlan.torqueOffset = accel
+        lcs = sm['controlsState'].lateralControlState
+        steer_now = lcs.torqueState.output if lcs.which() == 'torqueState' else 0.0  # lane keeping's torque, before the offset
+        plan_send.lateralManeuverPlan.torqueOffset = accel + maneuver.hold_correction(steer_now)
       else:
         plan_send.lateralManeuverPlan.desiredCurvature = base + accel / max(v_ego, MIN_SPEED) ** 2
     pm.send('lateralManeuverPlan', plan_send)

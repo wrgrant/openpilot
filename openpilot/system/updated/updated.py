@@ -379,7 +379,9 @@ class Updater:
       ["git", "checkout", "--force", "--no-recurse-submodules", "-B", branch, "FETCH_HEAD"],
       ["git", "branch", "--set-upstream-to", f"origin/{branch}"],
       ["git", "reset", "--hard"],
-      ["git", "clean", "-xdff"],
+      # keep ignored build products (-d, not -xd), so the first boot of the update rebuilds only what changed instead
+      # of everything; untracked files like the prebuilt marker still go, so that boot does build
+      ["git", "clean", "-dff"],
       ["git", "submodule", "sync"],
       ["git", "submodule", "update", "--init", "--recursive"],
       ["git", "submodule", "foreach", "--recursive", "git", "reset", "--hard"],

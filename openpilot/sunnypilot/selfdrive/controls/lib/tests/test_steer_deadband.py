@@ -24,3 +24,20 @@ def test_monotonic():
   x = np.linspace(-0.3, 0.3, 2001)
   y = np.array([deadband_comp(t, 0.037) for t in x])
   assert np.all(np.diff(y) > 0)
+
+
+def test_ab_mode_alternates_blocks():
+  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, SteerDeadbandComp
+
+  class FakeParams:
+    def get(self, key, return_default=False):
+      return 0.03
+
+    def get_bool(self, key):
+      return key == "SteerDeadbandCompAB"
+
+  comp = SteerDeadbandComp()
+  comp._params = FakeParams()
+  off = comp.update(0.05, 1.0, mono_s=0.5 * AB_BLOCK_S)
+  on = comp.update(0.05, 1.0, mono_s=1.5 * AB_BLOCK_S)
+  assert off == 0.05 and abs(on - (0.05 + 0.03 * np.tanh(5))) < 1e-9
