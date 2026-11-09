@@ -14,7 +14,14 @@ from openpilot.common.hardware import HARDWARE
 from openpilot.common.params import Params
 from openpilot.system.ui.lib.application import gui_app, FontWeight
 from openpilot.system.ui.lib.text_measure import measure_text_cached
+from openpilot.system.ui.lib.wrap_text import wrap_text
+from openpilot.system.ui.sunnypilot.widgets.jokes import JOKES
 from openpilot.system.ui.widgets import Widget
+
+# Odyssey: a joke screensaver instead of the bouncing logo. Each joke shows its setup, then the punchline, then fades
+# out, and the next one appears somewhere else on the screen, so nothing stays lit in one spot (burn-in).
+SETUP_S, PUNCHLINE_S, FADE_S = 4.0, 7.0, 0.6
+JOKE_S = SETUP_S + PUNCHLINE_S
 
 
 class ScreenSaverSP(Widget):
@@ -24,19 +31,15 @@ class ScreenSaverSP(Widget):
     self._params = params or Params()
     self._is_mici = HARDWARE.get_device_type() == 'mici' or (HARDWARE.get_device_type() == "pc" and os.getenv("BIG") != "1")
 
-    self.x = 0.0
-    self.y = 100.0
-    self.vx = 120.0 if self._is_mici else 300.0
-    self.vy = 70.0 if self._is_mici else 200.0
-    self._hue = 150
-    self.color = rl.color_from_hsv(self._hue, 1, 1)
-
-    self.text = "sunnypilot"
-    self.font_size = 50 if self._is_mici else 200
+    self._setup_size = 34 if self._is_mici else 84
+    self._punch_size = 40 if self._is_mici else 104
+    self._order: list[int] = []
+    self._joke = JOKES[0]
+    self._joke_start = 0.0
+    self._pos = rl.Vector2(0, 0)
     self._start_time = None
     self._dismiss = False
     self._screensaver_timeout = 300
-    self._hit_last_frame = False
 
   @property
   def is_active(self) -> bool:
@@ -50,6 +53,7 @@ class ScreenSaverSP(Widget):
     self._screensaver_timeout = self._params.get("ScreenSaverTimeout", return_default=True)
     if self._start_time is None:
       self._start_time = time.monotonic()
+      self._next_joke()
     self._dismiss = False
 
   def hide_event(self):
@@ -63,57 +67,50 @@ class ScreenSaverSP(Widget):
     gui_app.pop_widget()
     return super()._handle_mouse_release(mouse_pos)
 
+  def _next_joke(self):
+    if not self._order:  # every joke once before any repeats
+      self._order = random.sample(range(len(JOKES)), len(JOKES))
+    self._joke = JOKES[self._order.pop()]
+    self._joke_start = time.monotonic()
+    self._pos = None  # placed on the first render, once the text size is known
+
+  def _lines(self, rect: rl.Rectangle):
+    width = int(rect.width * 0.72)
+    setup = wrap_text(gui_app.font(FontWeight.MEDIUM), self._joke[0], self._setup_size, width)
+    punch = wrap_text(gui_app.font(FontWeight.BOLD), self._joke[1], self._punch_size, width)
+    return setup, punch
+
   def _update_state(self):
     super()._update_state()
-
-    self.font = gui_app.font(FontWeight.AUDIOWIDE)
-    text_size = measure_text_cached(self.font, self.text, self.font_size, 0)
-    self.logo_width = text_size.x
-    self.logo_height = text_size.y
-
     if self._start_time and time.monotonic() - self._start_time > self._screensaver_timeout:
       self._dismiss = True
       self._start_time = None
-
-    dt = rl.get_frame_time()
-
-    self.x += self.vx * dt
-    self.y += self.vy * dt
-
-    hit_x = hit_y = False
-    if self.x + self.logo_width > self.rect.width:
-      self.vx *= -1
-      self.x = self.rect.width - self.logo_width
-      hit_x = True
-    elif self.x < 0:
-      self.vx *= -1
-      self.x = 0
-      hit_x = True
-
-    if self.y + self.logo_height > self.rect.height:
-      self.vy *= -1
-      self.y = self.rect.height - self.logo_height
-      hit_y = True
-    elif self.y < 0:
-      self.vy *= -1
-      self.y = 0
-      hit_y = True
-
-    hit = hit_x or hit_y
-    if hit and not self._hit_last_frame:
-      while self._hue_dist((new_hue := random.randint(0, 360)), self._hue) < 120:
-        pass
-      self._hue = new_hue
-      self.color = rl.color_from_hsv(self._hue, 1, 1)
-    self._hit_last_frame = hit
-
-  @staticmethod
-  def _hue_dist(a, b):
-    d = abs(a - b)
-    return min(d, 360 - d)
+    if time.monotonic() - self._joke_start > JOKE_S:
+      self._next_joke()
 
   def _render(self, rect: rl.Rectangle):
     self.set_rect(rect)
     rl.clear_background(rl.BLACK)
-    rl.draw_text_ex(self.font, self.text, rl.Vector2(int(self.x), int(self.y)), self.font_size, 0, self.color)
+    setup, punch = self._lines(rect)
+    setup_h, punch_h = self._setup_size * 1.2, self._punch_size * 1.15
+    gap = self._setup_size * 0.9
+    block_w = max(measure_text_cached(gui_app.font(FontWeight.BOLD), ln, self._punch_size).x for ln in punch)
+    block_w = max(block_w, max(measure_text_cached(gui_app.font(FontWeight.MEDIUM), ln, self._setup_size).x for ln in setup))
+    block_h = len(setup) * setup_h + gap + len(punch) * punch_h
+    if self._pos is None:
+      margin = rect.width * 0.04
+      self._pos = rl.Vector2(random.uniform(margin, max(margin, rect.width - block_w - margin)),
+                             random.uniform(margin, max(margin, rect.height - block_h - margin)))
+
+    t = time.monotonic() - self._joke_start
+    fade = min(1.0, t / FADE_S, (JOKE_S - t) / FADE_S)
+    punch_fade = min(1.0, max(0.0, (t - SETUP_S) / FADE_S)) * fade
+    x, y = rect.x + self._pos.x, rect.y + self._pos.y
+    for ln in setup:
+      rl.draw_text_ex(gui_app.font(FontWeight.MEDIUM), ln, rl.Vector2(x, y), self._setup_size, 0, rl.Color(235, 235, 235, int(255 * fade)))
+      y += setup_h
+    y += gap
+    for ln in punch:
+      rl.draw_text_ex(gui_app.font(FontWeight.BOLD), ln, rl.Vector2(x, y), self._punch_size, 0, rl.Color(255, 196, 0, int(255 * punch_fade)))
+      y += punch_h
     return -1
