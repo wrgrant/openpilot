@@ -20,7 +20,7 @@ from openpilot.common.params import Params
 
 SMOOTH_WIDTH = 0.01  # normalized torque over which the kick blends in around zero
 PARAMS_PERIOD_FRAMES = 500  # re-read the setting every 5 s at 100 Hz
-AB_BLOCK_S = 80.0  # one off -> kick -> bump cycle every 4 min, so a straight stretch sees all three
+AB_BLOCK_S = 60.0  # a 3 min off -> kick -> bump cycle; shorter blocks hold less than one 15-20 s swing each
 BUMP_PERIOD_FRAMES = 25  # 0.25 s at 100 Hz
 BUMP_MIN = 0.003  # below this a request is treated as zero, so noise around zero doesn't pulse
 
