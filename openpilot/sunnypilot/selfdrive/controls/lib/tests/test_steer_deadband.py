@@ -36,12 +36,12 @@ class TestSteerDeadband(OpenpilotTestCase):
     y = np.array([deadband_comp(t, 0.037) for t in x])
     assert np.all(np.diff(y) > 0)
 
-  def test_ab_mode_alternates_blocks(self):
-    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, SteerDeadbandComp
+  def test_ab_mode_rotates_off_kick_bump(self):
+    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, AB_KICK, SteerDeadbandComp
 
     class FakeParams:
       def get(self, key, return_default=False):
-        return 0.03
+        return 0.0
 
       def get_bool(self, key):
         return key == "SteerDeadbandCompAB"
@@ -49,5 +49,8 @@ class TestSteerDeadband(OpenpilotTestCase):
     comp = SteerDeadbandComp()
     comp._params = FakeParams()
     off = comp.update(0.05, 1.0, mono_s=0.5 * AB_BLOCK_S)
-    on = comp.update(0.05, 1.0, mono_s=1.5 * AB_BLOCK_S)
-    assert off == 0.05 and abs(on - (0.05 + 0.03 * np.tanh(5))) < 1e-9
+    kick = comp.update(0.05, 1.0, mono_s=1.5 * AB_BLOCK_S)
+    bump = [comp.update(0.02, 1.0, mono_s=2.5 * AB_BLOCK_S) for _ in range(25)]
+    assert off == 0.05
+    assert abs(kick - (0.05 + AB_KICK * np.tanh(5))) < 1e-9
+    assert set(np.round(bump, 6)) == {0.0, 0.06}

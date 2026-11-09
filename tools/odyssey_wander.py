@@ -14,8 +14,8 @@ it reports, in the 7-20 s band:
 
   PYTHONPATH=$PWD .venv/bin/python tools/odyssey_wander.py ~/comma-logs/<dongle>_<route> [--min-mph 25] [--min-s 45] [--ab]
 
---ab scores a drive made with SteerDeadbandCompAB on: it splits the stretches at the kick's on/off blocks and compares
-the two sides.
+--ab scores a drive made with SteerDeadbandCompAB on: it splits the stretches at the off / kick / bump blocks and
+compares them.
 """
 import argparse
 import glob
@@ -103,37 +103,34 @@ def analyze(d: dict[str, np.ndarray], r: np.ndarray) -> dict[str, float]:
           "follow": float(np.std(des - act) / max(np.std(des), 1e-6)), "lag": float(lags[w][np.argmax(cc[w])])}
 
 
-def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> list[tuple[bool, np.ndarray]]:
-  """Cut each stretch where SteerDeadbandCompAB's kick switches on or off; keep pieces of at least min_s."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import ab_kick_on
+def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> list[tuple[str, np.ndarray]]:
+  """Cut each stretch where SteerDeadbandCompAB switches compensation; keep pieces of at least min_s."""
+  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import ab_arm
   out = []
   for r in runs:
-    on = np.array([ab_kick_on(t) for t in d["t"][r]])
-    for piece in np.split(r, np.where(np.diff(on.astype(int)) != 0)[0] + 1):
+    arm = np.array([ab_arm(t) for t in d["t"][r]])
+    for piece in np.split(r, np.where(arm[1:] != arm[:-1])[0] + 1):
       if len(piece) >= min_s * FS:
-        out.append((bool(ab_kick_on(d["t"][piece[0]])), piece))
+        out.append((ab_arm(d["t"][piece[0]]), piece))
   return out
 
 
 def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> None:
-  pieces = ab_split(d, runs, min_s)
-  res = {True: [], False: []}
-  print(f"{'kick':>5} {'seg':>4} {'min':>4} {'mph':>4} {'wander':>7} {'period':>7} {'follow':>7}")
-  for on, r in pieces:
+  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_ARMS
+  res: dict[str, list[dict]] = {a: [] for a in AB_ARMS}
+  print(f"{'arm':>5} {'seg':>4} {'min':>4} {'mph':>4} {'wander':>7} {'period':>7} {'follow':>7}")
+  for arm, r in ab_split(d, runs, min_s):
     x = analyze(d, r)
-    res[on].append(x)
+    res[arm].append(x)
     wander = f"{x['wander']:7.1f}" if np.isfinite(x["wander"]) else f"{'-':>7}"
-    print(f"{'on' if on else 'off':>5} {int(x['seg']):>4} {x['minutes']:>4.1f} {x['mph']:>4.0f} {wander} {x['period']:>7.1f} {x['follow']:>7.2f}")
+    print(f"{arm:>5} {int(x['seg']):>4} {x['minutes']:>4.1f} {x['mph']:>4.0f} {wander} {x['period']:>7.1f} {x['follow']:>7.2f}")
   print()
-  means = {}
-  for on in (False, True):
-    w = np.array([x["wander"] for x in res[on] if np.isfinite(x["wander"])])
-    mins = sum(x["minutes"] for x in res[on])
-    means[on] = (w.mean() if len(w) else np.nan, w.std() / np.sqrt(len(w)) if len(w) > 1 else np.nan)
-    print(f"kick {'on ' if on else 'off'}: {mins:4.1f} min in {len(res[on])} pieces, wander {means[on][0]:.1f} ± {means[on][1]:.1f} cm rms")
-  if all(np.isfinite(means[k][0]) for k in means):
-    diff, se = means[True][0] - means[False][0], np.hypot(means[True][1], means[False][1])
-    print(f"kick changes wander by {diff:+.1f} ± {se:.1f} cm" + (" (beyond noise)" if abs(diff) > 2 * se else " (within noise: drive more)"))
+  for arm in AB_ARMS:
+    w = np.array([x["wander"] for x in res[arm] if np.isfinite(x["wander"])])
+    mins = sum(x["minutes"] for x in res[arm])
+    mean = w.mean() if len(w) else np.nan
+    se = w.std() / np.sqrt(len(w)) if len(w) > 1 else np.nan
+    print(f"{arm:>5}: {mins:4.1f} min in {len(res[arm])} pieces, wander {mean:.1f} ± {se:.1f} cm rms")
 
 
 def main():
@@ -141,7 +138,7 @@ def main():
   ap.add_argument("route_dir")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
-  ap.add_argument("--ab", action="store_true", help="compare SteerDeadbandCompAB's kick-on and kick-off blocks")
+  ap.add_argument("--ab", action="store_true", help="compare SteerDeadbandCompAB's off, kick and bump blocks")
   args = ap.parse_args()
 
   d = load(args.route_dir)
