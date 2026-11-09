@@ -64,6 +64,12 @@ NNLC vs stock v0 (open-loop replay, 1a7/1aa/1ab):
 - It saturates more below 20 mph.
 - A 0.45 s delay raises NNLC reversals by about 30% at 35+ mph.
 
+Closed-loop sim (`tools/odyssey_sim/closedloop/`, 1,400 runs; real V0 / NNLC / `OdysseySteer` on fitted and comma plants):
+- Simulated stock tracking cost does not reproduce recorded tracking, so rankings are weak.
+- The plants disagree on NNLC vs stock: NNLC is 8% better at 20+ mph on the William plant, tied on public data, worse on comma's generic model.
+- Robust across replay and sim: a 0.45 s delay adds 30-39% torque reversals with no tracking benefit (the van is back on the learned delay, `LagdToggle` 1), and the 0.03 kick is worth about 0.5%.
+- Low-speed angle steering is unvalidated: no plant is valid below about 10 mph.
+
 The lane-wander simulator overstates wander by 1-3×: use it to reject fragile controllers, not to rank them.
 
 Analysis tools:
