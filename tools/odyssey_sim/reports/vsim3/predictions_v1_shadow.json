@@ -1,0 +1,61 @@
+{
+  "registered_at_utc": "2026-11-09T16:24:43.114161+00:00",
+  "computed_at_utc": "2026-11-09T18:54:18.762269+00:00",
+  "original_source_sha256": "2ab90d0f900932a1e67d830ae1f6aa4e13dbf8d6aa3acaf5f0aa38a62be4e7a8",
+  "original_snapshot_reproduced": true,
+  "status": "Original unmasked v1 rule retained for transparent road scoring; primary v2 corrects visibility semantics.",
+  "predictions": {
+    "S3": {
+      "wander_cm": {
+        "n": 19,
+        "mean": 0.0671367277355749,
+        "ci95": [
+          -0.34100795499666653,
+          0.4874279335534158
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 6,
+        "mean": -0.026475378426493185,
+        "ci95": [
+          -0.06172806212924939,
+          0.0063637981254468555
+        ]
+      },
+      "body_jerk_rms_mps3": {
+        "n": 19,
+        "mean": 0.014778015928492816,
+        "ci95": [
+          0.010586982095613788,
+          0.019202063525666103
+        ]
+      }
+    },
+    "S5": {
+      "wander_cm": {
+        "n": 19,
+        "mean": 0.15391274061871418,
+        "ci95": [
+          -0.3173519618495599,
+          0.6694574708348883
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 6,
+        "mean": -0.04363305987546018,
+        "ci95": [
+          -0.08041577356960804,
+          -0.0066491389433377636
+        ]
+      },
+      "body_jerk_rms_mps3": {
+        "n": 19,
+        "mean": 0.03625466886937679,
+        "ci95": [
+          0.026272677073022315,
+          0.04738496316752463
+        ]
+      }
+    }
+  }
+}

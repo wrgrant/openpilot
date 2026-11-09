@@ -19,7 +19,7 @@ from tools.odyssey_sim.vsim.geometry import homography
 from tools.odyssey_sim.vsim.model import DefaultModel, prepare
 from tools.odyssey_sim.vsim.perturbation import injection
 from types import SimpleNamespace as NS
-from tools.odyssey_sim.vsim.metrics import perception_metrics, closure_metrics
+from tools.odyssey_sim.vsim.metrics import perception_metrics, closure_metrics, curve_scores, lane_scores, logged_lane_mask
 
 
 def records(route):
@@ -75,11 +75,11 @@ def main():
   ap.add_argument('--dpsi', type=float, default=0.0, help='degrees, positive right')
   ap.add_argument('--output', type=Path, help='optional evidence JSON and frame traces')
   ap.add_argument('--model', type=Path, default=Path('openpilot/selfdrive/modeld/models/driving_supercombo.onnx'))
-  ap.add_argument('--period', type=float, default=10.)
+  ap.add_argument('--period', type=float, default=10.0)
   ap.add_argument('--shape', choices=['sine', 'ramp', 'step'])
   ap.add_argument('--scratch', type=Path)
   ap.add_argument('--sensitivity', choices=['gain', 'friction', 'lag'])
-  ap.add_argument('--scale', type=float, default=1.)
+  ap.add_argument('--scale', type=float, default=1.0)
   args = ap.parse_args()
   if args.period <= 0:
     ap.error('period must be positive')
@@ -121,6 +121,7 @@ def main():
   loop = None
   if args.controller != 'logged':
     from tools.odyssey_sim.vsim.closed_loop import ClosedLoop
+
     loop = ClosedLoop(args.route, args.controller, args.scratch, (args.sensitivity, args.scale) if args.sensitivity else None, rows[0][0] + lo)
   model = DefaultModel(args.model)
   readers, traces = {}, []
@@ -201,7 +202,8 @@ def main():
       traces.append(
         {
           't': elapsed,
-          'dy': float(dy), 'dpsi': float(dpsi),
+          'dy': float(dy),
+          'dpsi': float(dpsi),
           'frame': md.frameId,
           'extra': md.frameIdExtra,
           'speed': speed,
@@ -209,6 +211,8 @@ def main():
           'timestamp_error_ms': (pair[0][2] - md.timestampEof) / 1e6,
           'curvature': action.desiredCurvature,
           'logged_curvature': md.action.desiredCurvature,
+          'lane_prob': output['lane_lines_prob'][0, 1::2].tolist(),
+          'logged_lane_prob': list(md.laneLineProbs),
           'lane': output['lane_lines'][0, 1:3, :, 0].tolist(),
           'logged_lane': [list(md.laneLines[i].y) for i in (1, 2)],
           'path': output['plan'][0, :, 1].tolist(),
@@ -240,7 +244,8 @@ def main():
     'controller': args.controller,
     'controller_identity': loop.identity if loop else None,
     'metrics': metrics,
-    'gate1_pass': loop is None and not (args.dy or args.dpsi or args.shape)
+    'gate1_pass': loop is None
+    and not (args.dy or args.dpsi or args.shape)
     and moving_metrics is not None
     and moving_metrics['curvature']['r'] is not None
     and moving_metrics['curvature']['r'] > 0.99,
@@ -256,6 +261,12 @@ def main():
     'skipped': dict(skipped),
     'message_counts': dict(counts),
   }
+  if loop and traces and loop.history:
+    result['matched_curve_metrics'] = curve_scores(traces, loop.history, loop.d, origin)
+    if len(traces) >= 3:
+      key = args.route.name.split('_')[1].split('--')[0]
+      result['canonical_lane_metrics'] = lane_scores(traces, loop.history, logged_lane_mask(traces, key, origin))
+    result['legacy_closure_metrics_note'] = 'closure_metrics is the legacy unmasked diagnostic; canonical_lane_metrics applies visibility/continuity gates.'
   if loop and args.output:
     args.output.with_suffix('.motion.json').write_text(json.dumps(loop.history))
   if args.output:

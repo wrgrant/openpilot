@@ -9,8 +9,9 @@ from tools.odyssey_sim.vsim.perturbation import PerturbationPlant
 
 
 def native_data(key):
-  d = dict(np.load(S / 'plant_data' / f'{key}.npz'))
-  b = np.load(S / 'calib' / f'{key}_body.npz')
+  root = S if (S / 'plant_data' / f'{key}.npz').exists() else S / 'vsim3' / 'cache'
+  d = dict(np.load(root / 'plant_data' / f'{key}.npz'))
+  b = np.load(root / 'calib' / f'{key}_body.npz')
   for name, col in [('roll', 1), ('angle_offset', 2), ('sr', 3), ('stiffness', 4)]:
     d[name] = align(d['t'], b['vp'], col, .5)
   for name, col in [('yaw', 3), ('pitch', 5)]:
@@ -18,7 +19,7 @@ def native_data(key):
   for name, col in [('delay', 1), ('factor', 2), ('friction', 3), ('torque_offset', 4)]:
     d[name] = align(d['t'], b['tuning'], col, .15)
   d['body'] = d['v'] * d['yaw']
-  controls = np.load(S / 'calib3' / f'{key}.npz')['native']
+  controls = np.load(root / 'calib3' / f'{key}.npz')['native']
   d['a_ego'] = align(d['t'], controls, 2, .04)
   return d
 
@@ -74,6 +75,8 @@ class ClosedLoop:
     cfg = Config(nnlc=self.meta['params'].get('NeuralNetworkLateralControl') == b'1')
     module, name = factory.split(':')
     self.controller = getattr(importlib.import_module(module), name)(self.meta, cfg)
+    import os
+    self.identity['simulation_arm'] = os.environ.get('VSIM_ARM', 'recorded')
     self.d = native_data(route.name.split('_')[1].split('--')[0])
     self.plant = PerturbationPlant(sensitivity=sensitivity)
     self.pose = RelativePose()

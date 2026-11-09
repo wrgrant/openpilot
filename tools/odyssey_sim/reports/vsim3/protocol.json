@@ -1,0 +1,57 @@
+{
+  "registered_at_utc": "2026-11-09T16:04:02.356282+00:00",
+  "training": [
+    "000001a3",
+    "000001a7"
+  ],
+  "heldout": [
+    "000001aa",
+    "000001ab"
+  ],
+  "extra_unseen": [
+    "0000019f",
+    "000001a0",
+    "000001a2"
+  ],
+  "selection": "Every maximal native continuously autonomous stretch >=45 s; split at >25ms native CAN gaps, v>5m/s, no pressed/blinker/abs(driver)>=500, finite required context. Require paired ready cameras throughout 15s model warmup and score. No hand-picked straight.",
+  "interval": "Paired window mean differences with 10000 deterministic window bootstrap resamples, 95% percentile CI; n<2 has no interval. Conditional on routes/windows, not a road-drive prediction interval.",
+  "failure": "Record full-window failures; never rank using only the surviving controllers.",
+  "curve": "Logged plan defines matched curve events via characterize.events; run-wide is median outside-directed near-lane offset over middle 50%; exit body threshold is 20% logged peak minus plan threshold time.",
+  "jerk": "RMS derivative of body lateral acceleration resampled to20Hz, m/s3, no hand torque proxy.",
+  "ab_units": "Existing odyssey_wander --ab nnlc_model reports wander in cm RMS. It does not report curve or body jerk. Added units are metres and m/s3.",
+  "tuning": "No controller/plant parameter fitting on heldout. Existing +/-25% uncertainty retained.",
+  "source_sha256": {
+    "tools/odyssey_sim/vsim/test_model.py": "53cdec9e8fb034ea75b9078f3daf394ecf3658d9045459423e609a5c6bbbc858",
+    "tools/odyssey_sim/vsim/bias.py": "cdc7b4c9450f7ea5b8507eb6cac32e8e28b9c5320f4c7251336f827404028678",
+    "tools/odyssey_sim/vsim/metrics.py": "d9c6666dd487a364e2c94c75133ebf4941e65be0ee8b8311a6bac6bd4e02a854",
+    "tools/odyssey_sim/vsim/run.py": "f8d3ce4b896f95e28a18bfab37b8ed48ef9a1eb42e342105d75b7a189ec9aae4",
+    "tools/odyssey_sim/vsim/test_perturbation.py": "ea49ac2446cd70cf7845682d303ecbdb61f982641461de0b4c4cb9c4b81665df",
+    "tools/odyssey_sim/vsim/prepare_extra.py": "ae62aff219d1228024ac2e425bf92e5b61dc96e9ed119669d35f030825525450",
+    "tools/odyssey_sim/vsim/plant_audit.py": "095582cb414a2f44061d19d0cb784d93646f83d7f951bc2042bca8e48872f56e",
+    "tools/odyssey_sim/vsim/controls_audit.py": "4ceadb12a250749aa44854bab52b1452c7f3ca0ec7e4d168add6a877b79870fc",
+    "tools/odyssey_sim/vsim/model.py": "d5dbdf69933a505846327287069d7767002dcfcec19399e2bcf4e431c3aba663",
+    "tools/odyssey_sim/vsim/campaign.py": "f28ac661042ea13fe710b2007cfe377c8b3bcdd1710780f345e98986e724ccd9",
+    "tools/odyssey_sim/vsim/transfer.py": "25fa1c95e472945e2470c0f5a56175a20896fa19cb358bb04fea4f4de14b98c2",
+    "tools/odyssey_sim/vsim/geometry.py": "5a957bdc8e83b3f689cf70ed0bc8b028cea6c035a5d565a730def5349775d4d0",
+    "tools/odyssey_sim/vsim/test_campaign.py": "ea9ecf4488047240b526f8d2debe8d907baa993bd881b38ea84c25c5fff9d0cd",
+    "tools/odyssey_sim/vsim/candidates.py": "4d1e8bd0160292f9ad4ed51f7bb649127b11bc0bb9976af47e413def571aa8bc",
+    "tools/odyssey_sim/vsim/pulses.py": "4b894648fbebfde304525b3a0cfa8554da198e358087596ebb1d9f244a646438",
+    "tools/odyssey_sim/vsim/closed_loop.py": "f9044ecac0cee379a03de93ad49a528496a12224e2ec3118a26b472fee95cb82",
+    "tools/odyssey_sim/vsim/test_geometry.py": "1519ae12d9d4306f0682ae651b479b7ea970e8d1427508aebf172a61ea188cca",
+    "tools/odyssey_sim/vsim/video.py": "d2802f7c7e98d420194f48e3d6dd004f19f183725991c210c4d2f1e4a690fa86",
+    "tools/odyssey_sim/vsim/perturbation.py": "cc5e053960686f59d3c992850cb6ba7abca06e933175bdb1b303ce4437041310",
+    "tools/odyssey_sim/vsim/analyze.py": "5f6a26254108d6a456282990373d7804822501eedd2d1d4c997b0e054b237748"
+  },
+  "local_routes_before_predictions": [
+    "04b44e4c4fe44232_000001a3--c16cc8db23",
+    "04b44e4c4fe44232_0000019c--0d91088e6e",
+    "04b44e4c4fe44232_000001ab--9191c0d55d",
+    "04b44e4c4fe44232_000001aa--ba236ee054",
+    "04b44e4c4fe44232_00000174--f116099ddd",
+    "04b44e4c4fe44232_000001a7--a7f62f4b3f",
+    "04b44e4c4fe44232_000001a4--917ddc3202",
+    "04b44e4c4fe44232_0000019b--67c64d0ac6",
+    "04b44e4c4fe44232_000001a5--555b3a0ea8",
+    "04b44e4c4fe44232_0000018c--9a64dd12bc"
+  ]
+}

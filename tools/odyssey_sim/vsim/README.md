@@ -6,12 +6,14 @@ causal calibration/delay/traffic/desire context and the graph's recurrent state.
 It applies a road-plane homography before camera preprocessing, in one resample.
 The model predicts the plan and action; no fitted planner replaces it.
 
-The moving 1a3 replay reaches desired-curvature r=0.99983. Pass 2 adds dynamic,
-kinematically consistent warps and a free-running real-controller loop around a
-logged-trajectory perturbation plant. A training straight completes, but **held-out
-closure and controller rankings remain unvalidated**: held-out video has not arrived.
-The pulse gate is also incomplete: 1a3 contains an older suite without the frozen
-no-pulse holds needed for the requested train/validation experiment.
+The moving 1a3 replay reaches desired-curvature r=0.99983. Dynamic, kinematically
+consistent warps close the real-controller loop around a logged-trajectory
+perturbation plant. Exhaustive controller comparisons and held-out curve/exit
+measurements retain each window's pose departure, because close agreement can
+carry recorded motion forward. **Controller rankings remain unvalidated**; see the
+current research report for per-window gate outcomes and prospective forecasts.
+The independent pulse gate is incomplete: 1a3 lacks the frozen no-pulse holds
+needed for the requested train/validation experiment.
 
 ## Run
 
@@ -39,7 +41,9 @@ exist. No silent default-model or calibration substitution occurs.
 
 Output includes lane/path/curvature agreement, runtime breakdown and existing
 `odyssey_wander` band/period metrics when >=45 continuous seconds are available.
-These are unmasked perception diagnostics. Matched curve width, curve release and takeover metrics remain unavailable.
+These are unmasked perception diagnostics. Closed-loop runs additionally print
+matched signed curve width, body release timing and body jerk in
+`matched_curve_metrics`; takeover metrics remain unavailable.
 Training closure exports pose and per-window wander RMS, period and spectrum.
 
 ## Code map
@@ -60,7 +64,8 @@ Training closure exports pose and per-window wander RMS, period and spectrum.
 
 ```sh
 .venv/bin/python tools/test_runner.py \
-  tools/odyssey_sim/vsim/test_geometry.py tools/odyssey_sim/vsim/test_model.py
+  tools/odyssey_sim/vsim/test_geometry.py tools/odyssey_sim/vsim/test_model.py \
+  tools/odyssey_sim/vsim/test_perturbation.py tools/odyssey_sim/vsim/test_campaign.py
 .venv/bin/ruff check tools/odyssey_sim/vsim
 .venv/bin/python -m tools.odyssey_sim.vsim.plant_audit \
   --route 000001a3 --output "$VSIM_SCRATCH/plant_recheck.json"
@@ -87,7 +92,7 @@ algebraically; this is an invariant, not independent plant validation.
 
 ## Pass 2 commands and interpretation
 
-Use the same scratch dependency environment above; set a separate output directory:
+Use the repository `.venv`; set a separate output directory:
 
 ```sh
 export VSIM2="$VSIM_SCRATCH/../vsim2"
@@ -138,3 +143,78 @@ training fit with its observational-identification limitations.
 `metrics.closure_metrics` exports per-window near-lane RMS, period and spectral
 power; those values alone cannot authorize ranking. See `report_vsim2.md` in scratch
 for generation failures, missing coverage and exact next steps.
+
+## Pass 3: discrimination and prospective validation
+
+`campaign.py` discovers **all maximal** native autonomous stretches >=45s, with
+v>5m/s, no driver override/blinker, finite context, and no >25ms CAN gap. It
+requires both cameras throughout scoring plus 15s recurrent warmup. A segment is
+ready only after both HEVC files exist and its next segment starts filling. The
+inventory records ineligible/missing-video coverage rather than selecting a
+convenient straight. Nothing reads the comma or writes to the log directory.
+
+```sh
+.venv/bin/python -m tools.odyssey_sim.vsim.campaign --scratch "$VSIM3" \
+  --routes 000001a3 000001a7 \
+  --arms stock v0 kp_half kp_double V1 S3 S5 friction bad_delay
+# Held-out settings stay frozen; S3/S5 are prospective comparisons.
+.venv/bin/python -m tools.odyssey_sim.vsim.campaign --scratch "$VSIM3" \
+  --routes 000001aa 000001ab --arms stock S3 S5
+.venv/bin/python -m tools.odyssey_sim.vsim.analyze --scratch "$VSIM3"
+.venv/bin/python -m tools.odyssey_sim.vsim.bias --scratch "$VSIM3"
+# Register the calculation before any new road drive/results; finalize after every named route is scanned.
+.venv/bin/python -m tools.odyssey_sim.vsim.predictions --scratch "$VSIM3"
+.venv/bin/python -m tools.odyssey_sim.vsim.predictions --scratch "$VSIM3" --finalize
+```
+
+`candidates.py` uses the pass-2 native V0 adapter. KP changes apply to the entire
+V0 schedule. V1/S3/S5 use the same bounded evaluator and response-shaper metadata
+as the production model A/B. `friction` adds the inverse FrictionAssist to stock
+NNLC; `bad_delay` delays the complete stock command by 30 native control updates
+(nominal 0.3s). Each run owns scratch Params and a separate process. Simulation
+identity records the requested arm. Commands and body/relative-pose trajectories
+are retained. Partial/domain-exit runs remain failures, never improvements.
+
+`run.py` also prints `matched_curve_metrics` directly, using the same
+`metrics.curve_scores` implementation as batch analysis. It also prints
+`canonical_lane_metrics` from the shared `metrics.lane_scores` function; the
+legacy unmasked closure diagnostics are labelled explicitly. Its per-event values
+remain separate from the legacy nullable aggregate perception fields.
+
+`analyze.py` reports paired-window mean differences and 95% percentile bootstrap
+intervals (10,000 seeded window resamples; fewer than two windows has no interval).
+These quantify conditional window uncertainty, **not** transport uncertainty for a
+new road drive. Wander uses the existing 7–20s detrended FFT metric in cm RMS,
+requiring both logged lane probabilities >0.5 for >80% of each window and
+interpolating low-confidence holes. The logged mask is fixed across candidates;
+insufficient visibility returns null. Unmasked diagnostics remain explicit.
+Near-field cubic-fit diagnostics remain separately identified. Spectra and maximum
+lane offset accompany pose departure. Curves are selected from the **logged**
+plan using `curves.characterize.events` so candidates cannot change event selection.
+Signed outside-directed width uses the middle 50% of each matched event,
+requires >80% visible mid-curve support, and is null otherwise; body release
+uses the 20% logged-plan-peak crossing. Body jerk is the RMS derivative of body
+lateral acceleration resampled to 20Hz. `odyssey_wander --ab nnlc_model` currently
+reports wander only; curve width (m) and jerk (m/s³) are additional metrics.
+
+`bias.py` applies the natural regression to complete, visible training-route
+free-running outputs and
+compares its implied harmonic gain to the pass-2 measured injected response.
+Differential fits also compare true relative pose with perceived lane regressors.
+A known linear/noise calibration demonstrates attenuation algebra; it does not
+establish the real model's noise level or identify the cause of the natural-fit
+gap. Road geometry, feedback and omitted temporal dynamics remain confounders.
+`prepare_extra.py` reuses extraction code for new local routes, without fitting,
+and confines new caches to `$VSIM3/cache`. Use the canonical research scratch
+`S/vsim3` for extra routes: `native_data` reuses the fixed existing `S` caches
+first, then `S/vsim3/cache`, where `S` is defined by `calib.identify`.
+
+Forecast registration preserves version history: the original unmasked formula
+and the visibility-corrected formula are timestamped separately. Full-window
+forecast inputs with unavailable lane metrics are excluded explicitly, not
+replaced by zero; body motion remains scoreable without lane lines.
+
+Only a completed discrimination test **and** held-out lane/curve closure can
+license rankings. A small error against the log is not enough when pose departure
+is small. Prospective road predictions must be timestamped before observing new
+A/B-drive results; retain their input-route inventory and hashes.

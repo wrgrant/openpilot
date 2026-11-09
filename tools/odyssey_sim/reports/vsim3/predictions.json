@@ -1,0 +1,400 @@
+{
+  "registered_at_utc": "2026-11-09T18:26:38.289296+00:00",
+  "formula_sha256": "1f56cf389aabbb57f1e3679e630e65380945bf86e6751e917f08c411658ba50d",
+  "locked": true,
+  "status": "numerical forecast locked from preregistered formula; no road-ranking validation claimed",
+  "initial_training_only_snapshot": {
+    "S3": {
+      "wander_cm": {
+        "n": 2,
+        "mean": -0.12879322098544144,
+        "ci95": [
+          -1.0053561344540096,
+          0.7477696924831267
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 0,
+        "mean": null,
+        "ci95": null,
+        "reason": "no complete paired events"
+      },
+      "body_jerk_rms_mps3": {
+        "n": 2,
+        "mean": 0.023959685852920437,
+        "ci95": [
+          0.01301513221066658,
+          0.034904239495174294
+        ]
+      }
+    },
+    "S5": {
+      "wander_cm": {
+        "n": 2,
+        "mean": 0.20381220390536203,
+        "ci95": [
+          -0.9724973831551811,
+          1.3801217909659051
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 0,
+        "mean": null,
+        "ci95": null,
+        "reason": "no complete paired events"
+      },
+      "body_jerk_rms_mps3": {
+        "n": 2,
+        "mean": 0.0491701996946835,
+        "ci95": [
+          0.020272946213725218,
+          0.07806745317564179
+        ]
+      }
+    }
+  },
+  "named_historical_routes": [
+    "000001a3",
+    "000001a7",
+    "000001aa",
+    "000001ab",
+    "0000019f",
+    "000001a0",
+    "000001a2"
+  ],
+  "units": {
+    "wander_cm": "cm RMS",
+    "curve_run_wide_m": "m",
+    "body_jerk_rms_mps3": "m/s3"
+  },
+  "estimator": "Mean paired-window candidate-minus-stock differences; >80% common logged lane visibility for wander, visible paired curve events for width, all complete pairs for body jerk; seeded 10000 percentile window bootstraps.",
+  "interval_caution": "Conditional 95% confidence intervals, not calibrated prediction intervals for a new road drive.",
+  "road_ab_settle_s": 30,
+  "simulation_warmup_s": 15,
+  "ab_scoring": "Existing odyssey_wander --ab nnlc_model reports wander only; curve and jerk use protocol.json additions.",
+  "new_drive_access": "No device access or new-drive A/B results read. Local inventory cannot establish whether an untransferred drive exists.",
+  "local_routes_at_registration": [
+    "04b44e4c4fe44232_000001a3--c16cc8db23",
+    "04b44e4c4fe44232_0000019c--0d91088e6e",
+    "04b44e4c4fe44232_000001ab--9191c0d55d",
+    "04b44e4c4fe44232_000001aa--ba236ee054",
+    "04b44e4c4fe44232_00000174--f116099ddd",
+    "04b44e4c4fe44232_000001a7--a7f62f4b3f",
+    "04b44e4c4fe44232_000001a4--917ddc3202",
+    "04b44e4c4fe44232_0000019b--67c64d0ac6",
+    "04b44e4c4fe44232_000001a5--555b3a0ea8",
+    "04b44e4c4fe44232_0000018c--9a64dd12bc"
+  ],
+  "predictions": {
+    "S3": {
+      "wander_cm": {
+        "n": 13,
+        "mean": 0.10051593384768392,
+        "ci95": [
+          -0.4498256207828802,
+          0.7098582216662357
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 5,
+        "mean": -0.03297944259902351,
+        "ci95": [
+          -0.07193571052397398,
+          0.005976825325926938
+        ]
+      },
+      "body_jerk_rms_mps3": {
+        "n": 19,
+        "mean": 0.014778015928492816,
+        "ci95": [
+          0.010586982095613788,
+          0.019202063525666103
+        ]
+      }
+    },
+    "S5": {
+      "wander_cm": {
+        "n": 13,
+        "mean": 0.15263604664519695,
+        "ci95": [
+          -0.5110995514137627,
+          0.930518546687472
+        ]
+      },
+      "curve_run_wide_m": {
+        "n": 5,
+        "mean": -0.04231627097356519,
+        "ci95": [
+          -0.08704281540560753,
+          0.002410273458477158
+        ]
+      },
+      "body_jerk_rms_mps3": {
+        "n": 19,
+        "mean": 0.03625466886937679,
+        "ci95": [
+          0.026272677073022315,
+          0.04738496316752463
+        ]
+      }
+    }
+  },
+  "registration_correction": {
+    "at": "2026-11-09T16:25:01.468467+00:00",
+    "original_sha256": "b8a472098facd8fa61454e371482cd774468377ec4bb4415e5b60581feab315a",
+    "reason": "Lint-only change from dict() to literal in units metadata; prediction calculation unchanged; original source retained."
+  },
+  "dependency_sha256": {
+    "tools/odyssey_sim/vsim/test_model.py": "53cdec9e8fb034ea75b9078f3daf394ecf3658d9045459423e609a5c6bbbc858",
+    "tools/odyssey_sim/vsim/bias.py": "0a2f5f1f53b7ad5b673195e4fa5e5626eafe7c381c078b20c4fda6194bb957ef",
+    "tools/odyssey_sim/vsim/metrics.py": "5a776a94b27ebd2af7a0a97bb7af33efa43868837eff021a53c7b66153383d92",
+    "tools/odyssey_sim/vsim/predictions.py": "1f56cf389aabbb57f1e3679e630e65380945bf86e6751e917f08c411658ba50d",
+    "tools/odyssey_sim/vsim/run.py": "502f95c8d5fe6c4487c4758e09fc2841b4dfa2175fc8819c5e454c31b7a88831",
+    "tools/odyssey_sim/vsim/test_perturbation.py": "ea49ac2446cd70cf7845682d303ecbdb61f982641461de0b4c4cb9c4b81665df",
+    "tools/odyssey_sim/vsim/prepare_extra.py": "c3fb2f521f32bd547f59d4f313e8d89f220e0e34601c7e3aeb6d96fd544debff",
+    "tools/odyssey_sim/vsim/plant_audit.py": "095582cb414a2f44061d19d0cb784d93646f83d7f951bc2042bca8e48872f56e",
+    "tools/odyssey_sim/vsim/controls_audit.py": "4ceadb12a250749aa44854bab52b1452c7f3ca0ec7e4d168add6a877b79870fc",
+    "tools/odyssey_sim/vsim/model.py": "d5dbdf69933a505846327287069d7767002dcfcec19399e2bcf4e431c3aba663",
+    "tools/odyssey_sim/vsim/campaign.py": "50a1d62f401eef4628bcd9a87b11627da07a7777b2c96c57d55115548531feda",
+    "tools/odyssey_sim/vsim/transfer.py": "25fa1c95e472945e2470c0f5a56175a20896fa19cb358bb04fea4f4de14b98c2",
+    "tools/odyssey_sim/vsim/geometry.py": "5a957bdc8e83b3f689cf70ed0bc8b028cea6c035a5d565a730def5349775d4d0",
+    "tools/odyssey_sim/vsim/test_campaign.py": "b9e613ce47d1c1d6c64f4d6c0a98caa03e98f510432ffbb46b2b425630c1a042",
+    "tools/odyssey_sim/vsim/candidates.py": "4d1e8bd0160292f9ad4ed51f7bb649127b11bc0bb9976af47e413def571aa8bc",
+    "tools/odyssey_sim/vsim/pulses.py": "4b894648fbebfde304525b3a0cfa8554da198e358087596ebb1d9f244a646438",
+    "tools/odyssey_sim/vsim/closed_loop.py": "bacee0b96a2bef73eb96802769d21fe8c1df01af160f6124ca47ef9c4b4d08e8",
+    "tools/odyssey_sim/vsim/test_geometry.py": "1519ae12d9d4306f0682ae651b479b7ea970e8d1427508aebf172a61ea188cca",
+    "tools/odyssey_sim/vsim/video.py": "d2802f7c7e98d420194f48e3d6dd004f19f183725991c210c4d2f1e4a690fa86",
+    "tools/odyssey_sim/vsim/perturbation.py": "cc5e053960686f59d3c992850cb6ba7abca06e933175bdb1b303ce4437041310",
+    "tools/odyssey_sim/vsim/analyze.py": "8c9f00ac63e35669217bab019bc0d358b11dc6cfd8b627787954e18a1c4bce20"
+  },
+  "model_sha256": {
+    "openpilot/selfdrive/modeld/models/driving_supercombo.onnx": "65a08adc31d5c456219687d99b7bf5e44d61dae2d49ea67850e76105c7248cce",
+    "openpilot/sunnypilot/neural_network_data/neural_network_lateral_control/HONDA_ODYSSEY.json": "32c9e028bc8c8fbddbca4c8684bc28d07a5fddbecd84fea29ea42e41b74c0410",
+    "/Users/williamgrant/comma-logs/odyssey-nnlc-models/HONDA_ODYSSEY_WILLIAM_S3.json": "869c050c4904937f4749161b977b36c45ac3393b979d19d3ed26db1c5f680ac4",
+    "/Users/williamgrant/comma-logs/odyssey-nnlc-models/HONDA_ODYSSEY_WILLIAM_S5.json": "461bda7b7d4fd395dcf342868c56f9e91e0c756f861b8db6f42672280393372f",
+    "/Users/williamgrant/comma-logs/odyssey-nnlc-models/HONDA_ODYSSEY_WILLIAM_V2.json": "56a390fce65b5e07505b7c1142415e01f72f0142fddbc4affe64dac4e8a2cc78",
+    "/Users/williamgrant/comma-logs/odyssey-nnlc-models/HONDA_ODYSSEY_WILLIAM_S4.json": "db0522d603cb67b2d49832830c746fc072020793de002c10963c88cd2b592ede",
+    "/Users/williamgrant/comma-logs/odyssey-nnlc-models/HONDA_ODYSSEY_WILLIAM_V1.json": "625bc6122fd545800902b668fdcfe04835303b6fb1d562a888ce0d5cd370c814"
+  },
+  "metric_corrections": [
+    {
+      "registered_at_utc": "2026-11-09T17:16:08.570103+00:00",
+      "reason": "Correct curve event selection to native controlsd desired lateral acceleration, matching characterize.events. Test reproduced missing event against a known native curve; fixed before any heldout video arrived. Original registration and analysis source retained. No road A/B results read.",
+      "old_dependency_sha256": {
+        "tools/odyssey_sim/vsim/test_model.py": "53cdec9e8fb034ea75b9078f3daf394ecf3658d9045459423e609a5c6bbbc858",
+        "tools/odyssey_sim/vsim/bias.py": "cdc7b4c9450f7ea5b8507eb6cac32e8e28b9c5320f4c7251336f827404028678",
+        "tools/odyssey_sim/vsim/metrics.py": "d9c6666dd487a364e2c94c75133ebf4941e65be0ee8b8311a6bac6bd4e02a854",
+        "tools/odyssey_sim/vsim/predictions.py": "2ab90d0f900932a1e67d830ae1f6aa4e13dbf8d6aa3acaf5f0aa38a62be4e7a8",
+        "tools/odyssey_sim/vsim/run.py": "f8d3ce4b896f95e28a18bfab37b8ed48ef9a1eb42e342105d75b7a189ec9aae4",
+        "tools/odyssey_sim/vsim/test_perturbation.py": "ea49ac2446cd70cf7845682d303ecbdb61f982641461de0b4c4cb9c4b81665df",
+        "tools/odyssey_sim/vsim/prepare_extra.py": "c3fb2f521f32bd547f59d4f313e8d89f220e0e34601c7e3aeb6d96fd544debff",
+        "tools/odyssey_sim/vsim/plant_audit.py": "095582cb414a2f44061d19d0cb784d93646f83d7f951bc2042bca8e48872f56e",
+        "tools/odyssey_sim/vsim/controls_audit.py": "4ceadb12a250749aa44854bab52b1452c7f3ca0ec7e4d168add6a877b79870fc",
+        "tools/odyssey_sim/vsim/model.py": "d5dbdf69933a505846327287069d7767002dcfcec19399e2bcf4e431c3aba663",
+        "tools/odyssey_sim/vsim/campaign.py": "69302709b1662f1a147819ec16804d6271a60209ca6791ffa7bd5799be001825",
+        "tools/odyssey_sim/vsim/transfer.py": "25fa1c95e472945e2470c0f5a56175a20896fa19cb358bb04fea4f4de14b98c2",
+        "tools/odyssey_sim/vsim/geometry.py": "5a957bdc8e83b3f689cf70ed0bc8b028cea6c035a5d565a730def5349775d4d0",
+        "tools/odyssey_sim/vsim/test_campaign.py": "a41385756e2472778c3c1b3d4e9726349a6597d26fb625a8e56f55f1bd30f7fc",
+        "tools/odyssey_sim/vsim/candidates.py": "4d1e8bd0160292f9ad4ed51f7bb649127b11bc0bb9976af47e413def571aa8bc",
+        "tools/odyssey_sim/vsim/pulses.py": "4b894648fbebfde304525b3a0cfa8554da198e358087596ebb1d9f244a646438",
+        "tools/odyssey_sim/vsim/closed_loop.py": "bacee0b96a2bef73eb96802769d21fe8c1df01af160f6124ca47ef9c4b4d08e8",
+        "tools/odyssey_sim/vsim/test_geometry.py": "1519ae12d9d4306f0682ae651b479b7ea970e8d1427508aebf172a61ea188cca",
+        "tools/odyssey_sim/vsim/video.py": "d2802f7c7e98d420194f48e3d6dd004f19f183725991c210c4d2f1e4a690fa86",
+        "tools/odyssey_sim/vsim/perturbation.py": "cc5e053960686f59d3c992850cb6ba7abca06e933175bdb1b303ce4437041310",
+        "tools/odyssey_sim/vsim/analyze.py": "7241ec369d2593db2ff3de0f8a061ebddf0b328da487c95d70a17dff02a8154c"
+      }
+    },
+    {
+      "registered_at_utc": "2026-11-09T18:26:38.289296+00:00",
+      "reason": "Match odyssey_wander lane-visibility semantics: >80% both logged probabilities >.5, interpolate unsupported holes; insufficient windows have null wander. Fixed logged mask preserves candidate pairing. Curve widths require visible mid-curve samples, but body release/jerk remain scoreable. No controller/plant change; no road A/B results read. Original unmasked v1 source and registration retained before_visibility_predictions.py and registration_before_visibility.json; v1 shadow forecasts will also be retained."
+    }
+  ],
+  "reporting_refactors": [
+    {
+      "at": "2026-11-09T18:05:42.173493+00:00",
+      "reason": "Move unchanged matched-curve calculation into shared metrics and expose it in one-command run CLI; guard undersampled failed traces. No trajectory/controller/plant or full-window metric formula change. CLI replay matches prior video and motion traces exactly; see cli_check_validation.json.",
+      "prior_dependency_sha256": {
+        "tools/odyssey_sim/vsim/test_model.py": "53cdec9e8fb034ea75b9078f3daf394ecf3658d9045459423e609a5c6bbbc858",
+        "tools/odyssey_sim/vsim/bias.py": "cdc7b4c9450f7ea5b8507eb6cac32e8e28b9c5320f4c7251336f827404028678",
+        "tools/odyssey_sim/vsim/metrics.py": "d9c6666dd487a364e2c94c75133ebf4941e65be0ee8b8311a6bac6bd4e02a854",
+        "tools/odyssey_sim/vsim/predictions.py": "2ab90d0f900932a1e67d830ae1f6aa4e13dbf8d6aa3acaf5f0aa38a62be4e7a8",
+        "tools/odyssey_sim/vsim/run.py": "f8d3ce4b896f95e28a18bfab37b8ed48ef9a1eb42e342105d75b7a189ec9aae4",
+        "tools/odyssey_sim/vsim/test_perturbation.py": "ea49ac2446cd70cf7845682d303ecbdb61f982641461de0b4c4cb9c4b81665df",
+        "tools/odyssey_sim/vsim/prepare_extra.py": "c3fb2f521f32bd547f59d4f313e8d89f220e0e34601c7e3aeb6d96fd544debff",
+        "tools/odyssey_sim/vsim/plant_audit.py": "095582cb414a2f44061d19d0cb784d93646f83d7f951bc2042bca8e48872f56e",
+        "tools/odyssey_sim/vsim/controls_audit.py": "4ceadb12a250749aa44854bab52b1452c7f3ca0ec7e4d168add6a877b79870fc",
+        "tools/odyssey_sim/vsim/model.py": "d5dbdf69933a505846327287069d7767002dcfcec19399e2bcf4e431c3aba663",
+        "tools/odyssey_sim/vsim/campaign.py": "69302709b1662f1a147819ec16804d6271a60209ca6791ffa7bd5799be001825",
+        "tools/odyssey_sim/vsim/transfer.py": "25fa1c95e472945e2470c0f5a56175a20896fa19cb358bb04fea4f4de14b98c2",
+        "tools/odyssey_sim/vsim/geometry.py": "5a957bdc8e83b3f689cf70ed0bc8b028cea6c035a5d565a730def5349775d4d0",
+        "tools/odyssey_sim/vsim/test_campaign.py": "c4c2464e2873287981217b356d65fffee882f843df8ebef861cfd7e0c546d053",
+        "tools/odyssey_sim/vsim/candidates.py": "4d1e8bd0160292f9ad4ed51f7bb649127b11bc0bb9976af47e413def571aa8bc",
+        "tools/odyssey_sim/vsim/pulses.py": "4b894648fbebfde304525b3a0cfa8554da198e358087596ebb1d9f244a646438",
+        "tools/odyssey_sim/vsim/closed_loop.py": "bacee0b96a2bef73eb96802769d21fe8c1df01af160f6124ca47ef9c4b4d08e8",
+        "tools/odyssey_sim/vsim/test_geometry.py": "1519ae12d9d4306f0682ae651b479b7ea970e8d1427508aebf172a61ea188cca",
+        "tools/odyssey_sim/vsim/video.py": "d2802f7c7e98d420194f48e3d6dd004f19f183725991c210c4d2f1e4a690fa86",
+        "tools/odyssey_sim/vsim/perturbation.py": "cc5e053960686f59d3c992850cb6ba7abca06e933175bdb1b303ce4437041310",
+        "tools/odyssey_sim/vsim/analyze.py": "bffc7d62ccc507e87bb73bf1a41cb8008feb90a0d4149e791ec96b8519a9f704"
+      }
+    }
+  ],
+  "first_registration_at_utc": "2026-11-09T16:24:43.114161+00:00",
+  "version": 2,
+  "metadata_format_changes": [
+    {
+      "at": "2026-11-09T18:27:59.319845+00:00",
+      "prior_formula_sha256": "838e6c97fd52e5811e8c34480865adcd7e14da4b249d0eafe66ac1e31db16034",
+      "reason": "Shorten metadata text to pass lint; estimator arithmetic unchanged."
+    }
+  ],
+  "diagnostic_scope_changes": [
+    {
+      "at": "2026-11-09T18:29:16.077252+00:00",
+      "reason": "Restrict pooled natural-fit diagnostic to visible training-route free runs. No held-out fit or prediction estimator change.",
+      "previous_bias_sha256": "cdc7b4c9450f7ea5b8507eb6cac32e8e28b9c5320f4c7251336f827404028678"
+    }
+  ],
+  "workflow_refactors": [
+    {
+      "at": "2026-11-09T18:33:10.391765+00:00",
+      "prior_formula_sha256": "a156cf353c22d6e700efbcc4bf9944d78b48eef647cc25401b671a4c55ddd171",
+      "reason": "Move already-used arrival/completion checks into versioned campaign helper; finalization no longer depends on a private watcher writing a marker. Estimator arithmetic unchanged. Finalization also requires fresh analysis coverage of every attempted controller/window, including explicit failures."
+    }
+  ],
+  "computed_at_utc": "2026-11-09T18:54:18.673186+00:00",
+  "analysis_sha256": "565ad295382871171c3a458dc7863b42f5728ba5078eb21f99682282ce75a781",
+  "post_lock_reporting_refactors": [
+    {
+      "at": "2026-11-09T19:03:50.738563+00:00",
+      "reason": "Share unchanged full-window lane scoring between CLI and analysis; expose canonical_lane_metrics and label legacy diagnostics. Add 900-frame gate for undersampled diagnostics. All 93 locked full-window numerical scores and repeat CLI model/motion traces match exactly; locked forecast numbers and analysis data are unchanged.",
+      "validation": "canonical_score_validation.json",
+      "previous_dependency_sha256": {
+        "tools/odyssey_sim/vsim/test_model.py": "53cdec9e8fb034ea75b9078f3daf394ecf3658d9045459423e609a5c6bbbc858",
+        "tools/odyssey_sim/vsim/bias.py": "0a2f5f1f53b7ad5b673195e4fa5e5626eafe7c381c078b20c4fda6194bb957ef",
+        "tools/odyssey_sim/vsim/metrics.py": "7cb7e05e8ebc9fa1f333d3afdb0e25eb70cc1ab5cede2e60432d097f4aa99b57",
+        "tools/odyssey_sim/vsim/predictions.py": "1f56cf389aabbb57f1e3679e630e65380945bf86e6751e917f08c411658ba50d",
+        "tools/odyssey_sim/vsim/run.py": "37d0956ac3301a8756b7fd1f1449e042a398a7298dbd17b73e7585b932fad0e3",
+        "tools/odyssey_sim/vsim/test_perturbation.py": "ea49ac2446cd70cf7845682d303ecbdb61f982641461de0b4c4cb9c4b81665df",
+        "tools/odyssey_sim/vsim/prepare_extra.py": "c3fb2f521f32bd547f59d4f313e8d89f220e0e34601c7e3aeb6d96fd544debff",
+        "tools/odyssey_sim/vsim/plant_audit.py": "095582cb414a2f44061d19d0cb784d93646f83d7f951bc2042bca8e48872f56e",
+        "tools/odyssey_sim/vsim/controls_audit.py": "4ceadb12a250749aa44854bab52b1452c7f3ca0ec7e4d168add6a877b79870fc",
+        "tools/odyssey_sim/vsim/model.py": "d5dbdf69933a505846327287069d7767002dcfcec19399e2bcf4e431c3aba663",
+        "tools/odyssey_sim/vsim/campaign.py": "50a1d62f401eef4628bcd9a87b11627da07a7777b2c96c57d55115548531feda",
+        "tools/odyssey_sim/vsim/transfer.py": "25fa1c95e472945e2470c0f5a56175a20896fa19cb358bb04fea4f4de14b98c2",
+        "tools/odyssey_sim/vsim/geometry.py": "5a957bdc8e83b3f689cf70ed0bc8b028cea6c035a5d565a730def5349775d4d0",
+        "tools/odyssey_sim/vsim/test_campaign.py": "cd8c7515aa80fc1e0f75dd4cd66c85244f8222021918c4a325829478d05f050f",
+        "tools/odyssey_sim/vsim/candidates.py": "4d1e8bd0160292f9ad4ed51f7bb649127b11bc0bb9976af47e413def571aa8bc",
+        "tools/odyssey_sim/vsim/pulses.py": "4b894648fbebfde304525b3a0cfa8554da198e358087596ebb1d9f244a646438",
+        "tools/odyssey_sim/vsim/closed_loop.py": "bacee0b96a2bef73eb96802769d21fe8c1df01af160f6124ca47ef9c4b4d08e8",
+        "tools/odyssey_sim/vsim/test_geometry.py": "1519ae12d9d4306f0682ae651b479b7ea970e8d1427508aebf172a61ea188cca",
+        "tools/odyssey_sim/vsim/video.py": "d2802f7c7e98d420194f48e3d6dd004f19f183725991c210c4d2f1e4a690fa86",
+        "tools/odyssey_sim/vsim/perturbation.py": "cc5e053960686f59d3c992850cb6ba7abca06e933175bdb1b303ce4437041310",
+        "tools/odyssey_sim/vsim/analyze.py": "358cc6c094c76753299e2fdc67a195d062054e581e60111dd8007cf093b07e4d"
+      }
+    }
+  ],
+  "primary_forecast_version": 2,
+  "original_unmasked_shadow": "predictions_v1_shadow.json",
+  "contributing_windows": {
+    "S3": {
+      "wander_cm": [
+        "000001a3_00",
+        "000001a3_01",
+        "000001a3_02",
+        "000001a7_00",
+        "000001a7_01",
+        "000001a7_02",
+        "000001aa_01",
+        "000001aa_02",
+        "000001aa_04",
+        "000001ab_00",
+        "000001ab_01",
+        "000001ab_02",
+        "000001ab_03"
+      ],
+      "curve_run_wide_m": [
+        "000001a7_02",
+        "000001aa_02",
+        "000001aa_05",
+        "000001ab_01",
+        "000001ab_03"
+      ],
+      "body_jerk_rms_mps3": [
+        "000001a3_00",
+        "000001a3_01",
+        "000001a3_02",
+        "000001a7_00",
+        "000001a7_01",
+        "000001a7_02",
+        "000001aa_00",
+        "000001aa_01",
+        "000001aa_02",
+        "000001aa_03",
+        "000001aa_04",
+        "000001aa_05",
+        "000001ab_00",
+        "000001ab_01",
+        "000001ab_02",
+        "000001ab_03",
+        "000001ab_04",
+        "000001ab_05",
+        "000001ab_06"
+      ]
+    },
+    "S5": {
+      "wander_cm": [
+        "000001a3_00",
+        "000001a3_01",
+        "000001a3_02",
+        "000001a7_00",
+        "000001a7_01",
+        "000001a7_02",
+        "000001aa_01",
+        "000001aa_02",
+        "000001aa_04",
+        "000001ab_00",
+        "000001ab_01",
+        "000001ab_02",
+        "000001ab_03"
+      ],
+      "curve_run_wide_m": [
+        "000001a7_02",
+        "000001aa_02",
+        "000001aa_05",
+        "000001ab_01",
+        "000001ab_03"
+      ],
+      "body_jerk_rms_mps3": [
+        "000001a3_00",
+        "000001a3_01",
+        "000001a3_02",
+        "000001a7_00",
+        "000001a7_01",
+        "000001a7_02",
+        "000001aa_00",
+        "000001aa_01",
+        "000001aa_02",
+        "000001aa_03",
+        "000001aa_04",
+        "000001aa_05",
+        "000001ab_00",
+        "000001ab_01",
+        "000001ab_02",
+        "000001ab_03",
+        "000001ab_04",
+        "000001ab_05",
+        "000001ab_06"
+      ]
+    }
+  },
+  "transport_assumptions": {
+    "historical_camera_offset_m": 0.0,
+    "next_drive_camera_offset_m_reported_by_brief": 0.12,
+    "simulation_min_speed_mps": 5.0,
+    "road_default_min_speed_mph": 25.0,
+    "simulated_recurrence_warmup_s": 15.0,
+    "road_block_settle_s": 30.0,
+    "evaluation": "No rescaling or choice of forecast version after reading road A/B results."
+  },
+  "metadata_finalized_at_utc": "2026-11-09T19:09:15.064825+00:00"
+}
