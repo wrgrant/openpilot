@@ -58,7 +58,7 @@ class TestOdysseyEpsReport(OpenpilotTestCase):
     from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, ab_arm
     from tools.odyssey_wander import FS, ab_split
     t = np.arange(0, 4 * AB_BLOCK_S, 1 / FS) + 10.0
-    pieces = ab_split({"t": t}, [np.arange(len(t))], 60)
+    pieces = ab_split({"t": t}, [np.arange(len(t))], AB_BLOCK_S / 2)
     assert [arm for arm, _ in pieces] == ["off", "kick", "bump", "off"]  # the last 10 s piece is too short to score
     for arm, p in pieces:
       assert all(ab_arm(x) == arm for x in t[p])
