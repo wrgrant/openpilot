@@ -103,22 +103,28 @@ def analyze(d: dict[str, np.ndarray], r: np.ndarray) -> dict[str, float]:
           "follow": float(np.std(des - act) / max(np.std(des), 1e-6)), "lag": float(lags[w][np.argmax(cc[w])])}
 
 
-def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...]) -> list[tuple[str, np.ndarray]]:
-  """Cut each stretch where the A/B test switches arm; keep pieces of at least min_s."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import ab_arm
+def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...],
+             block_s: float | None = None, settle_s: float = 0.0) -> list[tuple[str, np.ndarray]]:
+  """Cut each stretch where the A/B test switches arm, dropping the first settle_s of each block; keep pieces of at
+  least min_s."""
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S, ab_arm
+  block_s = AB_BLOCK_S if block_s is None else block_s
   out = []
   for r in runs:
-    arm = np.array([ab_arm(t, arms) for t in d["t"][r]])
-    for piece in np.split(r, np.where(arm[1:] != arm[:-1])[0] + 1):
-      if len(piece) >= min_s * FS:
-        out.append((ab_arm(d["t"][piece[0]], arms), piece))
+    r = r[(d["t"][r] % block_s) >= settle_s]
+    for rr in np.split(r, np.where(np.diff(r) > 1)[0] + 1) if len(r) else []:
+      arm = np.array([ab_arm(t, arms, block_s) for t in d["t"][rr]])
+      for piece in np.split(rr, np.where(arm[1:] != arm[:-1])[0] + 1):
+        if len(piece) >= min_s * FS:
+          out.append((ab_arm(d["t"][piece[0]], arms, block_s), piece))
   return out
 
 
-def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...]) -> None:
+def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...], block_s: float | None = None) -> None:
   res: dict[str, list[dict]] = {a: [] for a in arms}
   print(f"{'arm':>5} {'seg':>4} {'min':>4} {'mph':>4} {'wander':>7} {'period':>7} {'follow':>7}")
-  for arm, r in ab_split(d, runs, min_s, arms):
+  settle = 30.0 if block_s and block_s >= 120 else 0.0  # long-block tests skip each block's first 30 s
+  for arm, r in ab_split(d, runs, min_s, arms, block_s, settle):
     x = analyze(d, r)
     res[arm].append(x)
     wander = f"{x['wander']:7.1f}" if np.isfinite(x["wander"]) else f"{'-':>7}"
@@ -137,14 +143,17 @@ def main():
   ap.add_argument("route_dir")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
-  ap.add_argument("--ab", choices=("deadband", "nnlc"), help="compare the arms of an A/B drive: SteerDeadbandCompAB or NnlcAB")
+  ap.add_argument("--ab", choices=("deadband", "nnlc", "wander"),
+                  help="compare the arms of an A/B drive: SteerDeadbandCompAB, NnlcAB or OdysseyWanderAB")
   args = ap.parse_args()
 
   d = load(args.route_dir)
   runs = stretches(d, args.min_mph, args.min_s)
   if args.ab:
-    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import DEADBAND_ARMS, NNLC_ARMS
-    return ab_report(d, runs, args.min_s, DEADBAND_ARMS if args.ab == "deadband" else NNLC_ARMS)
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S, DEADBAND_ARMS, NNLC_ARMS, WANDER_ARMS, WANDER_BLOCK_S
+    arms, block = {"deadband": (DEADBAND_ARMS, AB_BLOCK_S), "nnlc": (NNLC_ARMS, AB_BLOCK_S),
+                   "wander": (WANDER_ARMS, WANDER_BLOCK_S)}[args.ab]
+    return ab_report(d, runs, args.min_s, arms, block)
   total = len(d["t"]) / FS / 60
   alone = sum(len(r) for r in runs) / FS / 60
   print(f"{total:.0f} min logged; {len(runs)} stretches of openpilot steering alone >= {args.min_s:.0f} s "

@@ -154,7 +154,9 @@ class Controls(ControlsExt):
                                                      self.steer_limited_by_safety, self.desired_curvature,
                                                      self.calibrated_pose, curvature_limited, lat_delay)
     if self.odyssey_steer is not None:
-      steer = self.odyssey_steer.apply(steer, CC.latActive, CS, self.VM, lp, self.desired_curvature, self.LaC.steer_max)
+      steer = self.odyssey_steer.apply(steer, CC.latActive, CS, self.VM, lp, self.desired_curvature, self.LaC.steer_max,
+                                       getattr(lac_log, "desiredLateralAccel", float("nan")),
+                                       getattr(lac_log, "actualLateralAccel", float("nan")))
     actuators.torque = float(steer)
     if self.sm.valid['lateralManeuverPlan'] and CC.latActive:
       # steering characterization: a short torque pulse on top of lane keeping (tools/lateral_maneuvers/odyssey_suite.py)

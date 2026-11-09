@@ -28,8 +28,8 @@ def make(**params):
 
 
 class TestOdysseySteer(OpenpilotTestCase):
-  CS_SLOW = NS(vEgo=2.0, steeringAngleDeg=0.0)
-  CS_FAST = NS(vEgo=25.0, steeringAngleDeg=0.0)
+  CS_SLOW = NS(vEgo=2.0, steeringAngleDeg=0.0, steeringRateDeg=0.0, steeringPressed=False, leftBlinker=False, rightBlinker=False)
+  CS_FAST = NS(vEgo=25.0, steeringAngleDeg=0.0, steeringRateDeg=0.0, steeringPressed=False, leftBlinker=False, rightBlinker=False)
   LIVE = NS(roll=0.0, angleOffsetDeg=0.0)
 
   def test_all_off_is_identity(self):
