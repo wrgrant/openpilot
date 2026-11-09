@@ -308,6 +308,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"TorqueParamsOverrideFriction", {PERSISTENT | BACKUP, FLOAT, "0.1"}},
     {"SteerDeadbandComp", {PERSISTENT | BACKUP, FLOAT, "0.0"}},
     {"SteerDeadbandCompAB", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"NnlcAB", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"SteerLowSpeedAngle", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"SteerLowSpeedKpCap", {PERSISTENT | BACKUP, FLOAT, "0.0"}},
     {"TorqueParamsOverrideLatAccelFactor", {PERSISTENT | BACKUP, FLOAT, "2.5"}},

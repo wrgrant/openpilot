@@ -9,7 +9,7 @@ A negative SteerDeadbandComp selects bump mode instead (preliminary): requests s
 pulses of |value|, on for a share of each BUMP_PERIOD_FRAMES equal to the request's share of |value|, so the average
 torque matches the request but each pulse is big enough to break the wheel free. Larger requests pass through.
 
-SteerDeadbandCompAB rotates through AB_ARMS in AB_BLOCK_S blocks of the monotonic clock (the clock behind
+SteerDeadbandCompAB rotates through odyssey_ab.DEADBAND_ARMS in odyssey_ab.AB_BLOCK_S blocks of the monotonic clock (the clock behind
 logMonoTime): no compensation, the kick at AB_KICK, bump mode at AB_BUMP, ignoring SteerDeadbandComp. One drive then
 compares all three on the same roads; tools/odyssey_wander.py --ab scores them.
 """
@@ -17,21 +17,15 @@ import math
 import time
 
 from openpilot.common.params import Params
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import DEADBAND_ARMS, ab_arm
 
 SMOOTH_WIDTH = 0.01  # normalized torque over which the kick blends in around zero
 PARAMS_PERIOD_FRAMES = 500  # re-read the setting every 5 s at 100 Hz
-AB_BLOCK_S = 60.0  # a 3 min off -> kick -> bump cycle; shorter blocks hold less than one 15-20 s swing each
 BUMP_PERIOD_FRAMES = 25  # 0.25 s at 100 Hz
 BUMP_MIN = 0.003  # below this a request is treated as zero, so noise around zero doesn't pulse
 
 
-AB_ARMS = ("off", "kick", "bump")
 AB_KICK, AB_BUMP = 0.03, 0.06
-
-
-def ab_arm(mono_s: float) -> str:
-  """In A/B mode, which compensation runs at this monotonic time (s)."""
-  return AB_ARMS[int(mono_s // AB_BLOCK_S) % len(AB_ARMS)]
 
 
 def deadband_comp(torque: float, amount: float, width: float = SMOOTH_WIDTH) -> float:
@@ -67,6 +61,6 @@ class SteerDeadbandComp:
     self._frame += 1
     amount = self.amount
     if self.ab:
-      amount = {"off": 0.0, "kick": AB_KICK, "bump": -AB_BUMP}[ab_arm(time.monotonic() if mono_s is None else mono_s)]
+      amount = {"off": 0.0, "kick": AB_KICK, "bump": -AB_BUMP}[ab_arm(time.monotonic() if mono_s is None else mono_s, DEADBAND_ARMS)]
     out = bump_comp(torque, -amount, self._frame) if amount < 0 else deadband_comp(torque, amount)
     return max(-steer_max, min(steer_max, out))

@@ -37,7 +37,8 @@ class TestSteerDeadband(OpenpilotTestCase):
     assert np.all(np.diff(y) > 0)
 
   def test_ab_mode_rotates_off_kick_bump(self):
-    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, AB_KICK, SteerDeadbandComp
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S
+    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_KICK, SteerDeadbandComp
 
     class FakeParams:
       def get(self, key, return_default=False):

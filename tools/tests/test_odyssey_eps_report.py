@@ -55,10 +55,10 @@ class TestOdysseyEpsReport(OpenpilotTestCase):
     assert pulse_report(pulses) == 0.06
 
   def test_wander_ab_split_follows_the_blocks(self):
-    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_BLOCK_S, ab_arm
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S, DEADBAND_ARMS, ab_arm
     from tools.odyssey_wander import FS, ab_split
     t = np.arange(0, 4 * AB_BLOCK_S, 1 / FS) + 10.0
-    pieces = ab_split({"t": t}, [np.arange(len(t))], AB_BLOCK_S / 2)
+    pieces = ab_split({"t": t}, [np.arange(len(t))], AB_BLOCK_S / 2, DEADBAND_ARMS)
     assert [arm for arm, _ in pieces] == ["off", "kick", "bump", "off"]  # the last 10 s piece is too short to score
     for arm, p in pieces:
-      assert all(ab_arm(x) == arm for x in t[p])
+      assert all(ab_arm(x, DEADBAND_ARMS) == arm for x in t[p])

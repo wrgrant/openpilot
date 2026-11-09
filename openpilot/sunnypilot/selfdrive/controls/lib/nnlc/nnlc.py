@@ -6,6 +6,7 @@ See the LICENSE.md file in the root directory for more details.
 """
 from collections import deque
 import math
+import time
 import numpy as np
 
 from opendbc.car.lateral import FRICTION_THRESHOLD, get_friction
@@ -16,6 +17,7 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext_base import sign
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_jerk_aware import LatControlTorqueJerkAware
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_ARMS, ab_arm
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.model import NNTorqueModel
 
@@ -37,6 +39,8 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     super().__init__(lac_torque, CP, CP_SP, CI)
     self.params = Params()
     self.enabled = self.params.get_bool("NeuralNetworkLateralControl")
+    # Odyssey: NnlcAB rotates NNLC on and off in odyssey_ab blocks to compare it with the stock torque controller
+    self.ab = self.params.get_bool("NnlcAB")
     model_path = CP_SP.neuralNetworkLateralControl.model.path
     self.has_nn_model = model_path not in (MOCK_MODEL_PATH, '')
 
@@ -87,7 +91,20 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self._ff += get_friction_in_torque_space(self._desired_lateral_accel - self._actual_lateral_accel, self._lateral_accel_deadzone,
                                              FRICTION_THRESHOLD, self.torque_params)
 
+  def update_ab(self, mono_s: float) -> None:
+    """Switch NNLC for the current A/B block. The two modes run the PID in different units (torque vs lateral accel),
+    so a switch resets it and sets its limits for the new mode."""
+    want = ab_arm(mono_s, NNLC_ARMS) == "on"
+    if want == self.enabled:
+      return
+    self.enabled = want
+    self._pid.reset()
+    self.lac_torque.update_limits()
+    self.update_limits()
+
   def update_neural_network_feedforward(self, CS, params, calibrated_pose) -> None:
+    if self.ab:
+      self.update_ab(time.monotonic())
     if not self._nnlc_enabled:
       return
 

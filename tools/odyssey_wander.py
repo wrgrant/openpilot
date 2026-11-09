@@ -14,8 +14,8 @@ it reports, in the 7-20 s band:
 
   PYTHONPATH=$PWD .venv/bin/python tools/odyssey_wander.py ~/comma-logs/<dongle>_<route> [--min-mph 25] [--min-s 45] [--ab]
 
---ab scores a drive made with SteerDeadbandCompAB on: it splits the stretches at the off / kick / bump blocks and
-compares them.
+--ab deadband|nnlc scores an A/B drive (SteerDeadbandCompAB or NnlcAB): it splits the stretches at the arm switches and
+compares the arms.
 """
 import argparse
 import glob
@@ -103,29 +103,28 @@ def analyze(d: dict[str, np.ndarray], r: np.ndarray) -> dict[str, float]:
           "follow": float(np.std(des - act) / max(np.std(des), 1e-6)), "lag": float(lags[w][np.argmax(cc[w])])}
 
 
-def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> list[tuple[str, np.ndarray]]:
-  """Cut each stretch where SteerDeadbandCompAB switches compensation; keep pieces of at least min_s."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import ab_arm
+def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...]) -> list[tuple[str, np.ndarray]]:
+  """Cut each stretch where the A/B test switches arm; keep pieces of at least min_s."""
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import ab_arm
   out = []
   for r in runs:
-    arm = np.array([ab_arm(t) for t in d["t"][r]])
+    arm = np.array([ab_arm(t, arms) for t in d["t"][r]])
     for piece in np.split(r, np.where(arm[1:] != arm[:-1])[0] + 1):
       if len(piece) >= min_s * FS:
-        out.append((ab_arm(d["t"][piece[0]]), piece))
+        out.append((ab_arm(d["t"][piece[0]], arms), piece))
   return out
 
 
-def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float) -> None:
-  from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_ARMS
-  res: dict[str, list[dict]] = {a: [] for a in AB_ARMS}
+def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...]) -> None:
+  res: dict[str, list[dict]] = {a: [] for a in arms}
   print(f"{'arm':>5} {'seg':>4} {'min':>4} {'mph':>4} {'wander':>7} {'period':>7} {'follow':>7}")
-  for arm, r in ab_split(d, runs, min_s):
+  for arm, r in ab_split(d, runs, min_s, arms):
     x = analyze(d, r)
     res[arm].append(x)
     wander = f"{x['wander']:7.1f}" if np.isfinite(x["wander"]) else f"{'-':>7}"
     print(f"{arm:>5} {int(x['seg']):>4} {x['minutes']:>4.1f} {x['mph']:>4.0f} {wander} {x['period']:>7.1f} {x['follow']:>7.2f}")
   print()
-  for arm in AB_ARMS:
+  for arm in arms:
     w = np.array([x["wander"] for x in res[arm] if np.isfinite(x["wander"])])
     mins = sum(x["minutes"] for x in res[arm])
     mean = w.mean() if len(w) else np.nan
@@ -138,13 +137,14 @@ def main():
   ap.add_argument("route_dir")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
-  ap.add_argument("--ab", action="store_true", help="compare SteerDeadbandCompAB's off, kick and bump blocks")
+  ap.add_argument("--ab", choices=("deadband", "nnlc"), help="compare the arms of an A/B drive: SteerDeadbandCompAB or NnlcAB")
   args = ap.parse_args()
 
   d = load(args.route_dir)
   runs = stretches(d, args.min_mph, args.min_s)
   if args.ab:
-    return ab_report(d, runs, args.min_s)
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import DEADBAND_ARMS, NNLC_ARMS
+    return ab_report(d, runs, args.min_s, DEADBAND_ARMS if args.ab == "deadband" else NNLC_ARMS)
   total = len(d["t"]) / FS / 60
   alone = sum(len(r) for r in runs) / FS / 60
   print(f"{total:.0f} min logged; {len(runs)} stretches of openpilot steering alone >= {args.min_s:.0f} s "
