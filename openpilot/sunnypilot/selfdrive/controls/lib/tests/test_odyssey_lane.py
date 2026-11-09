@@ -67,6 +67,11 @@ class TestOdysseyLane(OpenpilotTestCase):
     self.assertEqual(lc.apply(k, ol.V_MIN - 0.1, True, False, mono_s=10.05), k)  # below 25 mph
     self.assertEqual(lc.apply(k, V, True, False, mono_s=10.0 + ol.MAX_MODEL_AGE + 0.01), k)  # stale model
 
+  def test_off_does_no_work(self):
+    lc = lane(on=False)
+    lc.update_model(None, V, mono_s=10.0)  # would raise if it touched the model message
+    self.assertEqual(lc.model_mono, -float('inf'))
+
   def test_unsure_or_bad_lines_give_no_correction(self):
     self.assertIsNone(ol.lane_pose(model(probs=(0.9, 0.4, 0.9, 0.9))))
     self.assertIsNone(ol.lane_pose(model(centre=-2.0)))

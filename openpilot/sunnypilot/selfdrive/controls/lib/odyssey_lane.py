@@ -61,12 +61,17 @@ class LaneCentering:
     self.ab = p.get_bool("OdysseyLaneCenterAB")
     self.delta = 0.0  # m/s², from the latest model frame
     self.model_mono = -math.inf
+    if self.on or self.ab:
+      # numpy's first polyfit takes about 60 ms on the comma; pay that here, not in the 100 Hz loop
+      np.polynomial.polynomial.polyfit(np.arange(8.0), np.zeros(8), 3)
 
   def active_arm(self, mono_s: float) -> bool:
     return ab_arm(mono_s, LANE_ARMS, WANDER_BLOCK_S) == "on" if self.ab else self.on
 
   def update_model(self, md, v_ego: float, mono_s: float | None = None) -> None:
-    """Call once per new modelV2 message."""
+    """Call once per new modelV2 message. Does nothing while both params are off."""
+    if not (self.on or self.ab):
+      return
     pose = lane_pose(md)
     self.delta = 0.0 if pose is None else correction(pose[0], pose[1], v_ego)
     self.model_mono = time.monotonic() if mono_s is None else mono_s

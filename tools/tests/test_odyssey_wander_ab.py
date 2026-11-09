@@ -110,6 +110,54 @@ class TestOdysseyWanderAB(unittest.TestCase):
     text = report(d)
     self.assertIn('stock body_jerk_rms_mps3: unavailable m/s3 (0 blocks)', text)
 
+  def pooled(self, routes, name, force=False):
+    from tools.odyssey_wander import ab_report_routes
+    output = io.StringIO()
+    with contextlib.redirect_stdout(output):
+      ab_report_routes([f'/x/drive{i}' for i in range(len(routes))], routes, name, 25, 45, force)
+    return output.getvalue()
+
+  def test_drive_without_the_test_is_skipped_unless_forced(self):
+    d = dict(route(), ab_params={'NnlcModelAB': True})
+    text = self.pooled([d], 'lane')
+    self.assertIn('drive0: skipped, OdysseyLaneCenterAB was not on (on: nnlc_model)', text)
+    self.assertIn('off:  0.0 min, 0 blocks', text)
+    self.assertIn('null test', self.pooled([d], 'lane', force=True))
+
+  def test_drives_pool_and_blocks_stay_separate(self):
+    a = dict(route(2), ab_params={'OdysseyLaneCenterAB': True})
+    b = dict(route(2), ab_params={'OdysseyLaneCenterAB': True})  # same clock times as a: must not merge into its blocks
+    text = self.pooled([a, b], 'lane')
+    self.assertIn('off:  5.0 min, 2 blocks', text)
+    self.assertIn(' on:  5.0 min, 2 blocks', text)
+    self.assertIn('on - off wander:', text)
+
+  def test_model_forecast_uses_lane_off_blocks_when_both_tests_ran(self):
+    d = dict(route(6), ab_params={'NnlcModelAB': True, 'OdysseyLaneCenterAB': True})
+    text = self.pooled([d], 'nnlc_model')
+    self.assertIn('kept 3 of 6 pieces, those with the lane correction off', text)
+    self.assertIn('stock body_jerk_rms_mps3: +1.000000 m/s3 (1 blocks)', text)
+    text = self.pooled([d], 'lane')
+    self.assertIn('pieces per model off/on: stock 1/1, S3 1/1, S5 1/1', text)
+
+  def test_driver_presses_count_once_each_per_arm(self):
+    d = dict(route(2), ab_params={'OdysseyLaneCenterAB': True})
+    for start in (60, 100, 250):  # two presses in the off block, one in the on block
+      d['pressed'][(d['t'] >= start) & (d['t'] < start + 2)] = 1
+    d['pressed'][(d['t'] >= 10) & (d['t'] < 12)] = 1  # inside the settling time: not counted
+    text = self.pooled([d], 'lane')
+    self.assertIn('off 8.0 (2 in 2 min), on 4.0 (1 in 2 min)', text)
+
+  def test_sway_measures_body_motion_without_lane_lines(self):
+    from tools.odyssey_wander import analyze
+    d = route(1)
+    r = np.arange(len(d['t']))
+    d['body'] = 0.2 * np.sin(2 * np.pi * d['t'] / 12)  # a 12 s swing of 0.2 m/s2
+    d['l_p'][:] = 0.0
+    x = analyze(d, r)
+    self.assertTrue(np.isnan(x['wander']))
+    self.assertAlmostEqual(x['sway'], 0.2 / np.sqrt(2), places=2)
+
   def test_load_reads_body_from_speed_times_logged_yaw(self):
     from openpilot.cereal import messaging
     from openpilot.tools.lib.logreader import save_log
@@ -132,3 +180,4 @@ class TestOdysseyWanderAB(unittest.TestCase):
       d = load(tmp)
     np.testing.assert_allclose(d['body'][:2], [2., -2.])
     self.assertTrue(np.isnan(d['body'][2]))
+    self.assertEqual(d['ab_params'], {})
