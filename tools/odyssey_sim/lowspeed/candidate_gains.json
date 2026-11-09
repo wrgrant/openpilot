@@ -1,0 +1,74 @@
+{
+  "selected_for_road": false,
+  "reason": "Only two low-speed training windows; mixed held-out tracking/roughness; plant invalid at walking speed and tight turns.",
+  "generations": [
+    {
+      "generation": 1,
+      "name": "initial_pi_pd",
+      "params": {
+        "kp": 0.02,
+        "ki": 0.003,
+        "kd": 0.012,
+        "friction": 0.22,
+        "hold": 0.003,
+        "rate_ff": 0.025,
+        "max_rate": 12.0,
+        "slew": 0.65,
+        "preview": 0.4
+      },
+      "train": {
+        "tracking_deg": 9.008359473745667,
+        "rate_change_deg_s2": 10.489919817666348,
+        "command_slew_rms": 0.6328749893520572,
+        "saturation": 0.0,
+        "high_effort": 0.047619047619047616
+      }
+    },
+    {
+      "generation": 2,
+      "name": "DE_training_only",
+      "evaluations": 480,
+      "params": {
+        "kp": 0.0378401438833664,
+        "ki": 0.0022409817008119115,
+        "kd": 0.006267962254424761,
+        "friction": 0.6039782309617225,
+        "hold": 0.01012784324596231,
+        "rate_ff": 0.048722117452901295,
+        "max_rate": 4.381309076294665,
+        "slew": 1.9693082017832884,
+        "preview": 0.4
+      },
+      "train": {
+        "tracking_deg": 7.473013361506403,
+        "rate_change_deg_s2": 9.99075383580511,
+        "command_slew_rms": 0.9917640389759538,
+        "saturation": 0.0,
+        "high_effort": 0.7380952380952381
+      }
+    },
+    {
+      "generation": 3,
+      "name": "constrained_preview_DE",
+      "params": {
+        "kp": 0.06245283792477635,
+        "ki": 0.007303596336086688,
+        "kd": 0.021216002610678016,
+        "friction": 0.10134507069731219,
+        "hold": 0.007902419488028514,
+        "rate_ff": 0.07264709590575943,
+        "max_rate": 3.0894556111346017,
+        "slew": 0.7882379251048954,
+        "preview": 0.4
+      },
+      "evaluations": 280,
+      "train": {
+        "tracking_deg": 8.830015987587661,
+        "rate_change_deg_s2": 9.524598001267083,
+        "command_slew_rms": 0.4493133318274738,
+        "saturation": 0.0,
+        "high_effort": 0.0
+      }
+    }
+  ]
+}
