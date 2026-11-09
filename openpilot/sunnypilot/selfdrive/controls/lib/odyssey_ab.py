@@ -9,6 +9,9 @@ NNLC_ARMS = ("on", "off")  # NnlcAB
 WANDER_ARMS = ("off", "inverse")  # OdysseyWanderAB
 # NnlcModelAB: stock HONDA_ODYSSEY NNLC vs the van-specific models (report_nnlc_smooth.md), WANDER_BLOCK_S blocks
 NNLC_MODEL_ARMS = ("stock", "S3", "S5")
+# OdysseyLaneCenterAB: lane-centring correction off/on (odyssey_lane.py), WANDER_BLOCK_S blocks. With NnlcModelAB also on,
+# block k runs model arm k % 3 and lane arm k % 2, so every 6 blocks cover all six combinations once.
+LANE_ARMS = ("off", "on")
 NNLC_MODEL_FILES = {"S3": "HONDA_ODYSSEY_WILLIAM_S3.json", "S5": "HONDA_ODYSSEY_WILLIAM_S5.json"}
 
 

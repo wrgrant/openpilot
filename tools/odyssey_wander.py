@@ -241,7 +241,7 @@ def main():
   ap.add_argument("route_dir")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
-  ap.add_argument("--ab", choices=("deadband", "nnlc", "wander", "nnlc_model"),
+  ap.add_argument("--ab", choices=("deadband", "nnlc", "wander", "nnlc_model", "lane"),
                   help="compare the arms of an A/B drive: SteerDeadbandCompAB, NnlcAB, OdysseyWanderAB or NnlcModelAB")
   args = ap.parse_args()
 
@@ -249,9 +249,9 @@ def main():
   runs = stretches(d, args.min_mph, args.min_s)
   if args.ab:
     from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import (AB_BLOCK_S, DEADBAND_ARMS, NNLC_ARMS, NNLC_MODEL_ARMS,
-                                                                        WANDER_ARMS, WANDER_BLOCK_S)
+                                                                        WANDER_ARMS, WANDER_BLOCK_S, LANE_ARMS)
     arms, block = {"deadband": (DEADBAND_ARMS, AB_BLOCK_S), "nnlc": (NNLC_ARMS, AB_BLOCK_S),
-                   "wander": (WANDER_ARMS, WANDER_BLOCK_S), "nnlc_model": (NNLC_MODEL_ARMS, WANDER_BLOCK_S)}[args.ab]
+                   "wander": (WANDER_ARMS, WANDER_BLOCK_S), "nnlc_model": (NNLC_MODEL_ARMS, WANDER_BLOCK_S), "lane": (LANE_ARMS, WANDER_BLOCK_S)}[args.ab]
     return ab_report(d, runs, args.min_s, arms, block)
   total = len(d["t"]) / FS / 60
   alone = sum(len(r) for r in runs) / FS / 60

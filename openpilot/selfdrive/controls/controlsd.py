@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import math
+import time
 from numbers import Number
 
 from openpilot.cereal import log
@@ -22,6 +23,7 @@ from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane import LaneCentering
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_steer import OdysseySteer
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
 
@@ -72,6 +74,7 @@ class Controls(ControlsExt):
     self.LaC = ControlsExt.initialize_lateral_control(self, self.LaC, self.CI, DT_CTRL)
     # Odyssey add-ons on the torque command, whichever torque controller class runs
     self.odyssey_steer = OdysseySteer() if self.CP.lateralTuning.which() == 'torque' else None
+    self.odyssey_lane = LaneCentering()  # Odyssey lane-centring correction on the model's curvature (off by default)
 
   def update(self):
     self.sm.update(15)
@@ -146,6 +149,11 @@ class Controls(ControlsExt):
       new_desired_curvature = self.sm['lateralManeuverPlan'].desiredCurvature if CC.latActive else self.curvature
     else:
       new_desired_curvature = model_v2.action.desiredCurvature if CC.latActive else self.curvature
+      now = time.monotonic()
+      if self.sm.updated['modelV2']:
+        self.odyssey_lane.update_model(model_v2, CS.vEgo, now)
+      lane_change = model_v2.meta.laneChangeState != LaneChangeState.off or CS.leftBlinker or CS.rightBlinker
+      new_desired_curvature = self.odyssey_lane.apply(new_desired_curvature, CS.vEgo, CC.latActive, lane_change, now)
     self.desired_curvature, curvature_limited = clip_curvature(CS.vEgo, self.desired_curvature, new_desired_curvature, lp.roll)
     lat_delay = self.sm["lateralDelay"].lateralDelay + LAT_SMOOTH_SECONDS
 
