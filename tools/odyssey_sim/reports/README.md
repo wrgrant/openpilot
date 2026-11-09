@@ -1,6 +1,6 @@
 # Odyssey steering research reports
 
-Worker reports and briefs from the simulator and controller research. Read `BRIEF_COMMON.md` first: it holds the goals, facts and rules every worker shares. The large evidence files (JSON, NPZ caches) stay in the session scratch directory named in each report and are not kept here; rerun the tool to regenerate them.
+Worker reports and briefs from the simulator and controller research. Read `BRIEF_COMMON.md` first: it holds the goals, facts and rules every worker shares. The large evidence files (JSON, NPZ caches) are not kept here. The reports name a session scratch directory under `/private/tmp`; its contents are copied to `~/comma-logs/odyssey-evidence/` on the Studio, minus virtualenvs and downloaded driving models.
 
 | Report | What it covers |
 |---|---|
