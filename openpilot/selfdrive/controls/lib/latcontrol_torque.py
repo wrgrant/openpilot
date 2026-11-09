@@ -12,6 +12,7 @@ from openpilot.common.pid import PIDController
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext import LatControlTorqueExt
 from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import SteerDeadbandComp
 from openpilot.common.params import Params
+from openpilot.sunnypilot.selfdrive.controls.lib.low_speed_angle import LowSpeedAngleSteer, STOCK_KP_CAP
 
 # At higher speeds (25+mph) we can assume:
 # Lateral acceleration achieved by a specific car correlates to
@@ -51,8 +52,9 @@ class LatControlTorque(LatControl):
     self.torque_params = CP.lateralTuning.torque.as_builder()
     self.torque_from_lateral_accel = CI.torque_from_lateral_accel()
     self.lateral_accel_from_torque = CI.lateral_accel_from_torque()
-    self.pid = PIDController([INTERP_SPEEDS, capped_kp(KP_INTERP, Params().get("SteerLowSpeedKpCap", return_default=True) or 0.0)],
-                             KI, rate=1/self.dt)
+    self.low_speed_angle = LowSpeedAngleSteer()
+    kp_cap = STOCK_KP_CAP if self.low_speed_angle.enabled else (Params().get("SteerLowSpeedKpCap", return_default=True) or 0.0)
+    self.pid = PIDController([INTERP_SPEEDS, capped_kp(KP_INTERP, kp_cap)], KI, rate=1/self.dt)
     self.update_limits()
     self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
     self.lat_accel_request_buffer_len = int(LAT_ACCEL_REQUEST_BUFFER_SECONDS / self.dt)
@@ -119,6 +121,7 @@ class LatControlTorque(LatControl):
       pid_log, output_torque = self.extension.update(CS, VM, self.pid, params, ff, pid_log, setpoint, measurement, calibrated_pose, roll_compensation,
                                                      future_desired_lateral_accel, measurement, lateral_accel_deadzone, gravity_adjusted_future_lateral_accel,
                                                      desired_curvature, measured_curvature, steer_limited_by_safety, output_torque)
+      output_torque = self.low_speed_angle.blend(output_torque, CS.vEgo, CS.steeringAngleDeg, VM, params, desired_curvature)
       output_torque = self.deadband_comp.update(output_torque, self.steer_max)
 
       pid_log.active = True
