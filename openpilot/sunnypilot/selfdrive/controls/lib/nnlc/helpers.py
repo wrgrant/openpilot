@@ -4,12 +4,16 @@ Copyright (c) 2021-, Haibin Wen, sunnypilot, and a number of other contributors.
 This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
+
 import os
 import tomllib
 from difflib import SequenceMatcher
 
 from opendbc.car import structs
 from openpilot.common.basedir import BASEDIR
+from openpilot.common.params import Params
+from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.model import NNTorqueModel
+import numpy as np
 
 TORQUE_NN_MODEL_PATH = os.path.join(BASEDIR, "openpilot", "sunnypilot", "neural_network_data", "neural_network_lateral_control")
 TORQUE_NN_MODEL_SUBSTITUTE_PATH = os.path.join(BASEDIR, "opendbc_repo", "opendbc", "car", "torque_data/substitute.toml")
@@ -28,7 +32,7 @@ def get_nn_model_path(CP: structs.CarParams) -> tuple[str, str, bool]:
     _model_path = None
     _max_similarity = -1.0
     for f in os.listdir(TORQUE_NN_MODEL_PATH):
-      if f.endswith(".json"):
+      if f.endswith(".json") and "_WILLIAM_" not in f:
         model = os.path.splitext(f)[0]
         similarity_score = similarity(model, _nn_candidate)
         if similarity_score > _max_similarity:
@@ -66,3 +70,29 @@ def get_nn_model_path(CP: structs.CarParams) -> tuple[str, str, bool]:
   model_name = os.path.splitext(os.path.basename(model_path))[0]
 
   return model_path, model_name, exact_match
+
+
+def get_nn_model_override(default_path: str) -> str:
+  """Select a validated drop-in model at startup; unset/invalid keeps stock.
+
+  Experimental files never participate in fuzzy fingerprint matching.
+  Only local basenames are accepted, including after resolving symlinks.
+  """
+  name = Params().get("NnlcModelOverride")
+  if not name or os.path.basename(name) != name or not name.endswith(".json"):
+    return default_path
+  path = os.path.realpath(os.path.join(TORQUE_NN_MODEL_PATH, name))
+  if os.path.dirname(path) != os.path.realpath(TORQUE_NN_MODEL_PATH):
+    return default_path
+  try:
+    model = NNTorqueModel(path)
+    if model.input_size != 18 or model.output_size != 1:
+      return default_path
+    if not np.isfinite(model.input_mean).all() or not np.isfinite(model.input_std).all() or np.any(model.input_std <= 0):
+      return default_path
+    for accel in (-3.0, 0.0, 3.0):
+      if not np.isfinite(model.evaluate([20.0, accel, 0.0, 0.0] + [accel] * 7 + [0.0] * 7)):
+        return default_path
+  except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError):
+    return default_path
+  return path

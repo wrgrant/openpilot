@@ -18,8 +18,9 @@ from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext_base import sign
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_jerk_aware import LatControlTorqueJerkAware
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_ARMS, ab_arm
-from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH
+from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH, get_nn_model_override
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.model import NNTorqueModel
+from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.safe_model import SafeNNTorqueModel
 
 LOW_SPEED_X = [0, 10, 20, 30]
 LOW_SPEED_Y = [12, 3, 1, 0]
@@ -41,13 +42,16 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self.enabled = self.params.get_bool("NeuralNetworkLateralControl")
     # Odyssey: NnlcAB rotates NNLC on and off in odyssey_ab blocks to compare it with the stock torque controller
     self.ab = self.params.get_bool("NnlcAB")
-    model_path = CP_SP.neuralNetworkLateralControl.model.path
+    stock_path = CP_SP.neuralNetworkLateralControl.model.path
+    model_path = get_nn_model_override(stock_path) if stock_path not in (MOCK_MODEL_PATH, '') else stock_path
     self.has_nn_model = model_path not in (MOCK_MODEL_PATH, '')
 
     # NN model takes current v_ego, lateral_accel, lat accel/jerk error, roll, and past/future/planned data
     # of lat accel and roll
     # Past value is computed using previous desired lat accel and observed roll
     self.model = NNTorqueModel(model_path) if self.has_nn_model else None
+    if self.has_nn_model and model_path != stock_path:
+      self.model = SafeNNTorqueModel(model_path, stock_path)
 
     self.pitch = FirstOrderFilter(0.0, 0.5, 0.01)
     self.pitch_last = 0.0

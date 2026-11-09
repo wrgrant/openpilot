@@ -76,7 +76,7 @@ Analysis tools:
 - `tools/odyssey_wander.py`: wander and A/B scoring.
 - `tools/odyssey_eps_report.py`: held-pulse report.
 - `tools/odyssey_lateral_sim.py`: lane-loop sim.
-- `tools/odyssey_sim/`, local branch `odyssey-sim`: `replay/` reproduces the van's logged v0/NNLC torque at r ≈ 0.999; `plant/` holds the fitted plant (`plant.py` step API, `plant_model.json`); `closedloop/` uses comma's Controls Challenge harness at `~/Code/ext/controls_challenge`; `nnlc_train/` holds the van-specific model.
+- `tools/odyssey_sim/`, local branch `odyssey-sim`: `replay/` reproduces the van's logged v0/NNLC torque at r ≈ 0.999; `plant/` holds the fitted plant (`plant.py` step API, `plant_model.json`); `closedloop/` uses comma's Controls Challenge harness at `~/Code/ext/controls_challenge`; `nnlc_train/` holds the van-specific model. See [the NNLC experiment guide](tools/odyssey_sim/nnlc_train/README.md) for route splits, the default-off model override, and the limits of offline improvements.
 
 ## Working on the van (pitfalls)
 
