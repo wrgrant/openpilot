@@ -5,6 +5,18 @@ from openpilot.common.test import OpenpilotTestCase
 
 
 class TestSteerDeadband(OpenpilotTestCase):
+  def test_bump_averages_to_the_request(self):
+    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import BUMP_PERIOD_FRAMES, bump_comp
+    for t in (0.012, -0.024, 0.04):
+      out = [bump_comp(t, 0.06, k) for k in range(BUMP_PERIOD_FRAMES)]
+      assert abs(np.mean(out) - t) <= 0.06 / BUMP_PERIOD_FRAMES / 2 + 1e-9
+      assert set(np.round(np.abs(out), 6)) <= {0.0, 0.06}, "pulses are full size or nothing"
+
+  def test_bump_passes_large_requests_and_ignores_noise(self):
+    from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import bump_comp
+    assert bump_comp(0.2, 0.06, 0) == 0.2 and bump_comp(-0.07, 0.06, 3) == -0.07
+    assert bump_comp(0.001, 0.06, 0) == 0.0
+
   def test_off_is_identity(self):
     for t in (-0.3, -0.01, 0.0, 0.02, 0.5):
       assert deadband_comp(t, 0.0) == t

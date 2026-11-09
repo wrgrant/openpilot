@@ -17,7 +17,7 @@ TS="$TS_DIR/tailscale --socket=$SOCK"
 
 start() {
   [ -x "$TS_DIR/tailscaled" ] || exit 0
-  pgrep -f "$TS_DIR/tailscaled" >/dev/null && exit 0
+  pgrep -x tailscaled >/dev/null && exit 0
   mkdir -p "$TS_DIR/state"
   nohup nice -n 10 "$TS_DIR/tailscaled" --tun=userspace-networking --statedir="$TS_DIR/state" --socket="$SOCK" \
     --port=41641 > "$TS_DIR/tailscaled.log" 2>&1 &
@@ -37,7 +37,7 @@ case "${1:-}" in
     $TS up --hostname=odyssey-comma --timeout=5s 2>&1 || true  # prints the login link the first time
     ;;
   start) start ;;
-  stop) pkill -f "$TS_DIR/tailscaled" || true ;;
+  stop) pkill -x tailscaled || true ;;
   status) $TS status ;;
   *) echo "usage: $0 install|start|stop|status" >&2; exit 2 ;;
 esac
