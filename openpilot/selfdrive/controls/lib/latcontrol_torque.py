@@ -11,6 +11,7 @@ from openpilot.common.pid import PIDController
 
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext import LatControlTorqueExt
 from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import SteerDeadbandComp
+from openpilot.common.params import Params
 
 # At higher speeds (25+mph) we can assume:
 # Lateral acceleration achieved by a specific car correlates to
@@ -35,13 +36,23 @@ JERK_GAIN = 0.3
 LAT_ACCEL_REQUEST_BUFFER_SECONDS = 1.0
 VERSION = 1
 
+def capped_kp(kp_interp: list[float], cap: float) -> list[float]:
+  """Odyssey: openpilot raises the proportional gain up to 300x at walking speed, where a lateral-accel error is tiny;
+  against a weak EPS that becomes 100% torque back and forth. SteerLowSpeedKpCap (0 = off) caps it, never below the
+  highway gain."""
+  if cap <= 0.0:
+    return kp_interp
+  return [min(k, max(cap, kp_interp[-1])) for k in kp_interp]
+
+
 class LatControlTorque(LatControl):
   def __init__(self, CP, CP_SP, CI, dt):
     super().__init__(CP, CP_SP, CI, dt)
     self.torque_params = CP.lateralTuning.torque.as_builder()
     self.torque_from_lateral_accel = CI.torque_from_lateral_accel()
     self.lateral_accel_from_torque = CI.lateral_accel_from_torque()
-    self.pid = PIDController([INTERP_SPEEDS, KP_INTERP], KI, rate=1/self.dt)
+    self.pid = PIDController([INTERP_SPEEDS, capped_kp(KP_INTERP, Params().get("SteerLowSpeedKpCap", return_default=True) or 0.0)],
+                             KI, rate=1/self.dt)
     self.update_limits()
     self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
     self.lat_accel_request_buffer_len = int(LAT_ACCEL_REQUEST_BUFFER_SECONDS / self.dt)
