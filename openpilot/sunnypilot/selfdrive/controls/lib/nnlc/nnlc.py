@@ -5,6 +5,7 @@ This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
 from collections import deque
+import json
 import math
 import time
 import numpy as np
@@ -17,8 +18,8 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext_base import sign
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_jerk_aware import LatControlTorqueJerkAware
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_ARMS, ab_arm
-from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH, get_nn_model_override
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_ARMS, NNLC_MODEL_ARMS, NNLC_MODEL_FILES, WANDER_BLOCK_S, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH, get_nn_model_override, validated_model_path
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.model import NNTorqueModel
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.safe_model import SafeNNTorqueModel
 
@@ -33,6 +34,50 @@ LOW_SPEED_Y = [12, 3, 1, 0]
 # to the roll value itself, then passed to nnff.
 def roll_pitch_adjust(roll, pitch):
   return roll * math.cos(pitch)
+
+
+class NnlcResponseShaper:
+  """Opt-in causal feedback/FF shaping stored with the experimental model.
+
+  Keep torque feedback and planned feedforward separate: damping the error need
+  not delay turn anticipation. Constants are seconds at the native 100 Hz rate.
+  """
+  def __init__(self, error_gain=1.0, error_tau=0.0, ff_tau=0.0):
+    self.error_gain = error_gain
+    self.error_tau = error_tau
+    self.ff_tau = ff_tau
+    self.reset()
+
+  @classmethod
+  def load(cls, path):
+    with open(path) as f:
+      settings = json.load(f).get('odyssey_smoothing')
+    if settings is None:
+      return None
+    limits = {'error_gain': (0.1, 3.0), 'error_tau': (0.0, 0.4), 'ff_tau': (0.0, 0.3)}
+    if not isinstance(settings, dict) or settings.keys() - limits.keys():
+      raise ValueError('Invalid Odyssey smoothing schema')
+    for key, value in settings.items():
+      if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not limits[key][0] <= value <= limits[key][1]:
+        raise ValueError('Invalid Odyssey smoothing value')
+    return cls(**settings)
+
+  def reset(self):
+    self.error = self.ff = None
+    self.last_update = None
+
+  def update(self, error, ff):
+    if not math.isfinite(error) or not math.isfinite(ff):
+      self.reset()
+      raise ValueError('Nonfinite NNLC response')
+    now = time.monotonic()
+    if self.last_update is not None and now - self.last_update > .1:
+      self.reset()
+    self.last_update = now
+    error *= self.error_gain
+    self.error = error if self.error is None else self.error + .01 / (self.error_tau + .01) * (error - self.error)
+    self.ff = ff if self.ff is None else self.ff + .01 / (self.ff_tau + .01) * (ff - self.ff)
+    return self.error, self.ff
 
 
 class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
@@ -52,6 +97,30 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self.model = NNTorqueModel(model_path) if self.has_nn_model else None
     if self.has_nn_model and model_path != stock_path:
       self.model = SafeNNTorqueModel(model_path, stock_path)
+
+    self.response_shaper = None
+    if self.has_nn_model and model_path != stock_path:
+      try:
+        self.response_shaper = NnlcResponseShaper.load(model_path)
+      except (OSError, ValueError, TypeError):
+        # Invalid experimental metadata restores the original controller/model.
+        self.model = NNTorqueModel(stock_path)
+
+    # Odyssey: NnlcModelAB rotates stock / van-specific models in WANDER_BLOCK_S blocks (odyssey_ab.NNLC_MODEL_ARMS)
+    self.model_ab = None
+    if self.has_nn_model and self.params.get_bool("NnlcModelAB"):
+      arms = {"stock": (self.model, self.response_shaper)}
+      for arm, name in NNLC_MODEL_FILES.items():
+        path = validated_model_path(name)
+        if path is None:
+          continue
+        try:
+          arms[arm] = (SafeNNTorqueModel(path, stock_path), NnlcResponseShaper.load(path))
+        except (OSError, ValueError, TypeError):
+          continue
+      if len(arms) > 1:
+        self.model_ab = arms
+        self.model_arm = "stock"
 
     self.pitch = FirstOrderFilter(0.0, 0.5, 0.01)
     self.pitch_last = 0.0
@@ -102,13 +171,29 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     if want == self.enabled:
       return
     self.enabled = want
+    if getattr(self, 'response_shaper', None) is not None:
+      self.response_shaper.reset()
     self._pid.reset()
     self.lac_torque.update_limits()
     self.update_limits()
 
+  def update_model_ab(self, mono_s: float) -> None:
+    """Switch to this block's model (missing candidates fall back to stock); reset the PID and shaper on a switch."""
+    arm = ab_arm(mono_s, NNLC_MODEL_ARMS, WANDER_BLOCK_S)
+    arm = arm if arm in self.model_ab else "stock"
+    if arm == self.model_arm:
+      return
+    self.model_arm = arm
+    self.model, self.response_shaper = self.model_ab[arm]
+    if self.response_shaper is not None:
+      self.response_shaper.reset()
+    self._pid.reset()
+
   def update_neural_network_feedforward(self, CS, params, calibrated_pose) -> None:
     if self.ab:
       self.update_ab(time.monotonic())
+    if self.model_ab is not None:
+      self.update_model_ab(time.monotonic())
     if not self._nnlc_enabled:
       return
 
@@ -178,4 +263,14 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     if self.model.friction_override:
       self._pid_log.error += get_friction(friction_input, self._lateral_accel_deadzone, FRICTION_THRESHOLD, self.torque_params)
 
+    if self.response_shaper is not None:
+      if CS.steeringPressed or CS.vEgo < 5:
+        self.response_shaper.reset()
+      else:
+        try:
+          self._pid_log.error, self._ff = self.response_shaper.update(self._pid_log.error, self._ff)
+        except ValueError:
+          # Safe model already sanitizes inference inputs; avoid stale filter state.
+          self._pid_log.error = 0.0
+          self._ff = 0.0
     self.update_output_torque(CS)

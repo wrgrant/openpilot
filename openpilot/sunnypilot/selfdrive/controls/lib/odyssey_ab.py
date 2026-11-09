@@ -7,6 +7,9 @@ WANDER_BLOCK_S = 180.0  # wander needs long blocks: score the last 150 s of each
 DEADBAND_ARMS = ("off", "kick", "bump")  # SteerDeadbandCompAB
 NNLC_ARMS = ("on", "off")  # NnlcAB
 WANDER_ARMS = ("off", "inverse")  # OdysseyWanderAB
+# NnlcModelAB: stock HONDA_ODYSSEY NNLC vs the van-specific models (report_nnlc_smooth.md), WANDER_BLOCK_S blocks
+NNLC_MODEL_ARMS = ("stock", "S3", "S5")
+NNLC_MODEL_FILES = {"S3": "HONDA_ODYSSEY_WILLIAM_S3.json", "S5": "HONDA_ODYSSEY_WILLIAM_S5.json"}
 
 
 def ab_arm(mono_s: float, arms: tuple[str, ...], block_s: float = AB_BLOCK_S) -> str:

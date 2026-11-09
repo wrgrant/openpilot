@@ -18,6 +18,8 @@ import numpy as np
 TORQUE_NN_MODEL_PATH = os.path.join(BASEDIR, "openpilot", "sunnypilot", "neural_network_data", "neural_network_lateral_control")
 TORQUE_NN_MODEL_SUBSTITUTE_PATH = os.path.join(BASEDIR, "opendbc_repo", "opendbc", "car", "torque_data/substitute.toml")
 MOCK_MODEL_PATH = os.path.join(TORQUE_NN_MODEL_PATH, "MOCK.json")
+# Odyssey: van-specific models live in our own repo (the neural_network_data submodule is sunnypilot's)
+ODYSSEY_MODEL_PATH = os.path.join(BASEDIR, "openpilot", "sunnypilot", "selfdrive", "controls", "lib", "nnlc", "odyssey_models")
 
 
 def similarity(s1: str, s2: str) -> float:
@@ -72,27 +74,30 @@ def get_nn_model_path(CP: structs.CarParams) -> tuple[str, str, bool]:
   return model_path, model_name, exact_match
 
 
-def get_nn_model_override(default_path: str) -> str:
-  """Select a validated drop-in model at startup; unset/invalid keeps stock.
-
-  Experimental files never participate in fuzzy fingerprint matching.
-  Only local basenames are accepted, including after resolving symlinks.
-  """
-  name = Params().get("NnlcModelOverride")
+def validated_model_path(name: str | None) -> str | None:
+  """Path of a valid 18-input drop-in model named `name` (a bare .json filename) in our Odyssey model folder or
+  sunnypilot's model folder, or None. Experimental files never take part in fuzzy fingerprint matching."""
   if not name or os.path.basename(name) != name or not name.endswith(".json"):
-    return default_path
-  path = os.path.realpath(os.path.join(TORQUE_NN_MODEL_PATH, name))
-  if os.path.dirname(path) != os.path.realpath(TORQUE_NN_MODEL_PATH):
-    return default_path
-  try:
-    model = NNTorqueModel(path)
-    if model.input_size != 18 or model.output_size != 1:
-      return default_path
-    if not np.isfinite(model.input_mean).all() or not np.isfinite(model.input_std).all() or np.any(model.input_std <= 0):
-      return default_path
-    for accel in (-3.0, 0.0, 3.0):
-      if not np.isfinite(model.evaluate([20.0, accel, 0.0, 0.0] + [accel] * 7 + [0.0] * 7)):
-        return default_path
-  except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError):
-    return default_path
-  return path
+    return None
+  for folder in (ODYSSEY_MODEL_PATH, TORQUE_NN_MODEL_PATH):
+    path = os.path.realpath(os.path.join(folder, name))
+    if os.path.dirname(path) != os.path.realpath(folder) or not os.path.isfile(path):
+      continue
+    try:
+      model = NNTorqueModel(path)
+      if model.input_size != 18 or model.output_size != 1:
+        return None
+      if not np.isfinite(model.input_mean).all() or not np.isfinite(model.input_std).all() or np.any(model.input_std <= 0):
+        return None
+      for accel in (-3.0, 0.0, 3.0):
+        if not np.isfinite(model.evaluate([20.0, accel, 0.0, 0.0] + [accel] * 7 + [0.0] * 7)):
+          return None
+    except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError):
+      return None
+    return path
+  return None
+
+
+def get_nn_model_override(default_path: str) -> str:
+  """Select a validated drop-in model at startup (NnlcModelOverride); unset/invalid keeps stock."""
+  return validated_model_path(Params().get("NnlcModelOverride")) or default_path

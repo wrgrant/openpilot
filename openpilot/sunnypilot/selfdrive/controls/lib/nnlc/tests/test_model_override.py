@@ -43,7 +43,7 @@ class TestVanModel(OpenpilotTestCase):
 
   @parameterized.expand([2.0, 5.0, 10.0, 20.0, 30.0, 40.0])
   def test_model_finite_and_monotonic(self, speed):
-    model = NNTorqueModel(os.path.join(helpers.TORQUE_NN_MODEL_PATH, "HONDA_ODYSSEY_WILLIAM_V1.json"))
+    model = NNTorqueModel(os.path.join(helpers.ODYSSEY_MODEL_PATH, "HONDA_ODYSSEY_WILLIAM_V1.json"))
     for roll in (-0.08, 0.0, 0.08):
       outputs = [model.evaluate([speed, a, 0.0, roll] + [a] * 7 + [roll] * 7) for a in np.linspace(-3.0, 3.0, 121)]
       self.assertTrue(np.isfinite(outputs).all())
@@ -51,7 +51,7 @@ class TestVanModel(OpenpilotTestCase):
 
   def test_experimental_output_bounded_and_missing_values_fall_back(self):
     stock = os.path.join(helpers.TORQUE_NN_MODEL_PATH, "HONDA_ODYSSEY.json")
-    model = SafeNNTorqueModel(os.path.join(helpers.TORQUE_NN_MODEL_PATH, "HONDA_ODYSSEY_WILLIAM_V1.json"), stock)
+    model = SafeNNTorqueModel(os.path.join(helpers.ODYSSEY_MODEL_PATH, "HONDA_ODYSSEY_WILLIAM_V1.json"), stock)
     rng = np.random.default_rng(42)
     for x in rng.uniform(-100.0, 100.0, (500, 18)):
       self.assertLessEqual(abs(model.evaluate(x.tolist())), 1.0)
@@ -83,3 +83,28 @@ class TestVanModel(OpenpilotTestCase):
     selected = cls(cp.as_reader(), sp.as_reader(), ci, 0.01).extension.model
     self.assertIsInstance(selected, SafeNNTorqueModel)
     self.assertNotEqual(selected.evaluate(x), baseline.evaluate(x))
+
+
+class TestModelAB(OpenpilotTestCase):
+  @parameterized.expand(["HONDA_ODYSSEY_WILLIAM_S3.json", "HONDA_ODYSSEY_WILLIAM_S5.json"])
+  def test_candidates_ship_in_repo_and_validate(self, name):
+    path = helpers.validated_model_path(name)
+    self.assertIsNotNone(path)
+    self.assertEqual(os.path.dirname(path), os.path.realpath(helpers.ODYSSEY_MODEL_PATH))
+
+  def test_model_ab_switches_model_and_resets(self):
+    from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.nnlc import NeuralNetworkLateralControl
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import WANDER_BLOCK_S
+    calls = []
+    shaper = SimpleNamespace(reset=lambda: calls.append("shaper"))
+    fake = SimpleNamespace(model_ab={"stock": ("m0", None), "S3": ("m3", shaper), "S5": ("m5", shaper)}, model_arm="stock",
+                           model="m0", response_shaper=None, _pid=SimpleNamespace(reset=lambda: calls.append("pid")))
+    NeuralNetworkLateralControl.update_model_ab(fake, 0.5 * WANDER_BLOCK_S)
+    self.assertEqual((fake.model, calls), ("m0", []))
+    NeuralNetworkLateralControl.update_model_ab(fake, 1.5 * WANDER_BLOCK_S)
+    self.assertEqual((fake.model, calls), ("m3", ["shaper", "pid"]))
+    NeuralNetworkLateralControl.update_model_ab(fake, 2.5 * WANDER_BLOCK_S)
+    self.assertEqual(fake.model, "m5")
+    del fake.model_ab["S5"]  # a candidate that failed to load runs stock instead
+    NeuralNetworkLateralControl.update_model_ab(fake, 2.6 * WANDER_BLOCK_S)
+    self.assertEqual(fake.model, "m0")

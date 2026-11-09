@@ -309,6 +309,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"SteerDeadbandComp", {PERSISTENT | BACKUP, FLOAT, "0.0"}},
     {"SteerDeadbandCompAB", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"NnlcAB", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"NnlcModelAB", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"OdysseyWanderAB", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"OdysseyWanderFriction", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"NnlcModelOverride", {PERSISTENT | BACKUP, STRING}},
