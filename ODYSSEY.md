@@ -48,6 +48,10 @@ From routes 18c–1ab, the 2026-11-09 plant fit (`tools/odyssey_sim/plant/`), an
 
 Steering hardware:
 - The EPS motor deadband is about 2.8% command (2-4%). Above it, motor ≈ 112 × (|command| − 0.028).
+- The EPS caps lane-keeping torque in firmware. Motor torque (`STEER_MOTOR_TORQUE`, raw units) against command, hands off, above 18 mph: 10% → 6, 20% → 14, 30% → 25, 40% → 39, 50% → 50, 60% → 57, 70% → 63, 80% → 67, 100% → 74-76. The top half of the command range adds only a third of the torque.
+- Below about 15 mph the EPS gives less at full command: about 15% of that cap under 3 mph, 30% at 3-5 mph, 40-60% from 5 to 15 mph, and all of it from about 17 mph. The same motor puts out a median of 175 and up to 608 units when the driver steers hard by hand under 10 mph, so the hardware has several times more torque than lane keeping may use.
+- At full command the van reaches about 0.7 m/s² at 18-30 mph, 1.2 at 30-45 mph and 1.0-1.7 above 45 mph. comma's fleet table (`opendbc/car/torque_data/params.toml`) lists the Odyssey's maximum at 0.84 m/s², against 1.3-2.2 for Toyotas and 1.9-2.7 for Hyundais. While a curve asks for more than 1 m/s², the command is at 100% for 77% of the time at 10-30 mph, 16% at 30-45 mph and 3-4% above 45 mph.
+- EPS firmware is `39990-THR-A020` (SuperG SH2A, application at 0xC000, 0x74000 bytes). Its lane-keeping torque table has inputs 0, 128, ... 1024 and outputs 0, 2019, 3230, 3980, 4345, 4577, 4721, 4864, 4864, stored six times. Stock and a community-modified image (table x2.0-2.5, identity `39990-THR,A020`), with decode and diff scripts, are in `~/comma-logs/odyssey-eps/` on the Studio. Nothing has been flashed.
 - Stick-slip friction is much larger: equivalent to 0.29 / 0.20 / 0.14 command at 10 / 20 / 30 m/s.
 - Aggregate steering lag is about 0.87 s.
 - Gain is 1.66 / 2.45 / 3.73 m/s² per unit command at 10 / 20 / 30 m/s, against 1.03 / 2.09 / 2.27 for the public-data Odyssey.
