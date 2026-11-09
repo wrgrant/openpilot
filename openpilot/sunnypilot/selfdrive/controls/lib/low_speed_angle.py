@@ -5,6 +5,7 @@ At walking speed a real curve needs almost no lateral accel, so openpilot's torq
 torque back and forth. The wheel angle, though, is measured to 0.1 degree and the angle a curve needs is large, so below
 V_FULL this steers on angle: a hold term for the wheel angle the curve needs, plus a correction on the angle error.
 It blends back to the stock controller by V_OFF, and in between the stock gain is capped so the two don't fight.
+Applied by odyssey_steer.OdysseySteer after whichever torque controller sunnypilot runs (v0 or v1).
 """
 import math
 
@@ -33,12 +34,29 @@ class LowSpeedAngleSteer:
   def __init__(self, params: Params | None = None):
     self.enabled = bool((params or Params()).get_bool("SteerLowSpeedAngle"))
 
-  def blend(self, output_torque: float, v_ego: float, angle_deg: float, VM, live_params, desired_curvature: float) -> float:
-    """output_torque is latcontrol_torque's internal sign (the negative of actuators.torque)."""
+  def blend(self, steer: float, v_ego: float, angle_deg: float, VM, live_params, desired_curvature: float) -> float:
+    """steer is the lateral controller's command in actuators.torque sign (same sign as the steering angle)."""
     if not self.enabled:
-      return output_torque
+      return steer
     w = blend_weight(v_ego)
     if w <= 0.0:
-      return output_torque
+      return steer
     angle_des = math.degrees(VM.get_steer_from_curvature(-desired_curvature, v_ego, live_params.roll)) + live_params.angleOffsetDeg
-    return (1.0 - w) * output_torque + w * -angle_steer(angle_des, angle_deg)
+    return (1.0 - w) * steer + w * angle_steer(angle_des, angle_deg)
+
+
+def capped_kp(kp_interp: list[float], cap: float) -> list[float]:
+  """openpilot raises the torque controller's proportional gain up to 300x at walking speed; cap it (0 = off), never
+  below the highway gain. Used while low-speed angle steering is on, so the stock controller doesn't fight it in the
+  blend region."""
+  if cap <= 0.0:
+    return kp_interp
+  return [min(k, max(cap, kp_interp[-1])) for k in kp_interp]
+
+
+def odyssey_kp_interp(kp_interp: list[float], params: Params | None = None) -> list[float]:
+  """The torque controllers' KP table with the Odyssey low-speed cap: STOCK_KP_CAP while low-speed angle steering is
+  on, else SteerLowSpeedKpCap (0 = off)."""
+  p = params or Params()
+  cap = STOCK_KP_CAP if p.get_bool("SteerLowSpeedAngle") else float(p.get("SteerLowSpeedKpCap", return_default=True) or 0.0)
+  return capped_kp(kp_interp, cap)

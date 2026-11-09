@@ -36,8 +36,15 @@ class TestLowSpeedAngle(OpenpilotTestCase):
 
   def test_sign_matches_openpilot(self):
     # a left curve (+ curvature) wants a negative steering angle here (latcontrol_angle's convention); from a straight
-    # wheel the command moves toward it: actuators.torque negative, so latcontrol_torque's internal output positive
+    # wheel the command (actuators.torque, same sign as the steering angle) moves toward it, so it is negative
     vm, live = FakeVM(), NS(roll=0.0, angleOffsetDeg=0.0)
     on = lsa.LowSpeedAngleSteer(params=NS(get_bool=lambda k: True))
     out = on.blend(0.0, 1.0, 0.0, vm, live, +0.01)
-    assert out > 0 and np.isfinite(out)
+    assert out < 0 and np.isfinite(out)
+
+  def test_kp_cap_follows_the_setting(self):
+    kp = [250.0, 30.0, 1.0]
+    on = NS(get_bool=lambda k: k == "SteerLowSpeedAngle", get=lambda k, return_default=False: 0.0)
+    off = NS(get_bool=lambda k: False, get=lambda k, return_default=False: 0.0)
+    assert lsa.odyssey_kp_interp(kp, on) == [lsa.STOCK_KP_CAP, lsa.STOCK_KP_CAP, 1.0]
+    assert lsa.odyssey_kp_interp(kp, off) == kp

@@ -1,6 +1,7 @@
 """The low-speed gain cap only lowers the walking-speed gains, and off leaves openpilot's gains alone."""
 from openpilot.common.test import OpenpilotTestCase
-from openpilot.selfdrive.controls.lib.latcontrol_torque import KP_INTERP, capped_kp
+from openpilot.selfdrive.controls.lib.latcontrol_torque import KP_INTERP
+from openpilot.sunnypilot.selfdrive.controls.lib.low_speed_angle import capped_kp
 
 
 class TestLowSpeedKpCap(OpenpilotTestCase):

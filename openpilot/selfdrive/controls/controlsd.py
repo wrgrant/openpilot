@@ -22,6 +22,7 @@ from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_steer import OdysseySteer
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
 
 State = log.SelfdriveState.OpenpilotState
@@ -69,6 +70,8 @@ class Controls(ControlsExt):
       self.LaC = LatControlTorque(self.CP, self.CP_SP, self.CI, DT_CTRL)
 
     self.LaC = ControlsExt.initialize_lateral_control(self, self.LaC, self.CI, DT_CTRL)
+    # Odyssey add-ons on the torque command, whichever torque controller class runs
+    self.odyssey_steer = OdysseySteer() if self.CP.lateralTuning.which() == 'torque' else None
 
   def update(self):
     self.sm.update(15)
@@ -150,6 +153,8 @@ class Controls(ControlsExt):
     steer, lateral_output, lac_log = self.LaC.update(CC.latActive, CS, self.VM, lp,
                                                      self.steer_limited_by_safety, self.desired_curvature,
                                                      self.calibrated_pose, curvature_limited, lat_delay)
+    if self.odyssey_steer is not None:
+      steer = self.odyssey_steer.apply(steer, CC.latActive, CS, self.VM, lp, self.desired_curvature, self.LaC.steer_max)
     actuators.torque = float(steer)
     if self.sm.valid['lateralManeuverPlan'] and CC.latActive:
       # steering characterization: a short torque pulse on top of lane keeping (tools/lateral_maneuvers/odyssey_suite.py)
