@@ -1,0 +1,49 @@
+{
+  "roll_proxy_fit": {
+    "source": "carControl.orientationNED[0], not an independently calibrated seat/roll sensor",
+    "unconstrained_drive_damping_stiffness": [
+      0.248085550674672,
+      -0.5404479580855539,
+      23.747883983479255
+    ],
+    "bounded_coefficients": [
+      0.21748166425131846,
+      0.010000000000000002,
+      23.831094904860997
+    ],
+    "natural_times_per_second": 0.77694831605027,
+    "damping_ratio": 0.0010242312120642898,
+    "variance_explained": 0.5477814366184122,
+    "coherence_1_3_per_second": 0.5045387911458667,
+    "status": "diagnostic, not substituted into frozen gate plant; road-bank and frame confounded"
+  },
+  "ablation": {
+    "full": {
+      "yaw_rms": 0.13786814515942666,
+      "seat_rms": 0.08970202265442681
+    },
+    "no_friction": {
+      "yaw_rms": 0.1697086583408865,
+      "seat_rms": 0.10113805971592132
+    },
+    "fast_motor": {
+      "yaw_rms": 0.3548006687384594,
+      "seat_rms": 0.20313333352673538
+    },
+    "short_relaxation": {
+      "yaw_rms": 0.08423459578702716,
+      "seat_rms": 0.0577230654869148
+    },
+    "no_roll": {
+      "yaw_rms": 0.13786814515942666,
+      "seat_rms": 0.08260984679607279
+    },
+    "old_scalar_plant": {
+      "yaw_rms": 0.052397911554560604
+    },
+    "road": {
+      "yaw_rms": 0.15990452255352508
+    }
+  },
+  "training_window_start": 453.452612907
+}
