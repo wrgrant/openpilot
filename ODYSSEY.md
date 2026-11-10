@@ -40,6 +40,7 @@ CAN signals (DBC `honda_odyssey_exl_2018_generated`):
 - `STEERING_SENSORS.STEER_ANGLE`: 0.1° steps.
 - `STEER_STATUS.STEER_ANGLE_RATE`: 0.1°/s steps, and moves before the angle ticks over. `tools/odyssey_eps_report.py fine_angle()` integrates it.
 - `STEER_STATUS.STEER_TORQUE_SENSOR`: the driver's hand torque.
+- The pose-filter yaw rate (`carControl.angularVelocity`) is about 85 ms later than the raw gyroscope in the 0.3-3 Hz band (1ac segment 7): the raw gyro follows the wheel angle by about 55 ms, the pose-filter yaw by about 140 ms. Fine for slow sway and for forces in newtons; for fitting the van's dynamics use the raw gyro in the vehicle frame, or model the delay.
 - `VEHICLE_DYNAMICS.LAT_ACCEL` **is unusable**: uncorrelated with steering-derived lateral accel. Use steering-angle-derived lateral accel.
 
 ## Measured facts about this van
