@@ -240,6 +240,12 @@ class TestPulseRuntime(unittest.TestCase):
       self.assertAlmostEqual(r.pose[1], .01 * a, msg="the heading is low-passed")
       r.update(10.05 + op.MAX_MODEL_AGE + .1, .0, cs, md, True, True, True, 0., 0.)
       self.assertEqual(r.pose, (.2, .01))
+    r = runtime()
+    with patch('openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane.lane_pose', return_value=None):
+      for n in range(3):
+        r.update(20. + n * DT, .0, cs, md, True, True, True, 0., 0.)
+      self.assertEqual(r.controller.reason, 'lane lines lost', "no usable lines is said in words the driver can act on")
+      self.assertFalse(r.controller.broken)
 
   def test_queue_overflow_disables_experiment_without_losing_abort(self):
     from types import SimpleNamespace as NS

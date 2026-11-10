@@ -426,9 +426,9 @@ class PulseRuntime:
         else:
           ahead = [abs(r*v) for r, v, t in zip(rates, velocities, ts, strict=True) if 0 <= t <= 3.]
           self.curve = max([abs(md.action.desiredCurvature * cs.vEgo**2), *ahead]) if ahead else math.inf
-      pose = self.pose or (math.nan, math.nan)
+      pose = self.pose or (0., 0.)  # no usable lane lines: reported below as lines lost, which is what the driver can act on
       x = Inputs(active=active, speed=cs.vEgo, offset=pose[0], heading=pose[1], curve_accel=getattr(self, 'curve', math.inf),
-                 lane_prob=min(md.laneLineProbs[1], md.laneLineProbs[2]) if len(md.laneLineProbs) == 4 else 0.,
+                 lane_prob=min(md.laneLineProbs[1], md.laneLineProbs[2]) if self.pose is not None and len(md.laneLineProbs) == 4 else 0.,
                  lane_width=getattr(self, 'width', 0.), driver_torque=cs.steeringTorque,
                  blinker=cs.leftBlinker or cs.rightBlinker, brake=cs.brakePressed, lane_change=str(md.meta.laneChangeState) not in ('off', '0'),
                  model_age=max(model_age, now-self.model_time), valid=valid, angle=cs.steeringAngleDeg, rate=cs.steeringRateDeg)
