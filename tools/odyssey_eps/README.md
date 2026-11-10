@@ -2,6 +2,19 @@
 
 Start here before working on the power-steering firmware of this van (2019 Odyssey Elite, EPS `39990-THR-A020`). It gathers what is known, where every piece lives, and what is still open. Nothing has been flashed on this van. The next step is reading its own EPS (see "Procedure").
 
+## Words you'll see in the Torque Collective Discord
+
+- **Torque Collective**: the Discord server where Honda EPS firmware work happens. Its channels are per car (odyssey-fw, crv-fw, civic-fw), plus general and fork-updates.
+- **RWD**: Honda's firmware update file, the scrambled format the dealer tool flashes. `rwd.py` and nrdr's `rwd-xray-2026` unpack and rebuild it.
+- **PTM (proper torque mod)**: an EPS firmware image with raised clamps, input scaling and loop gain, sometimes an added feedforward, and faster rate normalisation. It is firmware only. The software that drives it well is a separate piece, the Firmware Controller.
+- **Firmware Controller / HondaEpsController**: openpilot-side controllers (nrdr and StarPilot names for the same idea) that invert the EPS's own law, both the command table and the rate damping. This fork's `OdysseyEpsMap` inverts only the command table.
+- **Forks**: comma's openpilot → sunnypilot (this fork's base) → **nrdr** (Aragon [SP]'s Honda fork, branches `nrdr-clean`, `nrdr-nightly`, dated `nrdr-staging-*`, `nrdr-development`). Separately, FrogPilot → **StarPilot** (vote_for_nobody, "VFN", collaborates there). Jay DeFuria's Odyssey fork is `jasondefuria/openpilot_ody`.
+- **Konik**: a third-party replacement for comma's cloud (device registration, route upload and viewing), at `stable.konik.ai`. The community uses it to share routes. This van needs no cloud; logs come over Tailscale.
+- **Blendful**: a sunnypilot lateral feature that pulls the model's path toward lane centre when it trusts the lane lines. It is in this fork, off by default (`Blendful` param).
+- **Variable / firmware-derived steer ratio**: Honda racks have a ratio that changes with wheel angle, but openpilot learns one number. nrdr reads the ratio table from the firmware instead. The THR-A020 image probably holds such a table too; it is not located yet.
+- **Lateral stiction (NrdrLatStiction)**: nrdr's output stage that holds small commands to stop the EPS dithering, then lets decisive corrections through. It is a different answer to the same small-command problem that this fork's pulse idea attacks.
+- **Pedal interceptor**: add-on gas-pedal hardware for Hondas without stop-and-go ACC. This van uses factory ACC and does not need it.
+
 ## What is known
 
 **The unit.** Nidec EPS, SuperG SH2A processor; application at flash 0xC000, 0x74000 bytes. On this van the EPS answers diagnostics on CAN bus 0 through the camera harness (`carFw` in every drive log): UDS on 0x18DA30F1 / 0x18DAF130, CCP on 0x721 (requests) / 0x722 (replies). No OBD power cable is needed for that.
@@ -18,7 +31,7 @@ Start here before working on the power-steering firmware of this van (2019 Odyss
 
 **Software side.** The comma sends the same `STEERING_CONTROL` message to stock, table-scaled and PTM images; detection is the comma in the identity. Controllers: this fork's `OdysseyEpsMap` (`opendbc/sunnypilot/car/honda/eps_mod.py`) inverts a table-scaled image so it starts out driving like stock; it does not undo the rate damping, and a PTM image changes the firmware's own loop, so it would need its own calibration. The community runs nrdr's "Firmware Controller" (called HondaEpsController in their starpilot branch), which models the firmware law and inverts it; it has no Odyssey profile yet. Jay's fork (`jasondefuria/openpilot_ody`) uses PID gains 0.3 / 0.1 for the modified Odyssey. Drive routes from modified cars go to Konik (`stable.konik.ai`) in that community, not comma connect.
 
-## Procedure (planned; each live step needs William's go, William at the van and a battery charger on)
+## Procedure (planned; each live step needs an explicit go, someone at the van and a battery charger on)
 
 Van parked, ignition on, engine off, charger connected, openpilot stopped on the comma (`sudo systemctl stop comma`), then:
 
