@@ -1,6 +1,6 @@
 # Odyssey EPS preparation (offline only)
 
-`rwd.Image.decode(raw)` / `.encode()` validate all three checksums, the THR-A020 identity, keys, layout, torque axes and six table copies. `rwd.build(raw, outputs=..., limits=(...), identity=...)` or `scale=...` writes only known table/identity locations and recomputes checksums. Eight outputs exclude the leading zero knot. Cipher permutation is from nrdr-derived `check_rwd.py`; no downloaded module is imported.
+`rwd.Image.decode(raw)` / `.encode()` validate the container sum, the two payload sums and the block CRC the EPS checks while running (flash 0x60000-0x6FF5F), the THR-A020 identity, keys, layout, torque axes and six table copies. `rwd.build(raw, outputs=..., limits=(...), identity=...)` or `scale=...` writes only known table/identity locations and recomputes checksums. Eight outputs exclude the leading zero knot. Cipher permutation is from nrdr-derived `check_rwd.py`; no downloaded module is imported.
 
 Run from the repository with its Python:
 

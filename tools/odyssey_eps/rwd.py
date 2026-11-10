@@ -6,12 +6,18 @@ Cipher permutation transcribed from nrdr-derived check_rwd.py (see README).
 from dataclasses import dataclass
 import math
 import struct
+import zlib
 
 STOCK_ID = b'39990-THR-A020'
 MOD_ID = b'39990-THR,A020'
 TABLES = (0x4bbc2, 0x4bec2, 0x4c1c2, 0x5bbd8, 0x5bed8, 0x5c1d8)
 STOCK = (2019, 3230, 3980, 4345, 4577, 4721, 4864, 4864)
 COMMUNITY = (3968, 7936, 9950, 10863, 11443, 11803, 12160, 12160)
+# The EPS checks this block while running: CRC-32/BZIP2 of flash 0x60000-0x6FF5F, stored big-endian at flash 0x6FF7C.
+# The flasher does not check it. An image with a stale value flashes, then latches a permanent fault and drops assist.
+# Three of the six table copies are inside the block.
+BLOCK_START, BLOCK_END, BLOCK_CRC = 0x54000, 0x63f60, 0x63f7c
+REFLECT = bytes(int(f'{i:08b}'[::-1], 2) for i in range(256))
 
 
 def require(ok, message):
@@ -23,8 +29,14 @@ def word_sum(data):
   return sum(struct.unpack(f'>{len(data)//2}H', data)) & 0xffff
 
 
+def block_crc(payload):
+  crc = zlib.crc32(bytes(payload[BLOCK_START:BLOCK_END]).translate(REFLECT))
+  return int(f'{crc:032b}'[::-1], 2)
+
+
 def checksums(payload):
   require(len(payload) == 0x74000, 'wrong payload length')
+  require(block_crc(payload) == struct.unpack_from('>I', payload, BLOCK_CRC)[0], 'block CRC (flash 0x60000-0x6FF5F)')
   require(word_sum(payload[:0x73f80]) == struct.unpack_from('>H', payload, 0x73f80)[0], 'payload sum')
   require((-word_sum(payload[:0x73ffe])) & 0xffff == struct.unpack_from('>H', payload, 0x73ffe)[0], 'payload negative sum')
 
@@ -107,6 +119,7 @@ def build(raw, *, outputs=None, scale=None, limits=(1024, 1024), identity=MOD_ID
     struct.pack_into('>8H', payload, off, *outputs)
     # Two unknown words six bytes after the eight nonzero output knots.
     struct.pack_into('>2H', payload, off + 22, *limits)
+  struct.pack_into('>I', payload, BLOCK_CRC, block_crc(payload))  # before the sums, which cover it
   struct.pack_into('>H', payload, 0x73f80, word_sum(payload[:0x73f80]))
   struct.pack_into('>H', payload, 0x73ffe, -word_sum(payload[:0x73ffe]) & 0xffff)
   result = Image(image.prefix, image.headers, bytes(payload)).encode()
