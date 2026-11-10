@@ -1,4 +1,7 @@
-"""Odyssey A/B panel: which arm is running, how much good data each arm has, and a tap to switch arms.
+"""Odyssey test panel: which test and arm is running, how much good data there is, and three touch zones.
+  top strip    switch to the next test (pulse, bump, lane), so one trip can run several without parking
+  middle       next arm, or pause / resume the pulse test
+  bottom strip (pulse test) whether the wheel torque sensor may stop a shot
 It shows the arm controls reports back, never the arm the tap asked for, so the label is always what is steering."""
 import json
 import time
@@ -12,9 +15,12 @@ from openpilot.system.ui.widgets import Widget, DialogResult
 from openpilot.system.ui.widgets.confirm_dialog import ConfirmDialog
 
 # Sized to read at a glance from the driver's seat on the 2160x1080 screen: the arm is the largest thing after the speed
-PANEL_X, PANEL_Y, PANEL_W = 22, 290, 640
-PAD, HEADER, ARM, REASON, ROW_NAME, ROW_VALUE = 22, 36, 120, 42, 38, 30
-ROWS_Y, ROW_H, BAR_W = 250, 98, 280
+PANEL_X, PANEL_Y, PANEL_W = 22, 270, 640
+PAD, HEADER, ARM, REASON, ROW_NAME, ROW_VALUE = 22, 32, 120, 42, 38, 30
+HEAD_H, FOOT_H = 70, 120  # the touch strips: tall enough to hit without looking closely
+ROWS_Y, ROW_H, BAR_W = HEAD_H + 236, 98, 280
+PULSE_H = HEAD_H + 300 + FOOT_H
+ONROAD_TESTS = ("pulse", "bump", "lane")  # the tests the top strip cycles through; the model test needs its models loaded at start
 
 
 def next_arm(params):
@@ -29,6 +35,23 @@ def next_arm(params):
   params.put("OdysseyABArm", arms[(arms.index(arm) + 1) % len(arms)] if arm in arms else arms[0])
 
 
+def next_test(params):
+  """Top strip: the next of ONROAD_TESTS. The pulse test arrives paused; the others arrive in manual mode on their off arm."""
+  e = params.get("OdysseyABExperiment") or ""
+  test = ONROAD_TESTS[(ONROAD_TESTS.index(e) + 1) % len(ONROAD_TESTS)] if e in ONROAD_TESTS else ONROAD_TESTS[0]
+  params.put("OdysseyABArm", EXPERIMENTS[test][0] if EXPERIMENTS[test] else "")
+  if test == "pulse":
+    params.put_bool("OdysseyPulsePaused", True)
+  else:
+    params.put_bool("OdysseyABManual", True)
+  params.put("OdysseyABExperiment", test)
+
+
+def toggle_wheel_stop(params):
+  """Bottom strip of the pulse test: let the wheel torque sensor stop shots, or ignore it."""
+  params.put_bool("OdysseyPulseIgnoreWheel", not params.get_bool("OdysseyPulseIgnoreWheel"))
+
+
 def reset_totals():
   def confirmed(result):
     if result == DialogResult.CONFIRM:
@@ -38,8 +61,8 @@ def reset_totals():
 
 
 def panel_rect(content: rl.Rectangle, experiment: str) -> rl.Rectangle:
-  rows = 2 if experiment == "pulse" else len(EXPERIMENTS.get(experiment, ()))
-  return rl.Rectangle(content.x + PANEL_X, content.y + PANEL_Y, PANEL_W, ROWS_Y + rows * ROW_H + 2 * PAD)
+  height = PULSE_H if experiment == "pulse" else ROWS_Y + len(EXPERIMENTS.get(experiment, ())) * ROW_H + 2 * PAD
+  return rl.Rectangle(content.x + PANEL_X, content.y + PANEL_Y, PANEL_W, height)
 
 
 class OdysseyABPanel(Widget):
@@ -51,7 +74,20 @@ class OdysseyABPanel(Widget):
     self.last_read = 0.
     self.shown: rl.Rectangle | None = None  # where the panel was last drawn; None while hidden
     self.broken = False
-    self.set_click_callback(lambda: next_arm(ui_state.params))  # totals are reset in settings, parked: no dialogs while driving
+
+  def zone(self, pos) -> str:
+    """Which touch strip a point is in: 'test', 'wheel' or 'main'."""
+    if self.shown is None:
+      return ""
+    if pos.y < self.shown.y + HEAD_H:
+      return "test"
+    return "wheel" if self.e == "pulse" and pos.y >= self.shown.y + self.shown.height - FOOT_H else "main"
+
+  def _handle_mouse_release(self, mouse_pos, /) -> None:
+    # totals are reset in settings, parked: no dialogs while driving
+    action = {"test": next_test, "wheel": toggle_wheel_stop, "main": next_arm}.get(self.zone(mouse_pos))
+    if action is not None:
+      action(ui_state.params)
 
   def contains(self, pos) -> bool:
     """True if a touch at pos lands on the visible panel, so the road view leaves that touch to the panel."""
@@ -92,24 +128,34 @@ class OdysseyABPanel(Widget):
     def text(s, dx, dy, size, color=rl.WHITE):
       rl.draw_text_ex(self.font, s, rl.Vector2(x + dx, y + dy), size, 0, color)
 
+    text(f"{self.e} test   •   tap here for another test", 0, 0, HEADER, rl.LIGHTGRAY)
+    rl.draw_rectangle(int(rect.x), int(rect.y + HEAD_H), int(rect.width), 2, rl.GRAY)
     if self.e == "pulse":
       live = self.status.get("experiment") == "pulse" and time.monotonic() - self.status.get("mono_s", 0) < 2
       status = self.status if live else {}
-      text("pulse test • tap to pause / resume", 0, 0, HEADER, rl.LIGHTGRAY)
-      state = {"wait": "waiting", "recover": "re-centring"}.get(status.get("state"), str(status.get("state", "waiting")))
+      state = {"wait": "waiting", "recover": "re-centring", "lead-in": "pulsing", "pulse": "pulsing",
+               "tail": "pulsing"}.get(status.get("state"), str(status.get("state", "waiting")))
       headline = "paused" if status.get("paused") else state
       reason = str(status.get("reason", "waiting for controls"))
-      text(headline, 0, 50, 86)
-      if reason != headline:  # say why only when it adds something
-        text(reason, 0, 170, 36, rl.YELLOW)
-      text(f"{status.get('finished', 0)} / {status.get('total', 336)} shots • {status.get('band', '')} mph", 0, 250, 38)
-      text(str(status.get("last_result", "")), 0, 330, 30)
+      text(headline, 0, HEAD_H - 4, 86)
+      text("tap to start" if status.get("paused") else reason if reason != headline else "tap to pause", 0, HEAD_H + 100, 36, rl.YELLOW)
+      text(f"{status.get('finished', 0)} of {status.get('total', 0)} shots  •  {status.get('band', '')} mph", 0, HEAD_H + 160, 38)
+      text(str(status.get("last_result", "")), 0, HEAD_H + 218, 30)
+      foot = rect.height - FOOT_H - PAD
+      rl.draw_rectangle(int(rect.x), int(rect.y + rect.height - FOOT_H), int(rect.width), 2, rl.GRAY)
+      ignored = bool(status.get("ignore_wheel")) if live else ui_state.params.get_bool("OdysseyPulseIgnoreWheel")
+      wheel, limit = status.get("wheel", 0), status.get("wheel_limit", 800)
+      stopped = status.get("aborts", {}).get("you're steering", 0)
+      text(f"wheel sensor {wheel:.0f}, stops a shot at {limit:.0f}" + (f"  (stopped {stopped})" if stopped else ""), 0, foot + 14, 30,
+           rl.RED if wheel >= limit else rl.WHITE)
+      text("IGNORED  •  tap here to obey it" if ignored else "obeyed  •  tap here to ignore it", 0, foot + 58, 36,
+           rl.YELLOW if ignored else rl.LIGHTGRAY)
       return
-    text(f"{self.e} test" + ("  •  tap for next" if self.manual else "  •  by the clock"), 0, 0, HEADER, rl.LIGHTGRAY)
+    text("tap for the next arm" if self.manual else "arms switch by the clock", 0, HEAD_H, 30, rl.LIGHTGRAY)
     live = self.status.get("experiment") == self.e and time.monotonic() - self.status.get("mono_s", 0) < 2
     good = bool(live and self.status.get("good"))
-    text(str(self.status.get("arm", "")) if live else "waiting", 0, 44, ARM)
-    text(str(self.status.get("reason", "")) if live else "waiting for controls", 0, 178, REASON, rl.GREEN if good else rl.YELLOW)
+    text(str(self.status.get("arm", "")) if live else "waiting", 0, HEAD_H + 30, ARM)
+    text(str(self.status.get("reason", "")) if live else "waiting for controls", 0, HEAD_H + 164, REASON, rl.GREEN if good else rl.YELLOW)
     totals = self.totals[self.e]
     need = min(totals, key=lambda a: min(totals[a]["straight"] / TARGET_STRAIGHT, 1) + min(totals[a]["curve"] / TARGET_CURVE, 1))
     for i, arm in enumerate(EXPERIMENTS[self.e]):

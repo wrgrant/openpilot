@@ -13,7 +13,6 @@ Positive command follows carControl/Honda wheel-angle sign, NOT CAN STEER_TORQUE
 """
 from dataclasses import dataclass, asdict
 import math
-import random
 
 MAX_TORQUE = .15  # absolute controlsd request; panda and Honda rate limits still apply
 MAX_RELEASE = .06  # lane keeping's mean command over the settling time; more means a curve, strong crown or wind
@@ -31,15 +30,22 @@ MAX_SPEED_CHANGE = .5  # m/s from shot entry; a changing speed changes the exper
 MIN_LANE_PROB = .7  # both inner lane lines, stronger than ordinary lane correction
 DRIVER_TORQUE, DRIVER_SECONDS, HARD_DRIVER_TORQUE = 800., .15, 1200.  # Honda raw sensor units; provisional
 MAX_MODEL_AGE, MAX_FRAME_GAP = .15, .03  # seconds; stale road or scheduler gap aborts
-SETTLE_S, LEAD_S, TAIL_S, HARD_SHOT_S = 1., .3, .8, 2.2  # a shot is lead-in + pulse + tail: 1.15 to 2.1 s
-TRAIN_S = 1.0  # pulse trains and shams: four 0.25 s periods or two 0.5 s ones
+SETTLE_S, LEAD_S, TAIL_S, HARD_SHOT_S = 1., .2, .5, 2.3  # a shot is lead-in + signal + tail: 1.5 to 2.2 s
+TRAIN_S = 1.0  # pulse trains and shams: four 0.25 s periods
+PAIR_GAP_S = .5  # between the two opposite pulses of a pair: long enough to see the first one's wheel response
+RAMP_LEVELS, RAMP_STEP_S = (.02, .03, .04, .05, .06, .08), .15  # one direction, rising: where the wheel starts to creep
+SQUARE_LEVELS, SQUARE_HALF_S = (.02, .04, .06, .08, .10, .12), .1  # +level then -level: the EPS map, with no net push
+CHIRP_HZ, CHIRP_S = (.5, 3.), 1.5  # a sine sweeping these frequencies: the response the simulator has to match
 HANDOVER_STEP = .01  # normalized command per frame on the way back to lane keeping
-VERSION = 1
+VERSION = 2
 ACTIVE = ('lead-in', 'pulse', 'tail')
 
 
 @dataclass(frozen=True)
 class Condition:
+  """One shot's signal. kind: single (one pulse), pair (a pulse, PAIR_GAP_S, the opposite pulse: `period` is each
+  pulse's length), train (pulses of `duty` of each `period`), ramp, square, chirp (see the constants), or sham (nothing).
+  direction is the sign of the first push."""
   kind: str
   height: float
   duration: float
@@ -48,27 +54,82 @@ class Condition:
   duty: float = 0.
 
   def command(self, elapsed):
-    t = round((elapsed - LEAD_S) * 100) / 100
-    on = 0 <= t < self.duration
-    if self.kind == 'train' and on:
-      tick, period = round(t * 100), round(self.period * 100)
-      on = tick % period < round(period * self.duty)
-    return self.direction * self.height if on else 0.
+    tick = round((elapsed - LEAD_S) * 100)  # whole 100 Hz frames, so the signal's edges do not depend on float rounding
+    if not 0 <= tick < round(self.duration * 100) or self.kind == 'sham':
+      return 0.
+    t = tick / 100
+    if self.kind == 'train':
+      period = round(self.period * 100)
+      value = self.height if tick % period < round(period * self.duty) else 0.
+    elif self.kind == 'pair':
+      width, second = round(self.period * 100), round((self.period + PAIR_GAP_S) * 100)
+      value = self.height if tick < width else -self.height if second <= tick < second + width else 0.
+    elif self.kind == 'ramp':
+      value = RAMP_LEVELS[min(tick // round(RAMP_STEP_S * 100), len(RAMP_LEVELS) - 1)]
+    elif self.kind == 'square':
+      half = round(SQUARE_HALF_S * 100)
+      value = SQUARE_LEVELS[min(tick // (2 * half), len(SQUARE_LEVELS) - 1)] * (1 if (tick // half) % 2 == 0 else -1)
+    elif self.kind == 'chirp':
+      f0, f1 = CHIRP_HZ
+      value = self.height * math.sin(2 * math.pi * (f0 * t + (f1 - f0) * t * t / (2 * self.duration)))
+    else:
+      value = self.height
+    return self.direction * value
+
+  def label(self):
+    if self.kind in ('single', 'pair'):
+      return f"{self.kind} {100 * self.height:.0f}% {self.period or self.duration:g}s"
+    if self.kind == 'train':
+      return f"train {100 * self.height:.0f}% on {100 * self.duty:.0f}%"
+    return f"chirp {100 * self.height:.0f}%" if self.kind == 'chirp' else self.kind
 
 
-def plan(seed=1789):
-  """Full pass before repeat; fixed seed allows exact restart without storing RNG state."""
-  conditions = [Condition('single', h, d, s) for h in (.02, .03, .04, .05, .06, .08, .10, .12)
-                for d in (.05, .1, .2, .4) for s in (-1, 1)]
-  conditions += [Condition('train', h, TRAIN_S, s, period, duty) for h in (.05, .06, .08)
-                 for duty in (.2, .4, .6) for period in (.25, .5) for s in (-1, 1)]
-  # 12 sham conditions, alternating direction labels; same observation window as trains.
-  conditions += [Condition('sham', 0., TRAIN_S, (-1, 1)[i % 2]) for i in range(12)]
+def session():
+  """The 26 shots of one pass, most useful first, so a short drive still brings home a balanced set: about 10-15
+  minutes of straight highway at the shot rate replayed from recorded drives. Names are the shot ids in the log."""
+  def pair(h, w, s):
+    return Condition('pair', h, 2 * w + PAIR_GAP_S, s, period=w)
+
+  def train(h, duty, s):
+    return Condition('train', h, TRAIN_S, s, period=.25, duty=duty)
+  ramp = len(RAMP_LEVELS) * RAMP_STEP_S
+  square = len(SQUARE_LEVELS) * 2 * SQUARE_HALF_S
+  return (
+    ('sham-a', Condition('sham', 0., TRAIN_S, 1)),
+    ('square+', Condition('square', SQUARE_LEVELS[-1], square, 1)),  # the EPS map: motor torque at each command level
+    ('pair-6-0.1', pair(.06, .1, 1)),  # the bump mode's own pulse, then its reversal
+    ('ramp+', Condition('ramp', RAMP_LEVELS[-1], ramp, 1)),  # the level at which the wheel starts to move
+    ('chirp-5', Condition('chirp', .05, CHIRP_S, 1)),  # frequency response at a small size, for the simulator
+    ('train-6-30+', train(.06, .3, 1)),  # does pulse-width modulation deliver a small average torque?
+    ('ramp-', Condition('ramp', RAMP_LEVELS[-1], ramp, -1)),
+    ('pair-6-0.2', pair(.06, .2, -1)),
+    ('train-6-60-', train(.06, .6, -1)),
+    ('pair-4-0.1', pair(.04, .1, -1)),
+    ('pair-8-0.1', pair(.08, .1, 1)),
+    ('sham-b', Condition('sham', 0., TRAIN_S, -1)),
+    ('chirp-9', Condition('chirp', .09, CHIRP_S, -1)),
+    ('square-', Condition('square', SQUARE_LEVELS[-1], square, -1)),
+    ('pair-6-0.05', pair(.06, .05, 1)),
+    ('train-6-30-', train(.06, .3, -1)),
+    ('train-6-60+', train(.06, .6, 1)),
+    ('pair-4-0.2', pair(.04, .2, 1)),
+    ('pair-8-0.2', pair(.08, .2, -1)),
+    ('train-8-30+', train(.08, .3, 1)),
+    ('chirp-5i', Condition('chirp', .05, CHIRP_S, -1)),
+    ('pair-4-0.05', pair(.04, .05, -1)),
+    ('pair-8-0.05', pair(.08, .05, 1)),
+    ('train-8-30-', train(.08, .3, -1)),
+    ('chirp-9i', Condition('chirp', .09, CHIRP_S, 1)),
+    ('sham-c', Condition('sham', 0., TRAIN_S, 1)),
+  )
+
+
+def plan(passes=3):
+  """The session, then the same again with every first push reversed, then as the first: repeats for the noise."""
   out = []
-  for repeat in range(3):
-    block = list(enumerate(conditions))
-    random.Random(seed + repeat).shuffle(block)
-    out.extend((f'{repeat}:{i}', c) for i, c in block)
+  for repeat in range(passes):
+    for name, c in session():
+      out.append((f'{repeat}:{name}', c if repeat % 2 == 0 else Condition(c.kind, c.height, c.duration, -c.direction, c.period, c.duty)))
   return tuple(out)
 
 
@@ -114,6 +175,9 @@ class Pulse:
     self.speed_band = '45-70'
     self.settle_speed = None
     self.base_sum, self.base_n, self.offset_start = 0., 0, 0.
+    self.aborts = {}  # reason -> count since controls started, for the panel
+    self.ignore_wheel = False  # the driver's override: the wheel torque sensor neither blocks nor stops a shot
+    self.wheel_peak, self.wheel_peak_time = 0., -math.inf  # largest sensor reading in the last second, for the panel
 
   @property
   def in_shot(self):
@@ -151,7 +215,8 @@ class Pulse:
       return 'heading'
     if abs(x.curve_accel) > MAX_CURVE_ACCEL:
       return 'curve ahead'
-    if abs(x.driver_torque) >= HARD_DRIVER_TORQUE or (self.driver_since is not None and now - self.driver_since >= DRIVER_SECONDS):
+    if not self.ignore_wheel and (abs(x.driver_torque) >= HARD_DRIVER_TORQUE or
+                                  (self.driver_since is not None and now - self.driver_since >= DRIVER_SECONDS)):
       return "you're steering"
     if self.in_shot and (abs(x.speed - self.record['speed']) > MAX_SPEED_CHANGE or band(x.speed) != self.speed_band):
       return 'speed changed'
@@ -169,7 +234,9 @@ class Pulse:
       if not reason:
         self.done[self.speed_band].add(self.shot[0])
       c = self.shot[1]
-      self.last_result = f'{100*c.height:.0f}% {c.duration:g}s: ' + (f"aborted: {reason}" if reason else f"wheel {self.record['wheel_delta']:+.2f}°")
+      self.last_result = f'{c.label()}: ' + (f"stopped: {reason}" if reason else f"wheel {self.record['wheel_delta']:+.2f}°")
+      if reason:
+        self.aborts[reason] = self.aborts.get(reason, 0) + 1
     self.record, self.stable, self.state = None, None, 'recover'
 
   def step(self, now, normal, x, selected, paused=False):
@@ -189,6 +256,8 @@ class Pulse:
     if abs(x.rate) > .05:
       self.last_direction = 1 if x.rate > 0 else -1
     self.driver_since = (now if self.driver_since is None else self.driver_since) if abs(x.driver_torque) >= DRIVER_TORQUE else None
+    if abs(x.driver_torque) >= self.wheel_peak or now - self.wheel_peak_time > 1.:
+      self.wheel_peak, self.wheel_peak_time = abs(x.driver_torque), now
     reason = self.gate(now, x) if selected else 'not selected'
     reason = 'paused' if paused else reason
     if self.broken or not math.isfinite(normal) or not math.isfinite(now):
@@ -217,7 +286,7 @@ class Pulse:
         self.settle_speed = x.speed
       room = x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset)  # from the van's side to the nearer inner line
       ready = (speed_stable and abs(x.offset) <= START_OFFSET and room >= MIN_EDGE + MAX_DRIFT and abs(x.heading) <= START_HEADING and
-               abs(x.rate) <= .5 and abs(x.driver_torque) < DRIVER_TORQUE)
+               abs(x.rate) <= .5 and (self.ignore_wheel or abs(x.driver_torque) < DRIVER_TORQUE))
       if not ready or self.stable is None:
         self.base_sum, self.base_n = 0., 0
       self.stable = (now if self.stable is None else self.stable) if ready else None
@@ -268,6 +337,7 @@ class PulseRuntime:
     self.params = params
     self.controller = Pulse()
     self.config = (False, True, None)
+    self.ignore_wheel = False
     self.heartbeat = time.monotonic()
     self.queue = queue.Queue(maxsize=512)
     self.stop = threading.Event()
@@ -303,6 +373,7 @@ class PulseRuntime:
           if self.params.get_bool('OdysseyPulseReset'):
             raw = {}
             self.params.put_bool('OdysseyPulseReset', False)
+          self.ignore_wheel = self.params.get_bool('OdysseyPulseIgnoreWheel')
           self.config = (self.params.get('OdysseyABExperiment') == 'pulse', self.params.get_bool('OdysseyPulsePaused'), raw)
           last_poll = now
         try:
@@ -361,6 +432,7 @@ class PulseRuntime:
                  lane_width=getattr(self, 'width', 0.), driver_torque=cs.steeringTorque,
                  blinker=cs.leftBlinker or cs.rightBlinker, brake=cs.brakePressed, lane_change=str(md.meta.laneChangeState) not in ('off', '0'),
                  model_age=max(model_age, now-self.model_time), valid=valid, angle=cs.steeringAngleDeg, rate=cs.steeringRateDeg)
+      c.ignore_wheel = getattr(self, 'ignore_wheel', False)
       result = c.step(now, normal, x, selected, paused)
       while c.events:
         event = c.events[0]
@@ -374,7 +446,8 @@ class PulseRuntime:
       if selected and now-self.last_status >= .1:
         self.queue.put_nowait(('status', {'experiment': 'pulse', 'mono_s': now, 'state': c.state, 'reason': c.reason,
                                         'finished': len(c.done[c.speed_band]), 'total': len(c.plan), 'band': c.speed_band,
-                                        'last_result': c.last_result, 'paused': paused}))
+                                        'last_result': c.last_result, 'paused': paused, 'wheel': round(c.wheel_peak),
+                                        'wheel_limit': DRIVER_TORQUE, 'ignore_wheel': c.ignore_wheel, 'aborts': dict(c.aborts)}))
         self.last_status = now
       return result
     except Exception:

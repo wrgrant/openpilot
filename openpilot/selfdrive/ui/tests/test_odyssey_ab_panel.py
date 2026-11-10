@@ -106,8 +106,9 @@ class TestOdysseyPanel(OpenpilotTestCase):
                              ('tail', 'tail'), ('recover', 're-centring'), ('paused', "you're steering"), ('done', 'done')):
           params.put('OdysseyABExperiment', 'pulse', block=True)
           params.put('OdysseyABStatus', json.dumps({'experiment': 'pulse', 'mono_s': time.monotonic(),
-                     'state': name, 'reason': reason, 'finished': 21, 'total': 336, 'band': '45-70',
-                     'last_result': '5% 0.2s: wheel +0.30°', 'paused': name == 'paused'}), block=True)
+                     'state': name, 'reason': reason, 'finished': 7, 'total': 78, 'band': '45-70',
+                     'last_result': 'pair 6% 0.1s: wheel +0.30°', 'paused': name == 'paused',
+                     'wheel': 920 if name == 'tail' else 140, 'wheel_limit': 800, 'ignore_wheel': name == 'tail'}), block=True)
           panel.last_read = 0
           rl.begin_texture_mode(texture)
           rl.clear_background(rl.Color(38, 44, 52, 255))
@@ -118,9 +119,25 @@ class TestOdysseyPanel(OpenpilotTestCase):
           rl.unload_image(image)
           self.assertFalse(panel.broken)
         params.put_bool('OdysseyPulsePaused', False, block=True)
-        panel._handle_mouse_release(MousePos(100, 400))
+        top, bottom = panel.shown.y, panel.shown.y + panel.shown.height
+        panel._handle_mouse_release(MousePos(100, top + 200))  # the middle: pause
         time.sleep(.05)
         self.assertTrue(params.get_bool('OdysseyPulsePaused'))
+        panel._handle_mouse_release(MousePos(100, bottom - 40))  # the bottom strip: ignore the wheel sensor, and back
+        time.sleep(.05)
+        self.assertTrue(params.get_bool('OdysseyPulseIgnoreWheel'))
+        self.assertTrue(params.get_bool('OdysseyPulsePaused'), 'the bottom strip does not also start the test')
+        panel._handle_mouse_release(MousePos(100, bottom - 40))
+        time.sleep(.05)
+        self.assertFalse(params.get_bool('OdysseyPulseIgnoreWheel'))
+        seen = []
+        for _ in range(3):  # the top strip: pulse -> bump -> lane -> pulse, each arriving safe
+          panel._handle_mouse_release(MousePos(100, top + 20))
+          time.sleep(.05)
+          seen.append((params.get('OdysseyABExperiment'), params.get('OdysseyABArm') or '', params.get_bool('OdysseyABManual')))
+          panel.e = seen[-1][0]
+        self.assertEqual(seen, [('bump', 'off', True), ('lane', 'off', True), ('pulse', '', True)])
+        self.assertTrue(params.get_bool('OdysseyPulsePaused'), 'the pulse test arrives paused')
         from openpilot.selfdrive.ui.sunnypilot.layouts.settings.vehicle.brands.honda import HondaSettings
         params.put_bool('OdysseyPulsePaused', False, block=True)
         HondaSettings._select_experiment('pulse')

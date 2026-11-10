@@ -23,6 +23,8 @@ Evidence:
 - **Check 5, now met:** the panel renders in every pulse state (the earlier failure was the Mac's display being asleep).
 - 324 controls and tool tests plus the UI tests pass; lint clean.
 
+**Shortened for one trip (William: 80 minutes of highway is not available; 10-15 is).** The 336-shot plan is replaced by a 26-shot session, most useful first, of richer shots: a growing square wave (EPS map), a one-way ramp (where the wheel starts to creep), pairs of opposite pulses (the bump's pulse and its reversal), pulse trains, 0.5-3 Hz chirps (the simulator's frequency response) and shams. On the two good recorded highway drives a whole pass replays in 10 and 13 minutes. The panel gained a top strip that switches test without parking and, for this test, a bottom strip showing the wheel sensor's reading with a tap to ignore it. Hands off on straight highway that sensor would stop 0-4% of 2 s windows by itself (five drives). Worst-case check rerun for every shot: side of the van 30 cm or more from the line, 20 cm of movement at most.
+
 Still only checkable on the van: that the driver-torque thresholds do not trip on the wheel's own motion during a pulse, how well lane keeping re-centres after a shot, and the panel's tap.
 
 ---

@@ -90,23 +90,67 @@ class TestPulse(unittest.TestCase):
     self.assertTrue(p.events[-1]['completed'])
     self.assertEqual(p.done['45-70'], {'0:0'})
 
-  def test_plan_limits_train_duty_order_and_persistence(self):
-    schedule = plan()
-    self.assertEqual(len(schedule), 336)
-    self.assertEqual(len({i for i, _ in schedule}), 336)
-    self.assertEqual({i.split(':')[0] for i, _ in schedule[:112]}, {'0'})
-    self.assertEqual({i.split(':')[1] for i, _ in schedule[:112]}, {i.split(':')[1] for i, _ in schedule[112:224]})
-    self.assertNotEqual([i.split(':')[1] for i, _ in schedule[:112]], [i.split(':')[1] for i, _ in schedule[112:224]])
-    frames = round(op.HARD_SHOT_S / DT)
+  def test_session_is_short_bounded_and_each_signal_is_what_it_says(self):
+    shots, schedule = op.session(), plan()
+    self.assertEqual(len(schedule), 3 * len(shots))
+    self.assertEqual(len({i for i, _ in schedule}), len(schedule))
+    self.assertLess(sum(op.LEAD_S + c.duration + op.TAIL_S for _, c in shots), 60, "one pass is under a minute of shots")
+    self.assertEqual({name for name, _ in shots[:6]}, {'sham-a', 'square+', 'pair-6-0.1', 'ramp+', 'chirp-5', 'train-6-30+'},
+                     "a drive cut short after six shots has one of each kind")
+    for (_, a), (_, b) in zip(schedule[:len(shots)], schedule[len(shots):2 * len(shots)], strict=True):
+      self.assertEqual(b.direction, -a.direction, "the second pass repeats the first with every first push reversed")
     for _, c in schedule:
-      self.assertLessEqual(max(abs(c.command(n * DT)) for n in range(frames)), op.MAX_TORQUE)
+      frames = round((op.LEAD_S + c.duration + op.TAIL_S) / DT)
+      cmd = [c.command(n * DT) for n in range(frames + 5)]
+      self.assertLessEqual(max(abs(x) for x in cmd), op.MAX_TORQUE)
       self.assertLess(op.LEAD_S + c.duration + op.TAIL_S, op.HARD_SHOT_S, "every planned shot ends before the hard time limit")
-    c = Condition('train', .08, op.TRAIN_S, -1, .25, .4)
-    self.assertEqual(sum(c.command(n * DT) != 0 for n in range(frames)), round(op.TRAIN_S / DT * .4))
-    p = Pulse({'version': 1, 'done': {'45-70': [schedule[0][0], 'garbage']}})
+      lead, end = round(op.LEAD_S / DT), round((op.LEAD_S + c.duration) / DT)
+      self.assertEqual(set(cmd[:lead]) | set(cmd[end:]), {0.}, "quiet before and after the signal")
+    on = lambda c: [c.command(op.LEAD_S + n * DT) for n in range(round(c.duration / DT))]  # noqa: E731
+    pair = on(Condition('pair', .06, 2 * .1 + op.PAIR_GAP_S, 1, period=.1))
+    self.assertEqual((pair[:10], pair[10:60], pair[60:]), ([.06] * 10, [0.] * 50, [-.06] * 10))
+    self.assertAlmostEqual(sum(pair), 0.)
+    train = on(Condition('train', .08, op.TRAIN_S, -1, .25, .4))
+    self.assertEqual(sum(x != 0 for x in train), round(op.TRAIN_S / DT * .4))
+    ramp = on(dict(shots)['ramp-'])
+    self.assertEqual(sorted({-x for x in ramp}), list(op.RAMP_LEVELS))
+    self.assertEqual(ramp, sorted(ramp, reverse=True), "the ramp only ever grows")
+    square = on(dict(shots)['square+'])
+    self.assertEqual(sorted({abs(x) for x in square}), list(op.SQUARE_LEVELS))
+    self.assertAlmostEqual(sum(square), 0., msg="each level is pushed both ways for the same time")
+    chirp = on(dict(shots)['chirp-9'])
+    self.assertLessEqual(max(abs(x) for x in chirp), .09)
+    self.assertGreater(sum(a * b < 0 for a, b in zip(chirp, chirp[1:], strict=False)), 3, "the chirp reverses several times")
+    self.assertEqual(set(on(dict(shots)['sham-a'])), {0.})
+
+  def test_progress_round_trip_and_old_versions_are_ignored(self):
+    schedule = plan()
+    p = Pulse({'version': op.VERSION, 'done': {'45-70': [schedule[0][0], 'garbage']}})
     self.assertEqual(p.done['45-70'], {schedule[0][0]})
     self.assertEqual(Pulse(p.progress()).done, p.done)
-    self.assertEqual(Pulse({'version': 999}).done['45-70'], set())
+    self.assertEqual(Pulse({'version': op.VERSION - 1, 'done': {'45-70': [schedule[0][0]]}}).done['45-70'], set())
+
+  def test_ignoring_the_wheel_sensor_lets_a_shot_start_and_finish_with_torque_on_it(self):
+    hands = Inputs(driver_torque=op.HARD_DRIVER_TORQUE + 500)
+    p = Pulse()
+    for n in range(3 * SETTLE_FRAMES):
+      p.step(n * DT, .02, hands, True)
+    self.assertFalse(p.in_shot, "obeyed: torque on the wheel keeps the test waiting")
+    self.assertGreaterEqual(p.wheel_peak, op.HARD_DRIVER_TORQUE, "the panel can show the reading that blocked it")
+    p = Pulse()
+    p.ignore_wheel = True
+    for n in range(SETTLE_FRAMES + round(2.5 / DT)):
+      p.step(n * DT, .02, hands, True)
+    done = [e for e in p.events if e.get('completed')]
+    self.assertTrue(done, "ignored: shots run to the end")
+    self.assertNotIn("you're steering", p.aborts)
+    q, t = started()
+    q.step(t + DT, .1, Inputs(driver_torque=op.HARD_DRIVER_TORQUE + 500), True)
+    self.assertEqual(q.aborts, {"you're steering": 1}, "obeyed: the stop is counted for the panel")
+    for change in ({'brake': True}, {'blinker': True}, {'active': False}):
+      q, t = started()
+      q.ignore_wheel = True
+      self.assertEqual(q.step(t + DT, .1, replace(Inputs(), **change), True), .1, "the driver's other ways out still work")
 
   def test_fault_latches_and_inactive_is_passthrough(self):
     p = Pulse()

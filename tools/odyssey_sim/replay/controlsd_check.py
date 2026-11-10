@@ -69,7 +69,7 @@ def logged(lr: list) -> dict[str, np.ndarray]:
 
 
 def pulse_check(lr: list) -> bool:
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import MAX_TORQUE, plan
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import LEAD_S, MAX_TORQUE, plan
   off = replay(lr, BASE)
   paused = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": True})
   run = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": False})
@@ -80,7 +80,8 @@ def pulse_check(lr: list) -> bool:
   shots = [r for r in np.split(zero, np.where(np.diff(zero) > 1)[0] + 1) if len(r) >= 20] if len(zero) else []
   changed = np.flatnonzero(tq != off["torque"][:n])
   # the log stores the command as a 32-bit float: compare against the plan's heights at that precision, not rounded
-  heights = sorted({abs(float(x)) for x in tq[changed]} & {float(np.float32(c.height)) for _, c in plan() if c.height})
+  planned = {float(np.float32(abs(c.command(LEAD_S + k * 0.01)))) for _, c in plan() if c.kind != "chirp" for k in range(int(c.duration * 100))}
+  heights = sorted({abs(float(x)) for x in tq[changed]} & (planned - {0.0}))
   limit = max(MAX_TORQUE, float(np.max(np.abs(off["torque"][:n]))))
   bounded = bool(np.isfinite(tq).all()) and (not len(changed) or float(np.max(np.abs(tq[changed]))) <= limit)
   print(f"pulse off: {n} frames. Selected but paused: output identical to off: {same}")

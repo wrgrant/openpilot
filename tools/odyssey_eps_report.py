@@ -11,6 +11,8 @@ import json
 
 import numpy as np
 
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import LEAD_S
+
 STEER_MAX = 4096
 DBC = 'honda_odyssey_exl_2018_generated'
 MIN_SHOTS, MIN_SHAMS = 10, 10  # per setting, direction and speed; three repeats are a screening pass only
@@ -82,7 +84,7 @@ def measurements(records, samples):
       continue
     if s[0, 0]-r['start'] > .05 or r['end']-s[-1, 0] > .05:
       continue
-    pre = s[:, 0] < r['start']+.5
+    pre = s[:, 0] < r['start']+LEAD_S
     response = ~pre
     a = fine_angle(s[:, 1], s[:, 2], np.r_[.01, np.diff(s[:, 0])])
     delta = s[:, 4]-np.mean(s[pre, 4])
@@ -91,8 +93,8 @@ def measurements(records, samples):
     reversals = np.sum(np.diff(np.sign(delta[np.abs(delta) > .01])) != 0) / duration
     out.append({**r, 'wheel': sign*(np.mean(a[-10:])-np.mean(a[pre])), 'wheel_rate': float(np.max(np.abs(s[response, 2]))),
                 'motor': float(np.mean(s[response, 3])-np.mean(s[pre, 3])),
-                'average_command': float(sign*np.mean(s[(s[:, 0] >= r['start']+.5) &
-                                                                    (s[:, 0] < r['start']+.5+r['condition']['duration']), 5])),
+                'average_command': float(sign*np.mean(s[(s[:, 0] >= r['start']+LEAD_S) &
+                                                                    (s[:, 0] < r['start']+LEAD_S+r['condition']['duration']), 5])),
                 'accel': float(np.max(np.abs(delta))), 'push_N': float(75*np.max(np.abs(delta))), 'reversals_hz': float(reversals)})
   return out
 
