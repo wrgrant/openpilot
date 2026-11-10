@@ -1,0 +1,53 @@
+{
+  "parameters": [
+    0.017611129711580558,
+    112.34773082402586,
+    61.43141484772832,
+    0.01602943903206394,
+    7.371487814035448
+  ],
+  "names": [
+    "deadband",
+    "raw_per_command",
+    "cap_raw",
+    "tau_s",
+    "fade_full_m_s"
+  ],
+  "interval95": [
+    [
+      0.01597721855096742,
+      109.71361942776159,
+      55.00000000000037,
+      0.014490381579753263,
+      5.5692878752903
+    ],
+    [
+      0.019186737304955282,
+      115.02684153930772,
+      65.03338080939963,
+      0.019525942048599566,
+      9.580282589244774
+    ]
+  ],
+  "bounds": [
+    [
+      0.005,
+      50,
+      55,
+      0.003,
+      3
+    ],
+    [
+      0.07,
+      180,
+      100,
+      0.15,
+      12
+    ]
+  ],
+  "train_rmse": 6.989375632071018,
+  "test_rmse": 11.741693797555502,
+  "train_windows": 109,
+  "test_windows": 25,
+  "limitation": "Low-speed fade confounded by driver assistance; absolute torque scale is unknown; reversal +/-0.10 s excluded. Signed motor uses sign(CAN command)."
+}

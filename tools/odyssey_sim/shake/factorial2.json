@@ -1,0 +1,3268 @@
+{
+  "rows": [
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.5,
+        "after_crossing": 0.04354464324070441,
+        "command_rms": 0.04671897995303562,
+        "wheel_rms_deg": 0.09470554008858935,
+        "body_rms": 0.016386504520609232,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.5,
+        "after_crossing": 0.04354464324070441,
+        "command_rms": 0.04671897995303562,
+        "wheel_rms_deg": 0.09470554008858935,
+        "body_rms": 0.016386504520609232,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.5,
+        "after_crossing": 0.04354464324070441,
+        "command_rms": 0.04671897995303562,
+        "wheel_rms_deg": 0.09470554008858935,
+        "body_rms": 0.016386504520609232,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.05151437885278724,
+        "command_rms": 0.0717948332413882,
+        "wheel_rms_deg": 0.295223813834416,
+        "body_rms": 0.0650849407476367,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.05151437885278724,
+        "command_rms": 0.0717948332413882,
+        "wheel_rms_deg": 0.295223813834416,
+        "body_rms": 0.0650849407476367,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.05151437885278724,
+        "command_rms": 0.0717948332413882,
+        "wheel_rms_deg": 0.295223813834416,
+        "body_rms": 0.0650849407476367,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.7857142857142856,
+        "after_crossing": 0.04353864106735604,
+        "command_rms": 0.06607946416489101,
+        "wheel_rms_deg": 0.22028185641518833,
+        "body_rms": 0.038281141370556986,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.7857142857142856,
+        "after_crossing": 0.04353864106735604,
+        "command_rms": 0.06607946416489101,
+        "wheel_rms_deg": 0.22028185641518833,
+        "body_rms": 0.038281141370556986,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 3.7857142857142856,
+        "after_crossing": 0.04353864106735604,
+        "command_rms": 0.06607946416489101,
+        "wheel_rms_deg": 0.22028185641518833,
+        "body_rms": 0.038281141370556986,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.07012529267285104,
+        "command_rms": 0.09846047081085398,
+        "wheel_rms_deg": 0.4118737191674258,
+        "body_rms": 0.0912076846211608,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.07012529267285104,
+        "command_rms": 0.09846047081085398,
+        "wheel_rms_deg": 0.4118737191674258,
+        "body_rms": 0.0912076846211608,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.07012529267285104,
+        "command_rms": 0.09846047081085398,
+        "wheel_rms_deg": 0.4118737191674258,
+        "body_rms": 0.0912076846211608,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.03421589489742898,
+        "command_rms": 0.06861134957938268,
+        "wheel_rms_deg": 0.33328525622740446,
+        "body_rms": 0.05785477576715983,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.2857142857142856,
+        "after_crossing": 0.043438147732307766,
+        "command_rms": 0.06348209237858311,
+        "wheel_rms_deg": 0.32270900080414866,
+        "body_rms": 0.0563027692834319,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.928571428571429,
+        "after_crossing": 0.02663517046364794,
+        "command_rms": 0.0531326197491011,
+        "wheel_rms_deg": 0.26349198272363766,
+        "body_rms": 0.04537270122815341,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.7857142857142856,
+        "after_crossing": 0.050158730023830846,
+        "command_rms": 0.07697353226929658,
+        "wheel_rms_deg": 0.33981215077782806,
+        "body_rms": 0.07027097422177693,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.2857142857142856,
+        "after_crossing": 0.07318420401700296,
+        "command_rms": 0.09204239268063542,
+        "wheel_rms_deg": 0.37902811574188716,
+        "body_rms": 0.0825459056681872,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 3.0714285714285716,
+        "after_crossing": 0.054098322701130304,
+        "command_rms": 0.07723087589673659,
+        "wheel_rms_deg": 0.39011013971436104,
+        "body_rms": 0.08853989560660179,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.04652982135154651,
+        "command_rms": 0.08397970555728987,
+        "wheel_rms_deg": 0.3989137933652246,
+        "body_rms": 0.07139886333922149,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.571428571428571,
+        "after_crossing": 0.07187583638019329,
+        "command_rms": 0.0774020685479282,
+        "wheel_rms_deg": 0.3842028383968798,
+        "body_rms": 0.06823601241245678,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.928571428571429,
+        "after_crossing": 0.050259054615751406,
+        "command_rms": 0.07095900320156792,
+        "wheel_rms_deg": 0.3523847073241389,
+        "body_rms": 0.06242499372197791,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.0528387654753473,
+        "command_rms": 0.10805567661139985,
+        "wheel_rms_deg": 0.4489174959898056,
+        "body_rms": 0.09712071349253988,
+        "peak_per_second": 1.46484375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.857142857142857,
+        "after_crossing": 0.08605477149086935,
+        "command_rms": 0.12097533288844682,
+        "wheel_rms_deg": 0.5484741152464155,
+        "body_rms": 0.12001603611617896,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 3.7142857142857144,
+        "after_crossing": 0.07112047508184638,
+        "command_rms": 0.09597434390193642,
+        "wheel_rms_deg": 0.5131979618615787,
+        "body_rms": 0.11468471411418049,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.0714285714285716,
+        "after_crossing": 0.035078829968101514,
+        "command_rms": 0.0474289472936698,
+        "wheel_rms_deg": 0.09517913704730926,
+        "body_rms": 0.01647219270139873,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.9285714285714284,
+        "after_crossing": 0.048729942785544336,
+        "command_rms": 0.046685761927685226,
+        "wheel_rms_deg": 0.09480724289566574,
+        "body_rms": 0.016418142630100895,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 3.357142857142857,
+        "after_crossing": 0.03425291538837892,
+        "command_rms": 0.046926483774880096,
+        "wheel_rms_deg": 0.09419107998465417,
+        "body_rms": 0.016291335055523416,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.04867501456116512,
+        "command_rms": 0.07218298310191916,
+        "wheel_rms_deg": 0.29283308348096687,
+        "body_rms": 0.0643108606931889,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.928571428571429,
+        "after_crossing": 0.05061375814921369,
+        "command_rms": 0.07219261009051182,
+        "wheel_rms_deg": 0.29244980028136847,
+        "body_rms": 0.0644217794599641,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.214285714285714,
+        "after_crossing": 0.05404332136722526,
+        "command_rms": 0.071881156376135,
+        "wheel_rms_deg": 0.29068549233817415,
+        "body_rms": 0.06430225509664947,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.041815582791931497,
+        "command_rms": 0.06679320096765065,
+        "wheel_rms_deg": 0.21693791432925832,
+        "body_rms": 0.0376503942573756,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.5,
+        "after_crossing": 0.0450459996997415,
+        "command_rms": 0.0662799911675379,
+        "wheel_rms_deg": 0.21391296568345947,
+        "body_rms": 0.03715817604751095,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.5,
+        "after_crossing": 0.045820471045650076,
+        "command_rms": 0.0656982939176681,
+        "wheel_rms_deg": 0.21587544869574538,
+        "body_rms": 0.037455278047254174,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.785714285714286,
+        "after_crossing": 0.06892587197166522,
+        "command_rms": 0.10027680740061733,
+        "wheel_rms_deg": 0.4159289269118985,
+        "body_rms": 0.09268044237566163,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 6.071428571428571,
+        "after_crossing": 0.07378214696014532,
+        "command_rms": 0.09915206610305707,
+        "wheel_rms_deg": 0.4144296549735872,
+        "body_rms": 0.091829293858335,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 6.5,
+        "after_crossing": 0.059486411400693814,
+        "command_rms": 0.0993281831503619,
+        "wheel_rms_deg": 0.4149224631863127,
+        "body_rms": 0.09241955716738628,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.5,
+        "after_crossing": 0.029668090186602464,
+        "command_rms": 0.058258271774167224,
+        "wheel_rms_deg": 0.28164887926386073,
+        "body_rms": 0.050379258817481655,
+        "peak_per_second": 0.5859375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.04981035925530366,
+        "command_rms": 0.05630801332061134,
+        "wheel_rms_deg": 0.25162133880135346,
+        "body_rms": 0.04332964274382493,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.714285714285714,
+        "after_crossing": 0.02791764813979999,
+        "command_rms": 0.05687325006214308,
+        "wheel_rms_deg": 0.29043643525841484,
+        "body_rms": 0.05123461783899031,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.928571428571429,
+        "after_crossing": 0.05150323267628072,
+        "command_rms": 0.10025808833624458,
+        "wheel_rms_deg": 0.48118412741388494,
+        "body_rms": 0.10603910689090668,
+        "peak_per_second": 1.171875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.071428571428571,
+        "after_crossing": 0.03899843422121717,
+        "command_rms": 0.08077683473536545,
+        "wheel_rms_deg": 0.34289006324527266,
+        "body_rms": 0.07466086966759973,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.06327891051741481,
+        "command_rms": 0.08969111092500962,
+        "wheel_rms_deg": 0.3911825146345746,
+        "body_rms": 0.08476954396572993,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.5,
+        "after_crossing": 0.04637940337411027,
+        "command_rms": 0.07912788428011082,
+        "wheel_rms_deg": 0.39055301132194886,
+        "body_rms": 0.0704722966276883,
+        "peak_per_second": 0.5859375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.357142857142857,
+        "after_crossing": 0.07376892032432573,
+        "command_rms": 0.07686205175874986,
+        "wheel_rms_deg": 0.33683661407722126,
+        "body_rms": 0.05866977088730791,
+        "peak_per_second": 0.5859375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 6.214285714285714,
+        "after_crossing": 0.0451536568135399,
+        "command_rms": 0.07440321769824193,
+        "wheel_rms_deg": 0.36951983567947466,
+        "body_rms": 0.06644307605388608,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.071428571428571,
+        "after_crossing": 0.095498671010803,
+        "command_rms": 0.12286660990902741,
+        "wheel_rms_deg": 0.6215608112135942,
+        "body_rms": 0.13649207397256397,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.0930948713324384,
+        "command_rms": 0.10507931758699758,
+        "wheel_rms_deg": 0.4684321457288074,
+        "body_rms": 0.10440670307422095,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.5,
+        "after_crossing": 0.08282413400966099,
+        "command_rms": 0.11085024427845597,
+        "wheel_rms_deg": 0.4988011374027255,
+        "body_rms": 0.11012121043089165,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.04789063687350115,
+        "command_rms": 0.058963204258362566,
+        "wheel_rms_deg": 0.13991339890188073,
+        "body_rms": 0.024941662859741136,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.04789063687350115,
+        "command_rms": 0.058963204258362566,
+        "wheel_rms_deg": 0.13991339890188073,
+        "body_rms": 0.024941662859741136,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.04789063687350115,
+        "command_rms": 0.058963204258362566,
+        "wheel_rms_deg": 0.13991339890188073,
+        "body_rms": 0.024941662859741136,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.07415269486891102,
+        "command_rms": 0.102428604780042,
+        "wheel_rms_deg": 0.4350539353556049,
+        "body_rms": 0.1015052253543243,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.07415269486891102,
+        "command_rms": 0.102428604780042,
+        "wheel_rms_deg": 0.4350539353556049,
+        "body_rms": 0.1015052253543243,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.214285714285714,
+        "after_crossing": 0.07415269486891102,
+        "command_rms": 0.102428604780042,
+        "wheel_rms_deg": 0.4350539353556049,
+        "body_rms": 0.1015052253543243,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.05301639186924126,
+        "command_rms": 0.07887234614573062,
+        "wheel_rms_deg": 0.2583033229388386,
+        "body_rms": 0.04667515004693746,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.05301639186924126,
+        "command_rms": 0.07887234614573062,
+        "wheel_rms_deg": 0.2583033229388386,
+        "body_rms": 0.04667515004693746,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.785714285714286,
+        "after_crossing": 0.05301639186924126,
+        "command_rms": 0.07887234614573062,
+        "wheel_rms_deg": 0.2583033229388386,
+        "body_rms": 0.04667515004693746,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.642857142857143,
+        "after_crossing": 0.10080616318095786,
+        "command_rms": 0.19928983649305526,
+        "wheel_rms_deg": 0.8340859648127993,
+        "body_rms": 0.20591819022320712,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.642857142857143,
+        "after_crossing": 0.10080616318095786,
+        "command_rms": 0.19928983649305526,
+        "wheel_rms_deg": 0.8340859648127993,
+        "body_rms": 0.20591819022320712,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.642857142857143,
+        "after_crossing": 0.10080616318095786,
+        "command_rms": 0.19928983649305526,
+        "wheel_rms_deg": 0.8340859648127993,
+        "body_rms": 0.20591819022320712,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.857142857142857,
+        "after_crossing": 0.05356751599484291,
+        "command_rms": 0.08325476420903835,
+        "wheel_rms_deg": 0.3088671050767476,
+        "body_rms": 0.05432119497679724,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.0,
+        "after_crossing": 0.04614846961037257,
+        "command_rms": 0.07614814156947006,
+        "wheel_rms_deg": 0.31184310733141024,
+        "body_rms": 0.0554818151286284,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.142857142857143,
+        "after_crossing": 0.04625092825888111,
+        "command_rms": 0.06630147895446506,
+        "wheel_rms_deg": 0.2763170760990141,
+        "body_rms": 0.048224045236677476,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.0665594626837461,
+        "command_rms": 0.09449350099629303,
+        "wheel_rms_deg": 0.3766016329497524,
+        "body_rms": 0.082093779879897,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.428571428571429,
+        "after_crossing": 0.1208394319544511,
+        "command_rms": 0.12488547756373074,
+        "wheel_rms_deg": 0.491116795771267,
+        "body_rms": 0.11444451355109782,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.07481244915768899,
+        "command_rms": 0.10402684857711088,
+        "wheel_rms_deg": 0.5000955020684241,
+        "body_rms": 0.11738174322933788,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.928571428571429,
+        "after_crossing": 0.06678877101963461,
+        "command_rms": 0.10815706366083193,
+        "wheel_rms_deg": 0.42268995625097056,
+        "body_rms": 0.07861988342548677,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.857142857142857,
+        "after_crossing": 0.09269672034541906,
+        "command_rms": 0.09539981281380723,
+        "wheel_rms_deg": 0.3959755422882752,
+        "body_rms": 0.07237182271564163,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.428571428571429,
+        "after_crossing": 0.0716507928597754,
+        "command_rms": 0.08859364688975495,
+        "wheel_rms_deg": 0.3506889852116551,
+        "body_rms": 0.06467989895713094,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 4.5,
+        "after_crossing": 0.09568981343933726,
+        "command_rms": 0.15090921149382455,
+        "wheel_rms_deg": 0.6306377552737339,
+        "body_rms": 0.14680249187657174,
+        "peak_per_second": 1.46484375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 3.0,
+        "after_crossing": 0.3341157584142568,
+        "command_rms": 0.633155745499335,
+        "wheel_rms_deg": 5.7868686503743305,
+        "body_rms": 1.1905493184906315,
+        "peak_per_second": 1.171875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.428571428571429,
+        "after_crossing": 0.09292148458244358,
+        "command_rms": 0.1329003422360183,
+        "wheel_rms_deg": 0.6343390381361684,
+        "body_rms": 0.14980282035610615,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 6.071428571428571,
+        "after_crossing": 0.03940686072695263,
+        "command_rms": 0.058639659251655395,
+        "wheel_rms_deg": 0.1328012716582305,
+        "body_rms": 0.0236293381141075,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 6.214285714285714,
+        "after_crossing": 0.048140899602809706,
+        "command_rms": 0.057846092096993255,
+        "wheel_rms_deg": 0.13777063886010998,
+        "body_rms": 0.02440451670862931,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.642857142857143,
+        "after_crossing": 0.05160641959617795,
+        "command_rms": 0.05842862354669515,
+        "wheel_rms_deg": 0.13117899487219237,
+        "body_rms": 0.02326940434423185,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 6.785714285714286,
+        "after_crossing": 0.09800209249400786,
+        "command_rms": 0.10321433988620594,
+        "wheel_rms_deg": 0.4330028967072543,
+        "body_rms": 0.10104971667701294,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 7.071428571428571,
+        "after_crossing": 0.08220989525880017,
+        "command_rms": 0.10363922866650509,
+        "wheel_rms_deg": 0.4411837840023253,
+        "body_rms": 0.10268405346236703,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.785714285714286,
+        "after_crossing": 0.07641794137591293,
+        "command_rms": 0.10112915134382892,
+        "wheel_rms_deg": 0.4269494868512347,
+        "body_rms": 0.09908755873128772,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 6.357142857142857,
+        "after_crossing": 0.06185589538419228,
+        "command_rms": 0.0799611579712252,
+        "wheel_rms_deg": 0.25796151591713323,
+        "body_rms": 0.04676573982675223,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 6.642857142857143,
+        "after_crossing": 0.05822623231886562,
+        "command_rms": 0.07896961277153541,
+        "wheel_rms_deg": 0.2592968514660173,
+        "body_rms": 0.046905092437784186,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 6.5,
+        "after_crossing": 0.05478655736676258,
+        "command_rms": 0.0793577306826733,
+        "wheel_rms_deg": 0.25814427282731867,
+        "body_rms": 0.046724368735734885,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.785714285714286,
+        "after_crossing": 0.15166579837729563,
+        "command_rms": 0.2046497702534043,
+        "wheel_rms_deg": 0.8495159499509154,
+        "body_rms": 0.2101202996242454,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 4.928571428571429,
+        "after_crossing": 0.13963594041061167,
+        "command_rms": 0.20666265669846104,
+        "wheel_rms_deg": 0.8663790754172401,
+        "body_rms": 0.2139710342825039,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.357142857142857,
+        "after_crossing": 0.13420932200580837,
+        "command_rms": 0.20321850843886186,
+        "wheel_rms_deg": 0.83892973258038,
+        "body_rms": 0.20776311499051664,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.071428571428571,
+        "after_crossing": 0.04896962247153758,
+        "command_rms": 0.0717146499932153,
+        "wheel_rms_deg": 0.2870069838561064,
+        "body_rms": 0.05253394622698473,
+        "peak_per_second": 0.5859375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.5,
+        "after_crossing": 0.06339890495659709,
+        "command_rms": 0.06864281729532566,
+        "wheel_rms_deg": 0.24938109828623706,
+        "body_rms": 0.043749881537299785,
+        "peak_per_second": 0.390625
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 5.214285714285714,
+        "after_crossing": 0.04429778140906991,
+        "command_rms": 0.070360870679657,
+        "wheel_rms_deg": 0.28489939847239093,
+        "body_rms": 0.051164808651050143,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 6.642857142857143,
+        "after_crossing": 0.10113913244533722,
+        "command_rms": 0.1834544164391133,
+        "wheel_rms_deg": 0.8377483856790182,
+        "body_rms": 0.2035847463191286,
+        "peak_per_second": 1.26953125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.642857142857143,
+        "after_crossing": 0.0783666430938736,
+        "command_rms": 0.13049599149407431,
+        "wheel_rms_deg": 0.5539607201057111,
+        "body_rms": 0.1294035388266217,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 6.357142857142857,
+        "after_crossing": 0.08458451862977043,
+        "command_rms": 0.12971135444193616,
+        "wheel_rms_deg": 0.5326407045802724,
+        "body_rms": 0.12309021032055563,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 5.214285714285714,
+        "after_crossing": 0.07671365028367164,
+        "command_rms": 0.09860609291051275,
+        "wheel_rms_deg": 0.40922935123420656,
+        "body_rms": 0.07689073469401216,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 7.214285714285714,
+        "after_crossing": 0.07904728065026495,
+        "command_rms": 0.0941934020046733,
+        "wheel_rms_deg": 0.3367521907822422,
+        "body_rms": 0.060700750846427516,
+        "peak_per_second": 0.48828125
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 6.642857142857143,
+        "after_crossing": 0.08903745605019069,
+        "command_rms": 0.09952841511887903,
+        "wheel_rms_deg": 0.4008560746442324,
+        "body_rms": 0.07393512122913898,
+        "peak_per_second": 1.46484375
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 3.357142857142857,
+        "after_crossing": 0.30229455439476755,
+        "command_rms": 0.6378856714453268,
+        "wheel_rms_deg": 5.695296764615704,
+        "body_rms": 1.181453820809162,
+        "peak_per_second": 1.171875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 5.0,
+        "after_crossing": 0.12049764631335508,
+        "command_rms": 0.2339135788453403,
+        "wheel_rms_deg": 1.0068412979543742,
+        "body_rms": 0.24681402233390026,
+        "peak_per_second": 1.3671875
+      }
+    },
+    {
+      "model": 0,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 4.571428571428571,
+        "after_crossing": 0.14409625561284597,
+        "command_rms": 0.6407633240978696,
+        "wheel_rms_deg": 6.5694866232104046,
+        "body_rms": 1.3385210664846612,
+        "peak_per_second": 1.171875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5048477931765086,
+        "command_rms": 0.6037621406390167,
+        "wheel_rms_deg": 6.468060053082028,
+        "body_rms": 1.2248865855079938,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5048477931765086,
+        "command_rms": 0.6037621406390167,
+        "wheel_rms_deg": 6.468060053082028,
+        "body_rms": 1.2248865855079938,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5048477931765086,
+        "command_rms": 0.6037621406390167,
+        "wheel_rms_deg": 6.468060053082028,
+        "body_rms": 1.2248865855079938,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4543037838638322,
+        "command_rms": 0.5385037313640453,
+        "wheel_rms_deg": 6.086655443688837,
+        "body_rms": 1.323916982279426,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4543037838638322,
+        "command_rms": 0.5385037313640453,
+        "wheel_rms_deg": 6.086655443688837,
+        "body_rms": 1.323916982279426,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4543037838638322,
+        "command_rms": 0.5385037313640453,
+        "wheel_rms_deg": 6.086655443688837,
+        "body_rms": 1.323916982279426,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.4926141463273442,
+        "command_rms": 0.589964164435548,
+        "wheel_rms_deg": 6.513098684878565,
+        "body_rms": 1.2202667002632337,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.4926141463273442,
+        "command_rms": 0.589964164435548,
+        "wheel_rms_deg": 6.513098684878565,
+        "body_rms": 1.2202667002632337,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.4926141463273442,
+        "command_rms": 0.589964164435548,
+        "wheel_rms_deg": 6.513098684878565,
+        "body_rms": 1.2202667002632337,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.142857142857143,
+        "after_crossing": 0.4460103175329327,
+        "command_rms": 0.532744618036542,
+        "wheel_rms_deg": 5.648892893662749,
+        "body_rms": 1.241439660058454,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.142857142857143,
+        "after_crossing": 0.4460103175329327,
+        "command_rms": 0.532744618036542,
+        "wheel_rms_deg": 5.648892893662749,
+        "body_rms": 1.241439660058454,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.142857142857143,
+        "after_crossing": 0.4460103175329327,
+        "command_rms": 0.532744618036542,
+        "wheel_rms_deg": 5.648892893662749,
+        "body_rms": 1.241439660058454,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5315170608530986,
+        "command_rms": 0.6489634776190466,
+        "wheel_rms_deg": 7.5426427336608,
+        "body_rms": 1.3909341278993919,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4883493680439843,
+        "command_rms": 0.5566800949624703,
+        "wheel_rms_deg": 6.021535874793945,
+        "body_rms": 1.1287715221218981,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5075197151441415,
+        "command_rms": 0.6088452730745183,
+        "wheel_rms_deg": 6.583177222792819,
+        "body_rms": 1.2415134850945069,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.44952103238554086,
+        "command_rms": 0.5444052871648045,
+        "wheel_rms_deg": 6.463386668753337,
+        "body_rms": 1.4221608470397187,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.42610900891793607,
+        "command_rms": 0.4688510373403395,
+        "wheel_rms_deg": 5.292478970822169,
+        "body_rms": 1.1880710380618662,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.4285714285714284,
+        "after_crossing": 0.42856318088495754,
+        "command_rms": 0.5258942146306205,
+        "wheel_rms_deg": 5.8407060001945235,
+        "body_rms": 1.2720945588833623,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5320739713694962,
+        "command_rms": 0.6362655101405272,
+        "wheel_rms_deg": 7.352267658504468,
+        "body_rms": 1.3611386718328127,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5265764879840515,
+        "command_rms": 0.6194647847267462,
+        "wheel_rms_deg": 7.060370150020579,
+        "body_rms": 1.316176135327612,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.5035673734324514,
+        "command_rms": 0.5964827289653114,
+        "wheel_rms_deg": 6.648566230446986,
+        "body_rms": 1.2433855769574822,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.4755524687724756,
+        "command_rms": 0.563128238615697,
+        "wheel_rms_deg": 6.7149764610032125,
+        "body_rms": 1.4451990540483834,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0714285714285716,
+        "after_crossing": 0.48204421626198946,
+        "command_rms": 0.5256749157473996,
+        "wheel_rms_deg": 5.730386496470297,
+        "body_rms": 1.2501573867020759,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.2142857142857144,
+        "after_crossing": 0.47714607369808343,
+        "command_rms": 0.5385656448162592,
+        "wheel_rms_deg": 5.625209887357464,
+        "body_rms": 1.2212106871025201,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5144598409021104,
+        "command_rms": 0.6063066241717631,
+        "wheel_rms_deg": 6.5010160441107026,
+        "body_rms": 1.2297221400593756,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5032401958644326,
+        "command_rms": 0.6034928103519617,
+        "wheel_rms_deg": 6.465939813114242,
+        "body_rms": 1.2243920205834966,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5046135163533996,
+        "command_rms": 0.606677203573658,
+        "wheel_rms_deg": 6.514508523373399,
+        "body_rms": 1.2331985439318014,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.4285714285714284,
+        "after_crossing": 0.4291958772663036,
+        "command_rms": 0.5351965940229878,
+        "wheel_rms_deg": 6.0314296220543655,
+        "body_rms": 1.311760545995485,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4515053216213839,
+        "command_rms": 0.5390555598389755,
+        "wheel_rms_deg": 6.108944022416429,
+        "body_rms": 1.3287296094815175,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.45932692479987247,
+        "command_rms": 0.5415434753887165,
+        "wheel_rms_deg": 6.157146074474723,
+        "body_rms": 1.3376607945128638,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.49842350704213834,
+        "command_rms": 0.5894793397100709,
+        "wheel_rms_deg": 6.507416846929707,
+        "body_rms": 1.2186225534095494,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.49879744196961134,
+        "command_rms": 0.5896444160545927,
+        "wheel_rms_deg": 6.508504472359106,
+        "body_rms": 1.2188999299557666,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.4905573985125817,
+        "command_rms": 0.5889795547008125,
+        "wheel_rms_deg": 6.496298281621204,
+        "body_rms": 1.2160495648605514,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.2142857142857144,
+        "after_crossing": 0.47415398339414905,
+        "command_rms": 0.5422713537581083,
+        "wheel_rms_deg": 5.93441894078321,
+        "body_rms": 1.2829297061367215,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.142857142857143,
+        "after_crossing": 0.4413877576473746,
+        "command_rms": 0.5316559424386156,
+        "wheel_rms_deg": 5.631379602070172,
+        "body_rms": 1.239537727098633,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.2142857142857144,
+        "after_crossing": 0.4804301604270446,
+        "command_rms": 0.5521748634784989,
+        "wheel_rms_deg": 6.144690955555643,
+        "body_rms": 1.3228391544706024,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.4957007269488985,
+        "command_rms": 0.6090798454506788,
+        "wheel_rms_deg": 6.778389777913005,
+        "body_rms": 1.2557980105191244,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.7857142857142858,
+        "after_crossing": 0.5701036933787869,
+        "command_rms": 0.6763122007045373,
+        "wheel_rms_deg": 8.030767335387825,
+        "body_rms": 1.4707770540771128,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4613068718197564,
+        "command_rms": 0.5632393236330394,
+        "wheel_rms_deg": 5.893121168627993,
+        "body_rms": 1.1091814220007232,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.46183381450677385,
+        "command_rms": 0.5642040711247822,
+        "wheel_rms_deg": 6.617536286169688,
+        "body_rms": 1.4503410104072951,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0714285714285716,
+        "after_crossing": 0.39633475774045224,
+        "command_rms": 0.4690798014098479,
+        "wheel_rms_deg": 5.056007143137271,
+        "body_rms": 1.1465078517318459,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.4706434300653299,
+        "command_rms": 0.5551574691739853,
+        "wheel_rms_deg": 6.600399655232451,
+        "body_rms": 1.4282886697781394,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.5047285220043044,
+        "command_rms": 0.5764758365398697,
+        "wheel_rms_deg": 6.167778337873229,
+        "body_rms": 1.1684627319211067,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5752511305039932,
+        "command_rms": 0.6629365729770075,
+        "wheel_rms_deg": 7.808616584310463,
+        "body_rms": 1.4416077919533028,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.5205811672996499,
+        "command_rms": 0.608479610071265,
+        "wheel_rms_deg": 6.776155737084718,
+        "body_rms": 1.2800458772592074,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 2.0714285714285716,
+        "after_crossing": 0.4454265840531504,
+        "command_rms": 0.566409473093934,
+        "wheel_rms_deg": 6.661489137359055,
+        "body_rms": 1.4538659944515386,
+        "peak_per_second": 0.9765625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 2.0714285714285716,
+        "after_crossing": 0.47064888259060245,
+        "command_rms": 0.5455820460377684,
+        "wheel_rms_deg": 5.897559334344108,
+        "body_rms": 1.2920166475193575,
+        "peak_per_second": 0.87890625
+      }
+    },
+    {
+      "model": 2,
+      "gain": 1,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 2.2142857142857144,
+        "after_crossing": 0.4057921401312174,
+        "command_rms": 0.47661338372650036,
+        "wheel_rms_deg": 4.9864345786763264,
+        "body_rms": 1.104981015291031,
+        "peak_per_second": 1.07421875
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230820367012549,
+        "wheel_rms_deg": 11.276759374847702,
+        "body_rms": 1.9599035031402683,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230820367012549,
+        "wheel_rms_deg": 11.276759374847702,
+        "body_rms": 1.9599035031402683,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230820367012549,
+        "wheel_rms_deg": 11.276759374847702,
+        "body_rms": 1.9599035031402683,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9186824614595711,
+        "wheel_rms_deg": 12.292946132219221,
+        "body_rms": 2.4874973323701557,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9186824614595711,
+        "wheel_rms_deg": 12.292946132219221,
+        "body_rms": 2.4874973323701557,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9186824614595711,
+        "wheel_rms_deg": 12.292946132219221,
+        "body_rms": 2.4874973323701557,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9287039537424892,
+        "wheel_rms_deg": 11.307616843789896,
+        "body_rms": 1.9633363301551778,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9287039537424892,
+        "wheel_rms_deg": 11.307616843789896,
+        "body_rms": 1.9633363301551778,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9287039537424892,
+        "wheel_rms_deg": 11.307616843789896,
+        "body_rms": 1.9633363301551778,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.916905482369051,
+        "wheel_rms_deg": 12.450705597901699,
+        "body_rms": 2.480866863722278,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.916905482369051,
+        "wheel_rms_deg": 12.450705597901699,
+        "body_rms": 2.480866863722278,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.916905482369051,
+        "wheel_rms_deg": 12.450705597901699,
+        "body_rms": 2.480866863722278,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9229007040200076,
+        "wheel_rms_deg": 11.084147640617775,
+        "body_rms": 1.9339855088083304,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9369687679475498,
+        "wheel_rms_deg": 11.61695794640509,
+        "body_rms": 1.9945480132704896,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9217412231334237,
+        "wheel_rms_deg": 11.123780881216907,
+        "body_rms": 1.9320975926628563,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9112078382320868,
+        "wheel_rms_deg": 11.677057683836322,
+        "body_rms": 2.360130981420595,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9114150967214125,
+        "wheel_rms_deg": 11.542571295070271,
+        "body_rms": 2.297685977264503,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9187964177679597,
+        "wheel_rms_deg": 12.322230441834437,
+        "body_rms": 2.4845782487215025,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.931362077168822,
+        "wheel_rms_deg": 11.191697759505473,
+        "body_rms": 1.9375701781639847,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.921097881293234,
+        "wheel_rms_deg": 12.039670559718724,
+        "body_rms": 2.0725932290988043,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9335238731359129,
+        "wheel_rms_deg": 11.38036347635452,
+        "body_rms": 1.9636450490923405,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9135405060799354,
+        "wheel_rms_deg": 12.404967053729685,
+        "body_rms": 2.473598018726298,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9235591084177504,
+        "wheel_rms_deg": 13.36946090974329,
+        "body_rms": 2.6655927244001782,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": false,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.91742759461294,
+        "wheel_rms_deg": 12.250324571846155,
+        "body_rms": 2.483192307423335,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230916292668617,
+        "wheel_rms_deg": 11.27662607526667,
+        "body_rms": 1.9598863896190828,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9228799147716036,
+        "wheel_rms_deg": 11.270580124784475,
+        "body_rms": 1.9587484163405795,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230823682653201,
+        "wheel_rms_deg": 11.276639458889665,
+        "body_rms": 1.9598960564165397,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9186549460811513,
+        "wheel_rms_deg": 12.280411336190536,
+        "body_rms": 2.4857093336909326,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9186774622997146,
+        "wheel_rms_deg": 12.291658189615532,
+        "body_rms": 2.4871558770243847,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9191633291042337,
+        "wheel_rms_deg": 12.324167883438514,
+        "body_rms": 2.4935603071669594,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9287393296927373,
+        "wheel_rms_deg": 11.309431250407702,
+        "body_rms": 1.9636574810441063,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9292992806026464,
+        "wheel_rms_deg": 11.34380910926347,
+        "body_rms": 1.9667355620036344,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9288581517161457,
+        "wheel_rms_deg": 11.346049474194508,
+        "body_rms": 1.9677723083641916,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9199628445920532,
+        "wheel_rms_deg": 12.488690808598836,
+        "body_rms": 2.524617602421908,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9226218928890227,
+        "wheel_rms_deg": 12.606249121818934,
+        "body_rms": 2.544404595433776,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": false,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9114920006136684,
+        "wheel_rms_deg": 12.315794837678672,
+        "body_rms": 2.4666751918018797,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9211143921709108,
+        "wheel_rms_deg": 11.225986459429823,
+        "body_rms": 1.936182305168695,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9230131970791803,
+        "wheel_rms_deg": 10.991069078349266,
+        "body_rms": 1.9134953723747317,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.4285714285714286,
+        "after_crossing": 1.0,
+        "command_rms": 0.9260854788981195,
+        "wheel_rms_deg": 11.195224800940405,
+        "body_rms": 1.9433682331879305,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9318159180222158,
+        "wheel_rms_deg": 12.361598153184651,
+        "body_rms": 2.469110720247341,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9147148765968371,
+        "wheel_rms_deg": 12.630878212907726,
+        "body_rms": 2.5177641125136914,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": false,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9292752609011548,
+        "wheel_rms_deg": 12.92956155856355,
+        "body_rms": 2.5849749672724496,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9204995920526898,
+        "wheel_rms_deg": 11.031070932986596,
+        "body_rms": 1.9287702586069226,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9333754336167903,
+        "wheel_rms_deg": 11.21665796754257,
+        "body_rms": 1.9386215253420185,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 0,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9262216214751673,
+        "wheel_rms_deg": 11.322549460551393,
+        "body_rms": 1.9614365472857764,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 0,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.910091355304599,
+        "wheel_rms_deg": 12.200968402045095,
+        "body_rms": 2.4400128971246353,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 1,
+      "stats": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9237609542637772,
+        "wheel_rms_deg": 12.790054089168727,
+        "body_rms": 2.5840219015327097,
+        "peak_per_second": 0.78125
+      }
+    },
+    {
+      "model": 2,
+      "gain": 2,
+      "noise": true,
+      "disturbance": true,
+      "lane": true,
+      "window": 1,
+      "seed": 2,
+      "stats": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9179123542440908,
+        "wheel_rms_deg": 12.461629732894695,
+        "body_rms": 2.523602271348417,
+        "peak_per_second": 0.78125
+      }
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "open_loop_cells": [
+    {
+      "model": 0,
+      "speed": 0,
+      "output": "wheel",
+      "covered": 6,
+      "pass_bins": 0,
+      "uncovered": 2,
+      "corr": 0.5043251380453992,
+      "passed": false
+    },
+    {
+      "model": 0,
+      "speed": 0,
+      "output": "yaw_acceleration",
+      "covered": 4,
+      "pass_bins": 0,
+      "uncovered": 4,
+      "corr": 0.5809094446289726,
+      "passed": false
+    },
+    {
+      "model": 0,
+      "speed": 1,
+      "output": "wheel",
+      "covered": 8,
+      "pass_bins": 0,
+      "uncovered": 4,
+      "corr": 0.7618324141266613,
+      "passed": false
+    },
+    {
+      "model": 0,
+      "speed": 1,
+      "output": "yaw_acceleration",
+      "covered": 7,
+      "pass_bins": 0,
+      "uncovered": 5,
+      "corr": 0.6201722728425001,
+      "passed": false
+    },
+    {
+      "model": 1,
+      "speed": 0,
+      "output": "wheel",
+      "covered": 7,
+      "pass_bins": 0,
+      "uncovered": 1,
+      "corr": 0.8828017593938943,
+      "passed": false
+    },
+    {
+      "model": 1,
+      "speed": 0,
+      "output": "yaw_acceleration",
+      "covered": 6,
+      "pass_bins": 3,
+      "uncovered": 2,
+      "corr": 0.791131386842665,
+      "passed": false
+    },
+    {
+      "model": 1,
+      "speed": 1,
+      "output": "wheel",
+      "covered": 14,
+      "pass_bins": 0,
+      "uncovered": 2,
+      "corr": 0.7582700473626593,
+      "passed": false
+    },
+    {
+      "model": 1,
+      "speed": 1,
+      "output": "yaw_acceleration",
+      "covered": 15,
+      "pass_bins": 0,
+      "uncovered": 1,
+      "corr": 0.782647585951561,
+      "passed": false
+    },
+    {
+      "model": 2,
+      "speed": 0,
+      "output": "wheel",
+      "covered": 9,
+      "pass_bins": 0,
+      "uncovered": 3,
+      "corr": 0.8422479883888632,
+      "passed": false
+    },
+    {
+      "model": 2,
+      "speed": 0,
+      "output": "yaw_acceleration",
+      "covered": 10,
+      "pass_bins": 2,
+      "uncovered": 2,
+      "corr": 0.8207728016380939,
+      "passed": false
+    },
+    {
+      "model": 2,
+      "speed": 1,
+      "output": "wheel",
+      "covered": 11,
+      "pass_bins": 0,
+      "uncovered": 1,
+      "corr": 0.7348623464029009,
+      "passed": false
+    },
+    {
+      "model": 2,
+      "speed": 1,
+      "output": "yaw_acceleration",
+      "covered": 6,
+      "pass_bins": 0,
+      "uncovered": 6,
+      "corr": 0.7635792717849648,
+      "passed": false
+    }
+  ],
+  "open_loop_pass_bins": 5,
+  "open_loop_covered_bins": 103,
+  "open_loop_uncovered_bins": 33,
+  "closed_loop": [
+    {
+      "scope": "development",
+      "model": 0,
+      "windows": 11,
+      "ratios": {
+        "crossings_s": 1.4285714285714286,
+        "after_crossing": 0.9007044689177488,
+        "command_rms": 1.2105987269582084,
+        "wheel_rms_deg": 1.7362774222697677,
+        "body_rms": 1.2903187197364088
+      },
+      "peak_error": 0.1953125,
+      "passed": false
+    },
+    {
+      "scope": "development",
+      "model": 1,
+      "windows": 7,
+      "ratios": {
+        "crossings_s": 1.069767441860465,
+        "after_crossing": 2.4052840078066264,
+        "command_rms": 1.8059520315827113,
+        "wheel_rms_deg": 4.157198527399642,
+        "body_rms": 4.283774496813645
+      },
+      "peak_error": 0.09765625,
+      "passed": false
+    },
+    {
+      "scope": "development",
+      "model": 2,
+      "windows": 11,
+      "ratios": {
+        "crossings_s": 0.4375,
+        "after_crossing": 5.610601434985269,
+        "command_rms": 4.160223190858291,
+        "wheel_rms_deg": 19.75918510309553,
+        "body_rms": 18.391081514140723
+      },
+      "peak_error": 0.48828125,
+      "passed": false
+    },
+    {
+      "scope": "exposed check",
+      "model": 0,
+      "windows": 2,
+      "ratios": {
+        "crossings_s": 1.8402777777777777,
+        "after_crossing": 1.3016471325366887,
+        "command_rms": 1.402290713890887,
+        "wheel_rms_deg": 2.1108116122158034,
+        "body_rms": 1.4958023681050983
+      },
+      "peak_error": 0.87890625,
+      "passed": false
+    },
+    {
+      "scope": "exposed check",
+      "model": 1,
+      "windows": 2,
+      "ratios": {
+        "crossings_s": 1.387277521423863,
+        "after_crossing": 1.2357984469176428,
+        "command_rms": 1.1298944121525756,
+        "wheel_rms_deg": 1.5562457014747537,
+        "body_rms": 1.1382422045232843
+      },
+      "peak_error": 0.29296875,
+      "passed": false
+    },
+    {
+      "scope": "exposed check",
+      "model": 2,
+      "windows": 3,
+      "ratios": {
+        "crossings_s": 0.3859649122807018,
+        "after_crossing": 5.39226693876526,
+        "command_rms": 4.944955377144757,
+        "wheel_rms_deg": 12.438527453844971,
+        "body_rms": 9.631180494343846
+      },
+      "peak_error": 0.29296875,
+      "passed": false
+    }
+  ],
+  "factorial_effects": {
+    "model": {
+      "body_rms": 22.845441234393842,
+      "command_rms": 8.797263960651254,
+      "crossings_s": 0.368421052631579
+    },
+    "gain": {
+      "body_rms": 1.5999208241443064,
+      "command_rms": 1.5288836026125665,
+      "crossings_s": 0.8148148148148148
+    },
+    "noise": {
+      "body_rms": 1.000079887260586,
+      "command_rms": 1.002133925020788,
+      "crossings_s": 1.0476190476190477
+    },
+    "disturbance": {
+      "body_rms": 1.1214588508788619,
+      "command_rms": 1.0556159549933413,
+      "crossings_s": 1.0
+    },
+    "lane": {
+      "body_rms": 1.1889864982999154,
+      "command_rms": 1.191182051407298,
+      "crossings_s": 1.0473389355742297
+    }
+  },
+  "factorial_interaction_gain_model": 1.0729004427940847,
+  "report_sha256": "b3edbb21bc14e9a583d4f077613ffec958eabe93c5c3a793ec0bd1d38216972a"
+}

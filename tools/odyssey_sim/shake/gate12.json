@@ -1,0 +1,3209 @@
+{
+  "rows": [
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 138.882490259,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.40639736317581254,
+          "road_rms": 0.007125273534395838,
+          "sim_rms": 0.007960250152007426,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 0.841281751508384,
+              "phase_error_deg": 9.783657788656031,
+              "coherence": 0.7021295421741667,
+              "command_psd": 0.0018727764336895567
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.499628135531226,
+              "phase_error_deg": 37.83618092478163,
+              "coherence": 0.19894244333867533,
+              "command_psd": 0.0008773580820533276
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.8781871961444688,
+              "phase_error_deg": -53.49387063014836,
+              "coherence": 0.6643581138323468,
+              "command_psd": 0.0003552580608399213
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.031455621583852,
+              "phase_error_deg": -36.720292056534426,
+              "coherence": 0.8816959105525255,
+              "command_psd": 0.0031435113968895285
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.5944227583250498,
+          "road_rms": 0.03517491993826537,
+          "sim_rms": 0.03276255137078558,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 0.9300693509064865,
+              "phase_error_deg": 50.44307830822946,
+              "coherence": 0.7310293953785427,
+              "command_psd": 0.0018727764336895567
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.7079772251962844,
+              "phase_error_deg": -100.24388961271049,
+              "coherence": 0.2417536331365202,
+              "command_psd": 0.0008773580820533276
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.0907834156697374,
+              "phase_error_deg": -55.6904838092152,
+              "coherence": 0.2981130970094366,
+              "command_psd": 0.0003552580608399213
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.7351881575099778,
+              "phase_error_deg": 33.827877039343626,
+              "coherence": 0.6212615012225379,
+              "command_psd": 0.0031435113968895285
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 158.882490259,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7828742537148325,
+          "road_rms": 0.00620148346108825,
+          "sim_rms": 0.013396549377267787,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 6.498126417088124,
+              "phase_error_deg": 116.51426784190487,
+              "coherence": 0.5159813822188211,
+              "command_psd": 0.009351015369457882
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.1540504034523802,
+              "phase_error_deg": 14.614101712837465,
+              "coherence": 0.8431254786935748,
+              "command_psd": 0.0010557679080342478
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.2137303847808025,
+              "phase_error_deg": 16.392876794453294,
+              "coherence": 0.9615447904845763,
+              "command_psd": 0.002080306527141345
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.118459655753521,
+              "phase_error_deg": 34.48975533414089,
+              "coherence": 0.8335963552207794,
+              "command_psd": 0.001029035683221486
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.5854139072258022,
+          "road_rms": 0.054586473618788336,
+          "sim_rms": 0.06003651968650928,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.6955178227484025,
+              "phase_error_deg": 66.5431880415921,
+              "coherence": 0.7885870909175559,
+              "command_psd": 0.009351015369457882
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.730591036785596,
+              "phase_error_deg": 9.815634891243993,
+              "coherence": 0.4835510538702374,
+              "command_psd": 0.0010557679080342478
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.521557605855434,
+              "phase_error_deg": 11.539006292605539,
+              "coherence": 0.7816715121770255,
+              "command_psd": 0.002080306527141345
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.597187638655471,
+              "phase_error_deg": -153.88215545363587,
+              "coherence": 0.6459025269094565,
+              "command_psd": 0.001029035683221486
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 390.00274709,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7096269799869289,
+          "road_rms": 0.008611393081891983,
+          "sim_rms": 0.016546109891005033,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.8446115829893466,
+              "phase_error_deg": 2.057098513011019,
+              "coherence": 0.9756414566022656,
+              "command_psd": 0.004396809351821676
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.034211058437639,
+              "phase_error_deg": -47.98395632640352,
+              "coherence": 0.9206126577928397,
+              "command_psd": 0.0034438520418760992
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.632127498591461,
+              "phase_error_deg": -46.285199652301785,
+              "coherence": 0.9642484955514895,
+              "command_psd": 0.015245284172057432
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.1573083103559303,
+              "phase_error_deg": -35.33170759307538,
+              "coherence": 0.9998712460860355,
+              "command_psd": 0.08287522727291595
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7371205882851178,
+          "road_rms": 0.10380281712379054,
+          "sim_rms": 0.18012011792916327,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.478900071056687,
+              "phase_error_deg": 23.893554700164795,
+              "coherence": 0.9220990437146898,
+              "command_psd": 0.004396809351821676
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.7857455801460493,
+              "phase_error_deg": -11.988650479350026,
+              "coherence": 0.8960936123269141,
+              "command_psd": 0.0034438520418760992
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.4452805945101654,
+              "phase_error_deg": -47.104861773542645,
+              "coherence": 0.8348326704843743,
+              "command_psd": 0.015245284172057432
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3331955704522405,
+              "phase_error_deg": -24.997911721068395,
+              "coherence": 0.9922705828762607,
+              "command_psd": 0.08287522727291595
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 410.00274709,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7272874509921653,
+          "road_rms": 0.007446456276230968,
+          "sim_rms": 0.014585821861294389,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 5.353406308360389,
+              "phase_error_deg": 42.69655689443299,
+              "coherence": 0.8614959650610956,
+              "command_psd": 0.001726336918072636
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.9939017672998434,
+              "phase_error_deg": 9.858267829502585,
+              "coherence": 0.6775105334199426,
+              "command_psd": 0.011873279899280118
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.3448219247306374,
+              "phase_error_deg": -28.017588748103915,
+              "coherence": 0.9875695261282227,
+              "command_psd": 0.040553152875366094
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.4975826495770812,
+              "phase_error_deg": -24.567775680310543,
+              "coherence": 0.9907270588970223,
+              "command_psd": 0.019277963798260363
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8352978486762024,
+          "road_rms": 0.0911555277406976,
+          "sim_rms": 0.17009849920889772,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.293703981100323,
+              "phase_error_deg": 22.740944678540497,
+              "coherence": 0.8472802371466428,
+              "command_psd": 0.001726336918072636
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.318137657192097,
+              "phase_error_deg": -6.142649587342228,
+              "coherence": 0.9725592368117412,
+              "command_psd": 0.011873279899280118
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.535062954974571,
+              "phase_error_deg": -24.06931504282816,
+              "coherence": 0.9794976962099474,
+              "command_psd": 0.040553152875366094
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.6563584510571063,
+              "phase_error_deg": -56.025933405255124,
+              "coherence": 0.921611699201202,
+              "command_psd": 0.019277963798260363
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 433.452612907,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.751478520135526,
+          "road_rms": 0.007248429486487307,
+          "sim_rms": 0.01768542512793423,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.756675869909286,
+              "phase_error_deg": -116.4109471358095,
+              "coherence": 0.259706683346493,
+              "command_psd": 0.0010502047297580096
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.9074009788862054,
+              "phase_error_deg": -28.791453441171175,
+              "coherence": 0.9737723717987194,
+              "command_psd": 0.010473963869149974
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.841162077857469,
+              "phase_error_deg": -32.60287205054703,
+              "coherence": 0.9587816695349322,
+              "command_psd": 0.006930227254499164
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.341864073906263,
+              "phase_error_deg": -38.263510772030465,
+              "coherence": 0.9867148833941959,
+              "command_psd": 0.022963712791486846
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8154625585437307,
+          "road_rms": 0.09937337985700125,
+          "sim_rms": 0.23105108627902218,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.4080727398603097,
+              "phase_error_deg": 88.7632158518145,
+              "coherence": 0.6147353113370553,
+              "command_psd": 0.0010502047297580096
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.656403376524764,
+              "phase_error_deg": -9.11168322132727,
+              "coherence": 0.9935413850067835,
+              "command_psd": 0.010473963869149974
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.9135643860226115,
+              "phase_error_deg": -18.849754070724085,
+              "coherence": 0.9236785836376225,
+              "command_psd": 0.006930227254499164
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.7444459629562487,
+              "phase_error_deg": -40.40545482029357,
+              "coherence": 0.9084555516281514,
+              "command_psd": 0.022963712791486846
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 453.452612907,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.638655314946628,
+          "road_rms": 0.011970776018075344,
+          "sim_rms": 0.03187470169798941,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 15.93756250292937,
+              "phase_error_deg": -17.53381015946993,
+              "coherence": 0.7327891440588573,
+              "command_psd": 0.0029063355659806295
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.7431948003323066,
+              "phase_error_deg": -56.99101307793079,
+              "coherence": 0.9734474292513347,
+              "command_psd": 0.08021989132143761
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.847927964235742,
+              "phase_error_deg": -56.53749530042137,
+              "coherence": 0.9337201210605771,
+              "command_psd": 0.07506207916882393
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.882833520050155,
+              "phase_error_deg": -32.28241951242097,
+              "coherence": 0.9184413109771524,
+              "command_psd": 0.006078037430474871
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7092391743473512,
+          "road_rms": 0.15990452255352508,
+          "sim_rms": 0.42106569043277864,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.104333432429321,
+              "phase_error_deg": -11.532965137723556,
+              "coherence": 0.9095478952953863,
+              "command_psd": 0.0029063355659806295
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 4.141791544907671,
+              "phase_error_deg": -35.57152833791144,
+              "coherence": 0.9751064312576353,
+              "command_psd": 0.08021989132143761
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.6314118169115558,
+              "phase_error_deg": -49.54326222377953,
+              "coherence": 0.9571079428270092,
+              "command_psd": 0.07506207916882393
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3144285759012861,
+              "phase_error_deg": -166.73147232800204,
+              "coherence": 0.8421714485215592,
+              "command_psd": 0.006078037430474871
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 493.453011113,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.5327711835005958,
+          "road_rms": 0.01222787826221907,
+          "sim_rms": 0.03312565196032376,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.8583281407334873,
+              "phase_error_deg": 80.83367314282287,
+              "coherence": 0.8965511850835098,
+              "command_psd": 0.03513985770600373
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.7138417628979137,
+              "phase_error_deg": -19.58075128998604,
+              "coherence": 0.9626774183260797,
+              "command_psd": 0.03710576873633839
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 3.38050433308221,
+              "phase_error_deg": -40.811568839396436,
+              "coherence": 0.21454107775270626,
+              "command_psd": 0.009530522773310643
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.2195137840142325,
+              "phase_error_deg": -1.3893906175265787,
+              "coherence": 0.7086790559297872,
+              "command_psd": 0.010340008785561143
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.666530964829326,
+          "road_rms": 0.1363445229748984,
+          "sim_rms": 0.3898773978863551,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.073870096157353,
+              "phase_error_deg": 87.14743561177367,
+              "coherence": 0.955967530849752,
+              "command_psd": 0.03513985770600373
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.801213322450048,
+              "phase_error_deg": -6.837951571333294,
+              "coherence": 0.9828145882435856,
+              "command_psd": 0.03710576873633839
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.093937791327859,
+              "phase_error_deg": -36.8845117349676,
+              "coherence": 0.3750051081006698,
+              "command_psd": 0.009530522773310643
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.0575795212849193,
+              "phase_error_deg": 29.343915769576956,
+              "coherence": 0.5246603847325716,
+              "command_psd": 0.010340008785561143
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 513.453011113,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7427604008409148,
+          "road_rms": 0.007452471586264055,
+          "sim_rms": 0.023956188970019523,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.093947989638207,
+              "phase_error_deg": 49.29462841644214,
+              "coherence": 0.9693555116166984,
+              "command_psd": 0.027980776575805843
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.246597146666009,
+              "phase_error_deg": -56.09915156757152,
+              "coherence": 0.9642675440327095,
+              "command_psd": 0.026024943551888002
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.392696117487479,
+              "phase_error_deg": -41.028625009297365,
+              "coherence": 0.9867528048070735,
+              "command_psd": 0.08261990021906071
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.4405981605794855,
+              "phase_error_deg": -49.90905332624932,
+              "coherence": 0.9327595215482316,
+              "command_psd": 0.022365258766886827
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7440083598972288,
+          "road_rms": 0.10045528278934697,
+          "sim_rms": 0.2924993751477973,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.3153835226235415,
+              "phase_error_deg": 47.71140747633198,
+              "coherence": 0.9636592173505232,
+              "command_psd": 0.027980776575805843
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.96315877301997,
+              "phase_error_deg": -30.518900146919666,
+              "coherence": 0.9594202633414388,
+              "command_psd": 0.026024943551888002
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.1502357702362263,
+              "phase_error_deg": -41.095515259824865,
+              "coherence": 0.9803611955902208,
+              "command_psd": 0.08261990021906071
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.5415027520243698,
+              "phase_error_deg": -53.864183679105935,
+              "coherence": 0.6462410099202657,
+              "command_psd": 0.022365258766886827
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 570.003092334,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.742813040411626,
+          "road_rms": 0.003324496774507474,
+          "sim_rms": 0.006681371202602644,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.3207747539733394,
+              "phase_error_deg": 40.81749861046873,
+              "coherence": 0.965372918870056,
+              "command_psd": 0.011278868591605998
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.6605727675755286,
+              "phase_error_deg": 11.59330733074919,
+              "coherence": 0.8344868346190646,
+              "command_psd": 0.0009644062696990802
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.181789386974502,
+              "phase_error_deg": -17.00158713512637,
+              "coherence": 0.999048014678884,
+              "command_psd": 0.00955980679743669
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.50477037982934,
+              "phase_error_deg": -16.976173589877465,
+              "coherence": 0.9543383504262722,
+              "command_psd": 0.0008600578485867549
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.6574726783994793,
+          "road_rms": 0.06452370393502192,
+          "sim_rms": 0.07968408947238036,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.264795348341723,
+              "phase_error_deg": 22.811660505964806,
+              "coherence": 0.9022668833219657,
+              "command_psd": 0.011278868591605998
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.488683191687903,
+              "phase_error_deg": -19.587979333992905,
+              "coherence": 0.7391437041900221,
+              "command_psd": 0.0009644062696990802
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.6475611356016842,
+              "phase_error_deg": -23.1243383932091,
+              "coherence": 0.9985767956108582,
+              "command_psd": 0.00955980679743669
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.2049357440088222,
+              "phase_error_deg": -32.09826087672539,
+              "coherence": 0.836722222856377,
+              "command_psd": 0.0008600578485867549
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 590.003092334,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7886742373130462,
+          "road_rms": 0.00821361702105829,
+          "sim_rms": 0.01685049602646515,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.889612472633407,
+              "phase_error_deg": 75.99498217398501,
+              "coherence": 0.21523389653559094,
+              "command_psd": 0.007219917267485112
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.4951421425896112,
+              "phase_error_deg": -22.076683539413498,
+              "coherence": 0.08970032373257353,
+              "command_psd": 0.0002846780089835777
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.1777402988769652,
+              "phase_error_deg": -5.921782272054428,
+              "coherence": 0.9550130551517851,
+              "command_psd": 0.004509463908998692
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.2892826930527215,
+              "phase_error_deg": -28.947859152332946,
+              "coherence": 0.20985084369660534,
+              "command_psd": 0.0005434942184848203
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7396706993459204,
+          "road_rms": 0.10003083216850318,
+          "sim_rms": 0.19818068832767666,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 7.489167814877853,
+              "phase_error_deg": 9.115853039569233,
+              "coherence": 0.07445287949514803,
+              "command_psd": 0.007219917267485112
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.833054574617178,
+              "phase_error_deg": -6.795924230435315,
+              "coherence": 0.18975809522835416,
+              "command_psd": 0.0002846780089835777
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.934417949693498,
+              "phase_error_deg": -23.682336364097125,
+              "coherence": 0.9547747722660265,
+              "command_psd": 0.004509463908998692
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.45109649188171946,
+              "phase_error_deg": -33.807309745869354,
+              "coherence": 0.6580651240602229,
+              "command_psd": 0.0005434942184848203
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 613.463011015,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.6875361444629574,
+          "road_rms": 0.0052088135558690605,
+          "sim_rms": 0.018596834239289803,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 5.796085381823562,
+              "phase_error_deg": 57.771877133388394,
+              "coherence": 0.7575460264588013,
+              "command_psd": 0.026602747885626377
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 54.9445359242604,
+              "phase_error_deg": -67.03581189166057,
+              "coherence": 0.03164922265073865,
+              "command_psd": 0.001864135369786766
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 6.852064547394018,
+              "phase_error_deg": 0.39838083268215146,
+              "coherence": 0.5237264604467093,
+              "command_psd": 0.0010761723192611518
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.5533882580638667,
+              "phase_error_deg": -151.2807092091908,
+              "coherence": 0.6042178079884211,
+              "command_psd": 0.0005808071784202872
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.6838940848356218,
+          "road_rms": 0.06402467327338571,
+          "sim_rms": 0.20633995450797907,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.369192073053182,
+              "phase_error_deg": 42.01795280220695,
+              "coherence": 0.7923345947671084,
+              "command_psd": 0.026602747885626377
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 5.333166127776,
+              "phase_error_deg": 117.05775816359642,
+              "coherence": 0.5306046344792611,
+              "command_psd": 0.001864135369786766
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.9035373143614993,
+              "phase_error_deg": -29.113101531800226,
+              "coherence": 0.6867825023768457,
+              "command_psd": 0.0010761723192611518
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.25861042454427224,
+              "phase_error_deg": -99.3724634819475,
+              "coherence": 0.9105434537335356,
+              "command_psd": 0.0005808071784202872
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 798.592001466,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.9398600849187527,
+          "road_rms": 0.003926780800160415,
+          "sim_rms": 0.009080305322556242,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.416947860700861,
+              "phase_error_deg": 5.876223184246324,
+              "coherence": 0.9096200414551855,
+              "command_psd": 0.003528988658585524
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.9665398420573599,
+              "phase_error_deg": 6.90323981357307,
+              "coherence": 0.8840393832108385,
+              "command_psd": 0.0013213985549665884
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.3134198893817836,
+              "phase_error_deg": -50.74248494587033,
+              "coherence": 0.8368381921413688,
+              "command_psd": 0.00041978524186361675
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3746909875112843,
+              "phase_error_deg": -20.355112087684386,
+              "coherence": 0.8359062311820958,
+              "command_psd": 0.00028321508859776125
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7662021168071607,
+          "road_rms": 0.018302387000452263,
+          "sim_rms": 0.030143073059168836,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.9828860264283807,
+              "phase_error_deg": 1.9446007293384977,
+              "coherence": 0.7923938968046671,
+              "command_psd": 0.003528988658585524
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.360526061466817,
+              "phase_error_deg": -33.4423218938749,
+              "coherence": 0.512868824225262,
+              "command_psd": 0.0013213985549665884
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.07647120695098668,
+              "phase_error_deg": -72.35532938412125,
+              "coherence": 0.2671566931358903,
+              "command_psd": 0.00041978524186361675
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.9810905659967905,
+              "phase_error_deg": -126.08251053880342,
+              "coherence": 0.2725720292702598,
+              "command_psd": 0.00028321508859776125
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 818.592001466,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.6862212553416966,
+          "road_rms": 0.0014347422852760872,
+          "sim_rms": 0.004926630391629992,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.8362008137937806,
+              "phase_error_deg": 8.550794723427119,
+              "coherence": 0.3781519108119088,
+              "command_psd": 0.0004731195881152256
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.4648661625750377,
+              "phase_error_deg": -12.381735417129779,
+              "coherence": 0.966596003152423,
+              "command_psd": 0.002806811105393919
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.8741115823551604,
+              "phase_error_deg": 9.356776930875073,
+              "coherence": 0.9836438008699765,
+              "command_psd": 0.0010935917829425035
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.757537707800192,
+              "phase_error_deg": -40.12234592660177,
+              "coherence": 0.9256127002616318,
+              "command_psd": 0.00022473080416985242
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.4702485450612148,
+          "road_rms": 0.01205878810436559,
+          "sim_rms": 0.021259066465709648,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.595623095167677,
+              "phase_error_deg": 35.215411238585375,
+              "coherence": 0.34175574868521086,
+              "command_psd": 0.0004731195881152256
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.210329047098308,
+              "phase_error_deg": 155.5036929531433,
+              "coherence": 0.5599498114758271,
+              "command_psd": 0.002806811105393919
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.452232804770793,
+              "phase_error_deg": 118.34804141631362,
+              "coherence": 0.9313714561779999,
+              "command_psd": 0.0010935917829425035
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.30492810377058016,
+              "phase_error_deg": 11.704931131737762,
+              "coherence": 0.4395059209824195,
+              "command_psd": 0.00022473080416985242
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 1,
+      "lane": 0,
+      "start": 855.863471756,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.732433176413898,
+          "road_rms": 0.0014191722445360227,
+          "sim_rms": 0.007053563825311602,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.277589886537225,
+              "phase_error_deg": 31.159925661879605,
+              "coherence": 0.9937991608837402,
+              "command_psd": 0.004604820358743524
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 5.728275300939648,
+              "phase_error_deg": 66.13591735388646,
+              "coherence": 0.8139702935288221,
+              "command_psd": 0.0010029268948792238
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 3.8140365503614055,
+              "phase_error_deg": -2.03033965114023,
+              "coherence": 0.9448738699954556,
+              "command_psd": 0.003105774762041615
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 3.1394796697647704,
+              "phase_error_deg": -32.97687154945818,
+              "coherence": 0.693808702621682,
+              "command_psd": 0.00043556431495063474
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7875812112450347,
+          "road_rms": 0.029133593485417258,
+          "sim_rms": 0.055572864768652086,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.0387251614795083,
+              "phase_error_deg": 18.01836229387791,
+              "coherence": 0.9737706231438027,
+              "command_psd": 0.004604820358743524
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.0765417152058436,
+              "phase_error_deg": 5.136794022282743,
+              "coherence": 0.756312604129278,
+              "command_psd": 0.0010029268948792238
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.405492665635123,
+              "phase_error_deg": 21.840065550500814,
+              "coherence": 0.399803041614151,
+              "command_psd": 0.003105774762041615
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.8046963288854732,
+              "phase_error_deg": -133.60743990489829,
+              "coherence": 0.8867679226132158,
+              "command_psd": 0.00043556431495063474
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 0,
+      "lane": 1,
+      "start": 987.173831654,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8555746270001039,
+          "road_rms": 0.014907592094982065,
+          "sim_rms": 0.036846569159019134,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.6042993876457365,
+              "phase_error_deg": 4.106038634272318,
+              "coherence": 0.9616954190012961,
+              "command_psd": 0.12848341910066494
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.884826557840739,
+              "phase_error_deg": -38.104616448149166,
+              "coherence": 0.9756068587107376,
+              "command_psd": 0.09107145373582336
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.8207424062228598,
+              "phase_error_deg": -29.539146667282996,
+              "coherence": 0.8491311338438389,
+              "command_psd": 0.04558244198507831
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.0105429735647982,
+              "phase_error_deg": -44.355445540498195,
+              "coherence": 0.9640945874071487,
+              "command_psd": 0.04614909366791344
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.708830862735914,
+          "road_rms": 0.07987250593067782,
+          "sim_rms": 0.1513144700445338,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.2451678504473964,
+              "phase_error_deg": 4.0495405206849995,
+              "coherence": 0.9719308833863984,
+              "command_psd": 0.12848341910066494
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 4.71545296236268,
+              "phase_error_deg": -45.617964679106855,
+              "coherence": 0.9455706535514644,
+              "command_psd": 0.09107145373582336
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.42990444152819535,
+              "phase_error_deg": -15.445790680760892,
+              "coherence": 0.7687846469938688,
+              "command_psd": 0.04558244198507831
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.3568217122429532,
+              "phase_error_deg": -15.830014232995298,
+              "coherence": 0.9593141913360207,
+              "command_psd": 0.04614909366791344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 0,
+      "lane": 1,
+      "start": 1007.173831654,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8843195478400405,
+          "road_rms": 0.007988711339613833,
+          "sim_rms": 0.016701762631186716,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.1463255349987826,
+              "phase_error_deg": -5.3129703074771575,
+              "coherence": 0.9235746322803342,
+              "command_psd": 0.010788876930810529
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.7863118541335132,
+              "phase_error_deg": -25.786986439596788,
+              "coherence": 0.9986033266034079,
+              "command_psd": 0.027301484011491472
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.9797601234814937,
+              "phase_error_deg": -23.85832067531163,
+              "coherence": 0.9916849458869522,
+              "command_psd": 0.03386427510394117
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.054311137821199,
+              "phase_error_deg": -49.89726142520789,
+              "coherence": 0.9837194611101826,
+              "command_psd": 0.018171310781505204
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8153827989977981,
+          "road_rms": 0.038412947625394406,
+          "sim_rms": 0.06780681805030035,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.2474051804896233,
+              "phase_error_deg": -17.387731202301033,
+              "coherence": 0.9216741252030302,
+              "command_psd": 0.010788876930810529
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.6229732218461583,
+              "phase_error_deg": -23.90838329227518,
+              "coherence": 0.9838660880734265,
+              "command_psd": 0.027301484011491472
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 3.637904196594577,
+              "phase_error_deg": -39.01250821070544,
+              "coherence": 0.9187853088148009,
+              "command_psd": 0.03386427510394117
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.8532479161814397,
+              "phase_error_deg": -62.67866151591489,
+              "coherence": 0.8096572578981005,
+              "command_psd": 0.018171310781505204
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1110.002644263,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7515062308731512,
+          "road_rms": 0.00704161340040512,
+          "sim_rms": 0.007829201120646978,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.530431929232507,
+              "phase_error_deg": 30.008501469068936,
+              "coherence": 0.9631009954803759,
+              "command_psd": 0.004355790428749924
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.8928568546900663,
+              "phase_error_deg": 21.92223509874544,
+              "coherence": 0.9910479529645001,
+              "command_psd": 0.004183703806226592
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.40337777908836925,
+              "phase_error_deg": 13.927905543621952,
+              "coherence": 0.8992508572542677,
+              "command_psd": 0.004860813926887542
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.199041759486422,
+              "phase_error_deg": 107.09756155262565,
+              "coherence": 0.35190457781949375,
+              "command_psd": 0.0002427025626410391
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.61133307584202,
+          "road_rms": 0.08319981628150791,
+          "sim_rms": 0.03958098539221077,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.0904139181434025,
+              "phase_error_deg": 31.715053517701378,
+              "coherence": 0.7997784728980901,
+              "command_psd": 0.004355790428749924
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.5436045190773804,
+              "phase_error_deg": 9.438705910275402,
+              "coherence": 0.9655336830576673,
+              "command_psd": 0.004183703806226592
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.11987840915176805,
+              "phase_error_deg": 4.951112998784876,
+              "coherence": 0.9155450647762085,
+              "command_psd": 0.004860813926887542
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.44238376845146926,
+              "phase_error_deg": 122.21981748701889,
+              "coherence": 0.20738172868747612,
+              "command_psd": 0.0002427025626410391
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1130.002644263,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.29459879022685426,
+          "road_rms": 0.00437914583916423,
+          "sim_rms": 0.01212807790775573,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.119144899978484,
+              "phase_error_deg": 93.78457917665075,
+              "coherence": 0.798757894067018,
+              "command_psd": 0.0015378822388327003
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.1799819386183337,
+              "phase_error_deg": 60.61081957129118,
+              "coherence": 0.8876603995528053,
+              "command_psd": 0.0009893755837558451
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.155655762611514,
+              "phase_error_deg": 52.55659976544971,
+              "coherence": 0.9876793881552027,
+              "command_psd": 0.001103729532335935
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.598351764379488,
+              "phase_error_deg": 0.9932753968607163,
+              "coherence": 0.9420568215648413,
+              "command_psd": 0.00170852765953277
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.24740872188959712,
+          "road_rms": 0.040687496169010434,
+          "sim_rms": 0.061953033934849834,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.6543607978272696,
+              "phase_error_deg": 61.791240873003794,
+              "coherence": 0.7368238081233813,
+              "command_psd": 0.0015378822388327003
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.1854815848817466,
+              "phase_error_deg": 39.739199703890655,
+              "coherence": 0.844120599205149,
+              "command_psd": 0.0009893755837558451
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.9051182211197628,
+              "phase_error_deg": -145.33303975825024,
+              "coherence": 0.6474308301573851,
+              "command_psd": 0.001103729532335935
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.5402085950236304,
+              "phase_error_deg": 140.11487276903338,
+              "coherence": 0.44623058785004505,
+              "command_psd": 0.00170852765953277
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1153.474974611,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.5907477480346961,
+          "road_rms": 0.0054034780101379215,
+          "sim_rms": 0.01200775372456849,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.526447282649284,
+              "phase_error_deg": 16.58522399201691,
+              "coherence": 0.586757957130157,
+              "command_psd": 0.0023218640242268517
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 4.174111562545234,
+              "phase_error_deg": 155.727935948586,
+              "coherence": 0.255852606837823,
+              "command_psd": 0.003798456158492558
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.2822869864041677,
+              "phase_error_deg": -18.78265654433088,
+              "coherence": 0.6450856882196498,
+              "command_psd": 0.010349612444181634
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.580241284125456,
+              "phase_error_deg": -28.76320494834031,
+              "coherence": 0.9352317080397564,
+              "command_psd": 0.0015152802179988177
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.35688980361096984,
+          "road_rms": 0.04378196165620862,
+          "sim_rms": 0.05307519979884674,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.9480686346655958,
+              "phase_error_deg": 19.086302352449678,
+              "coherence": 0.6951551473115275,
+              "command_psd": 0.0023218640242268517
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.9104575867767127,
+              "phase_error_deg": 163.15086358560868,
+              "coherence": 0.6939091108649329,
+              "command_psd": 0.003798456158492558
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.3534878773418,
+              "phase_error_deg": 143.50275960442096,
+              "coherence": 0.360745459776315,
+              "command_psd": 0.010349612444181634
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.07136328245416158,
+              "phase_error_deg": -11.169665277219417,
+              "coherence": 0.9829730496392326,
+              "command_psd": 0.0015152802179988177
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6717.613232749,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.6424679769237746,
+          "road_rms": 0.012774477471296992,
+          "sim_rms": 0.039734852788689504,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.478489629436144,
+              "phase_error_deg": -26.011689589428048,
+              "coherence": 0.32637383361740946,
+              "command_psd": 0.002406478399310638
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.730536566255573,
+              "phase_error_deg": -36.29561054167798,
+              "coherence": 0.9031866527725315,
+              "command_psd": 0.02026316894478301
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.8718382118644552,
+              "phase_error_deg": -61.415078502869285,
+              "coherence": 0.943490391692389,
+              "command_psd": 0.014945341043469257
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.1272527142380886,
+              "phase_error_deg": -40.6485864454976,
+              "coherence": 0.4387826162239302,
+              "command_psd": 0.0013848559774073475
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.6397064322000333,
+          "road_rms": 0.16488481736939253,
+          "sim_rms": 0.5189348868273805,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.2993644470799524,
+              "phase_error_deg": -163.68500540785473,
+              "coherence": 0.7872568581446503,
+              "command_psd": 0.002406478399310638
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 5.018841621143023,
+              "phase_error_deg": -20.93633321503888,
+              "coherence": 0.919437945396719,
+              "command_psd": 0.02026316894478301
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.720862554351808,
+              "phase_error_deg": -86.20289532839021,
+              "coherence": 0.9222253169426697,
+              "command_psd": 0.014945341043469257
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.4890352118229854,
+              "phase_error_deg": -30.019129370935065,
+              "coherence": 0.8267472153162277,
+              "command_psd": 0.0013848559774073475
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6737.613232749,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7374421271730988,
+          "road_rms": 0.00903791377084608,
+          "sim_rms": 0.02958733807575443,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.2632568227163565,
+              "phase_error_deg": 27.68806963319548,
+              "coherence": 0.9803954868264478,
+              "command_psd": 0.00978786543448511
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.2623029135979746,
+              "phase_error_deg": -28.776838200781988,
+              "coherence": 0.9685989038158652,
+              "command_psd": 0.021158885318622027
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.4669960960180162,
+              "phase_error_deg": -21.588755969641493,
+              "coherence": 0.9864226090672232,
+              "command_psd": 0.014018062501750602
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.6616145418934892,
+              "phase_error_deg": -3.8071352581436604,
+              "coherence": 0.7970602038019519,
+              "command_psd": 0.0014361053320103244
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7330783104189422,
+          "road_rms": 0.11259161267192935,
+          "sim_rms": 0.3252169240774076,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.20718795315371,
+              "phase_error_deg": 52.53461738423121,
+              "coherence": 0.9708812423476605,
+              "command_psd": 0.00978786543448511
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.451849369896338,
+              "phase_error_deg": -13.433554269936248,
+              "coherence": 0.9914571090044818,
+              "command_psd": 0.021158885318622027
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6109619830196424,
+              "phase_error_deg": -23.145006827988126,
+              "coherence": 0.9695014712971644,
+              "command_psd": 0.014018062501750602
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.5527510452920736,
+              "phase_error_deg": 62.703225599216985,
+              "coherence": 0.6815780462813888,
+              "command_psd": 0.0014361053320103244
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6760.273621118,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7790979675522199,
+          "road_rms": 0.007863818064714381,
+          "sim_rms": 0.018653271086034973,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.315400452027583,
+              "phase_error_deg": 5.315691111473138,
+              "coherence": 0.839453072049574,
+              "command_psd": 0.002457369696437422
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.71401223323827,
+              "phase_error_deg": -19.187814255434322,
+              "coherence": 0.988613258115778,
+              "command_psd": 0.007270772417215079
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.4802321091729918,
+              "phase_error_deg": -28.707937883658133,
+              "coherence": 0.9907574381909723,
+              "command_psd": 0.006893691545727469
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3003423141732007,
+              "phase_error_deg": -18.485399290896623,
+              "coherence": 0.9068499890533023,
+              "command_psd": 0.0017487740892728459
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8448512276566572,
+          "road_rms": 0.09435359900946805,
+          "sim_rms": 0.22476969535314084,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.5901368516392047,
+              "phase_error_deg": -2.2300387639075345,
+              "coherence": 0.7590039330701767,
+              "command_psd": 0.002457369696437422
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.0758611030254674,
+              "phase_error_deg": -13.79658203850533,
+              "coherence": 0.9952435114143491,
+              "command_psd": 0.007270772417215079
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.214244502070072,
+              "phase_error_deg": -20.95903441919567,
+              "coherence": 0.9556669445585908,
+              "command_psd": 0.006893691545727469
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.1901018526665081,
+              "phase_error_deg": -22.565935868834423,
+              "coherence": 0.8219804427322309,
+              "command_psd": 0.0017487740892728459
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6780.273621118,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7853806639274744,
+          "road_rms": 0.007871340151841606,
+          "sim_rms": 0.020839328107031554,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.863860853086196,
+              "phase_error_deg": 10.450319355317845,
+              "coherence": 0.98812241371086,
+              "command_psd": 0.017144211183719442
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.2037493841805933,
+              "phase_error_deg": 3.0413381953053733,
+              "coherence": 0.9535339984332479,
+              "command_psd": 0.002697298516097856
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.7754137190112869,
+              "phase_error_deg": -33.61183653697411,
+              "coherence": 0.9573268806936954,
+              "command_psd": 0.019613785066428253
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.1755431737187665,
+              "phase_error_deg": -54.81839330106872,
+              "coherence": 0.9928274044606608,
+              "command_psd": 0.00434158895899805
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8322168614841798,
+          "road_rms": 0.10297379347875046,
+          "sim_rms": 0.23867022555360384,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.5856515034540495,
+              "phase_error_deg": -3.7736889235995443,
+              "coherence": 0.9225380748054007,
+              "command_psd": 0.017144211183719442
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.299521220804813,
+              "phase_error_deg": 8.384786284419544,
+              "coherence": 0.7585951979458101,
+              "command_psd": 0.002697298516097856
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.053187366843795,
+              "phase_error_deg": -31.047631145704703,
+              "coherence": 0.9602825783124103,
+              "command_psd": 0.019613785066428253
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.9898749917223842,
+              "phase_error_deg": -23.177307211766,
+              "coherence": 0.9651272929326784,
+              "command_psd": 0.00434158895899805
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6892.093800026,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7348623464029009,
+          "road_rms": 0.0073386778756375105,
+          "sim_rms": 0.01761591592569651,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.151555403529628,
+              "phase_error_deg": 108.36567544023852,
+              "coherence": 0.8196043710183715,
+              "command_psd": 0.013587237266697647
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 4.359548217601057,
+              "phase_error_deg": -9.624531042732025,
+              "coherence": 0.7362414056054621,
+              "command_psd": 0.007289945119934062
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6518386710483859,
+              "phase_error_deg": -27.64439919899279,
+              "coherence": 0.9961929496566979,
+              "command_psd": 0.03721782003273595
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.2055244955651534,
+              "phase_error_deg": -31.806080886199187,
+              "coherence": 0.9962413926207302,
+              "command_psd": 0.03206683001442982
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8108904299169126,
+          "road_rms": 0.09931547359886464,
+          "sim_rms": 0.21403573743949686,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.068607811857671,
+              "phase_error_deg": -15.91678854584653,
+              "coherence": 0.6686504581502873,
+              "command_psd": 0.013587237266697647
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.7503275379295236,
+              "phase_error_deg": -30.453661151095105,
+              "coherence": 0.8990791857184838,
+              "command_psd": 0.007289945119934062
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6781113060210522,
+              "phase_error_deg": -21.49154635003647,
+              "coherence": 0.9763267218475783,
+              "command_psd": 0.03721782003273595
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.5215900306271848,
+              "phase_error_deg": -20.786535366119693,
+              "coherence": 0.9766878327871515,
+              "command_psd": 0.03206683001442982
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6912.093800026,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7084107927609171,
+          "road_rms": 0.010389089066580601,
+          "sim_rms": 0.025221410079131392,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.127012995834036,
+              "phase_error_deg": 3.1761361700707353,
+              "coherence": 0.5772961658278236,
+              "command_psd": 0.0005314720878036761
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.7108796386421896,
+              "phase_error_deg": -36.82996746874719,
+              "coherence": 0.995529689307359,
+              "command_psd": 0.11498466260676121
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.95755120827455,
+              "phase_error_deg": -62.02246060955247,
+              "coherence": 0.8948118155730159,
+              "command_psd": 0.01621823584133697
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3895903506643188,
+              "phase_error_deg": -19.354435061562977,
+              "coherence": 0.9254806136693611,
+              "command_psd": 0.025615522929793515
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.6702651898212679,
+          "road_rms": 0.11916918450881078,
+          "sim_rms": 0.2986871840068245,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.980276745109803,
+              "phase_error_deg": 27.045272554408093,
+              "coherence": 0.42828818757021914,
+              "command_psd": 0.0005314720878036761
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 5.236958064077769,
+              "phase_error_deg": -38.25687961623825,
+              "coherence": 0.9973855871703723,
+              "command_psd": 0.11498466260676121
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.983078337772334,
+              "phase_error_deg": -67.62484114634098,
+              "coherence": 0.4291688006283733,
+              "command_psd": 0.01621823584133697
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 4.008124350715308,
+              "phase_error_deg": -68.544291205614,
+              "coherence": 0.6931943139985259,
+              "command_psd": 0.025615522929793515
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6940.272497768,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7462674037441736,
+          "road_rms": 0.007305916372539029,
+          "sim_rms": 0.01674915521554173,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.3700214119680165,
+              "phase_error_deg": 45.24691275529521,
+              "coherence": 0.7932912536544124,
+              "command_psd": 0.009223025097442585
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.969735596783901,
+              "phase_error_deg": -34.43218724484143,
+              "coherence": 0.9846201088204243,
+              "command_psd": 0.025462943361771094
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.918978500339217,
+              "phase_error_deg": -30.74085585988384,
+              "coherence": 0.9911706556497152,
+              "command_psd": 0.1149460868534451
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.5225433504802808,
+              "phase_error_deg": -19.847709934475976,
+              "coherence": 0.8661968330541734,
+              "command_psd": 0.018212908028348348
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7635792717849648,
+          "road_rms": 0.09669482815441582,
+          "sim_rms": 0.20008938062784878,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 8.339730725609758,
+              "phase_error_deg": 40.27466648883837,
+              "coherence": 0.688932689176372,
+              "command_psd": 0.009223025097442585
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 3.370572360831172,
+              "phase_error_deg": -0.8754001292255597,
+              "coherence": 0.9800685035919696,
+              "command_psd": 0.025462943361771094
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.960926975368017,
+              "phase_error_deg": -18.124321412774414,
+              "coherence": 0.9392744466081658,
+              "command_psd": 0.1149460868534451
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.8915733489510123,
+              "phase_error_deg": -100.24301543856609,
+              "coherence": 0.34616486844369077,
+              "command_psd": 0.018212908028348348
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7060.286553191,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8571594916464985,
+          "road_rms": 0.0034498195527761263,
+          "sim_rms": 0.011151298153787334,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.964127600218648,
+              "phase_error_deg": 8.103750207229906,
+              "coherence": 0.8884710980948277,
+              "command_psd": 0.0060550976548707156
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.7677503975066646,
+              "phase_error_deg": -49.625160182073046,
+              "coherence": 0.9196927845095815,
+              "command_psd": 0.0016381521319314633
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.9936821934145115,
+              "phase_error_deg": -84.68143692340394,
+              "coherence": 0.8407291412198247,
+              "command_psd": 0.0005442908658524854
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.3254726677002084,
+              "phase_error_deg": -39.84786378992615,
+              "coherence": 0.9466206623894152,
+              "command_psd": 0.0005199272983395441
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.6201722728425001,
+          "road_rms": 0.06404537844692519,
+          "sim_rms": 0.1277599382789809,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.599556949438961,
+              "phase_error_deg": 5.351303736618295,
+              "coherence": 0.948785231712147,
+              "command_psd": 0.0060550976548707156
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.5860121826723277,
+              "phase_error_deg": -20.573724936809537,
+              "coherence": 0.8677614454634419,
+              "command_psd": 0.0016381521319314633
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.3062932452845026,
+              "phase_error_deg": -125.39353620183637,
+              "coherence": 0.7865717060273786,
+              "command_psd": 0.0005442908658524854
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.647296708955537,
+              "phase_error_deg": 161.06052261996706,
+              "coherence": 0.664880616595216,
+              "command_psd": 0.0005199272983395441
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7138.08299561,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.34308260909764426,
+          "road_rms": 0.00812974029095053,
+          "sim_rms": 0.023441134118941637,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.0500534890173836,
+              "phase_error_deg": -175.79631125491008,
+              "coherence": 0.5000170993749377,
+              "command_psd": 0.01857505965640934
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.7623423546131574,
+              "phase_error_deg": -41.496104906861845,
+              "coherence": 0.6622892057083609,
+              "command_psd": 0.0011299929065233783
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.8522537099003168,
+              "phase_error_deg": 89.01891444463027,
+              "coherence": 0.1914897308476043,
+              "command_psd": 0.0016486437298667204
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.35951221796982663,
+              "phase_error_deg": 17.534078472213608,
+              "coherence": 0.9824884729404548,
+              "command_psd": 0.005665265835047981
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.5750956038735185,
+          "road_rms": 0.05805118028459381,
+          "sim_rms": 0.20391659369942985,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 6.222127153153935,
+              "phase_error_deg": 165.68352581189407,
+              "coherence": 0.2192397715912934,
+              "command_psd": 0.01857505965640934
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.9966648918236792,
+              "phase_error_deg": -22.942473067509333,
+              "coherence": 0.6674865590088304,
+              "command_psd": 0.0011299929065233783
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.9322981666499083,
+              "phase_error_deg": 119.5516835181005,
+              "coherence": 0.3826045899025806,
+              "command_psd": 0.0016486437298667204
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.5616879749660626,
+              "phase_error_deg": 134.42161336263337,
+              "coherence": 0.952700778619591,
+              "command_psd": 0.005665265835047981
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7158.08299561,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.7618324141266613,
+          "road_rms": 0.003685443961805665,
+          "sim_rms": 0.012335752381568053,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 5.120794422939002,
+              "phase_error_deg": 25.730190458391125,
+              "coherence": 0.9450103003623178,
+              "command_psd": 0.009948944626556535
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 7.328031300071589,
+              "phase_error_deg": -44.89486633952931,
+              "coherence": 0.8459020763238033,
+              "command_psd": 0.0019874831106916147
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 5.77731689505887,
+              "phase_error_deg": -14.085873144930085,
+              "coherence": 0.48243733073741635,
+              "command_psd": 0.001491159292702574
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.9396978151466315,
+              "phase_error_deg": -54.61928220423812,
+              "coherence": 0.8368773251602624,
+              "command_psd": 0.0018908969596889244
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7085124939378499,
+          "road_rms": 0.054166820777705245,
+          "sim_rms": 0.12560617209782476,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.359598817814402,
+              "phase_error_deg": 24.683859857419943,
+              "coherence": 0.9376442237206783,
+              "command_psd": 0.009948944626556535
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.020435319309766,
+              "phase_error_deg": -54.03516517008944,
+              "coherence": 0.8422102712889538,
+              "command_psd": 0.0019874831106916147
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.569942220753073,
+              "phase_error_deg": -47.82479940260186,
+              "coherence": 0.6670536033361049,
+              "command_psd": 0.001491159292702574
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.6477744437032773,
+              "phase_error_deg": -142.95993413374887,
+              "coherence": 0.725760593009214,
+              "command_psd": 0.0018908969596889244
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8017.535419701,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8726003779053704,
+          "road_rms": 0.008063890432900456,
+          "sim_rms": 0.015567650237942302,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.379362962096416,
+              "phase_error_deg": -7.985580773187005,
+              "coherence": 0.8537109810548069,
+              "command_psd": 0.0029941757215757947
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.8109833512384625,
+              "phase_error_deg": 1.4986854478322182,
+              "coherence": 0.9951170473210498,
+              "command_psd": 0.034952207044129754
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6195199172012371,
+              "phase_error_deg": -2.9717666487455854,
+              "coherence": 0.9260504162522368,
+              "command_psd": 0.014183336593169416
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.143779785415566,
+              "phase_error_deg": -20.18769363981172,
+              "coherence": 0.6691058513459345,
+              "command_psd": 0.0016526491820803007
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7768234012808367,
+          "road_rms": 0.03925368552986114,
+          "sim_rms": 0.07103365137969907,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.3737137929272665,
+              "phase_error_deg": -8.218252874226106,
+              "coherence": 0.7890215415823885,
+              "command_psd": 0.0029941757215757947
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.9440693392682764,
+              "phase_error_deg": -16.227046922530494,
+              "coherence": 0.9960118558232645,
+              "command_psd": 0.034952207044129754
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6869252729366395,
+              "phase_error_deg": 1.1888327899599747,
+              "coherence": 0.9426835427332018,
+              "command_psd": 0.014183336593169416
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.6873809814200795,
+              "phase_error_deg": -11.332080067070269,
+              "coherence": 0.5923907850592252,
+              "command_psd": 0.0016526491820803007
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8037.535419701,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8144631546442086,
+          "road_rms": 0.009902184968918185,
+          "sim_rms": 0.01850947514562661,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.4292375966273996,
+              "phase_error_deg": 12.849598414673478,
+              "coherence": 0.6128298502095668,
+              "command_psd": 0.004043148686449753
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 2.2849572714777118,
+              "phase_error_deg": 6.087983312820747,
+              "coherence": 0.2537927818736245,
+              "command_psd": 0.005390801646996039
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.6689076777445784,
+              "phase_error_deg": -28.051857660898207,
+              "coherence": 0.9700740029135102,
+              "command_psd": 0.0419089026085809
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.2851609136082438,
+              "phase_error_deg": -41.03099270551746,
+              "coherence": 0.9880765046564913,
+              "command_psd": 0.03127622967632333
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8207728016380939,
+          "road_rms": 0.06491654312089767,
+          "sim_rms": 0.09378095625453055,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.6053447570231107,
+              "phase_error_deg": 39.89626229432475,
+              "coherence": 0.8402621219587045,
+              "command_psd": 0.004043148686449753
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.6348419093039663,
+              "phase_error_deg": 19.635148238994695,
+              "coherence": 0.43292083267890596,
+              "command_psd": 0.005390801646996039
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.4082712356510882,
+              "phase_error_deg": -4.62583975933339,
+              "coherence": 0.9523485509824953,
+              "command_psd": 0.0419089026085809
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.707706234659425,
+              "phase_error_deg": -41.20758966345863,
+              "coherence": 0.9524139441409062,
+              "command_psd": 0.03127622967632333
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8059.114672758,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8422479883888632,
+          "road_rms": 0.008058614070299024,
+          "sim_rms": 0.019440457394217223,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 4.431558372976014,
+              "phase_error_deg": 0.9204918263247681,
+              "coherence": 0.9426437513935849,
+              "command_psd": 0.012231611218622686
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.7694623100560956,
+              "phase_error_deg": -2.6608792967975607,
+              "coherence": 0.9785387780324355,
+              "command_psd": 0.010009660336425159
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.9966763986806708,
+              "phase_error_deg": -21.268348466094896,
+              "coherence": 0.9693685875608469,
+              "command_psd": 0.0050984585402927985
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.4846542539221377,
+              "phase_error_deg": -39.70493859765243,
+              "coherence": 0.9333619285138695,
+              "command_psd": 0.025815924694090754
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8505682348314778,
+          "road_rms": 0.06167343262303997,
+          "sim_rms": 0.110724379185069,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.719374727912874,
+              "phase_error_deg": 9.492484054950786,
+              "coherence": 0.9934096359258552,
+              "command_psd": 0.012231611218622686
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.4560671757072712,
+              "phase_error_deg": -2.046821757788531,
+              "coherence": 0.9677052938447818,
+              "command_psd": 0.010009660336425159
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.9728039265764694,
+              "phase_error_deg": 19.40159149675716,
+              "coherence": 0.9893956115321009,
+              "command_psd": 0.0050984585402927985
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.8612473096698487,
+              "phase_error_deg": -13.06266569215631,
+              "coherence": 0.9864674671647803,
+              "command_psd": 0.025815924694090754
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 0,
+      "speed": 0,
+      "lane": 1,
+      "start": 8182.70582719,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.9212752803755558,
+          "road_rms": 0.010453297503333804,
+          "sim_rms": 0.015516610313704162,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.4250361452343745,
+              "phase_error_deg": 3.2932916595281174,
+              "coherence": 0.9019779127367953,
+              "command_psd": 0.0035501941086202556
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.01944524782263,
+              "phase_error_deg": -37.315758716848606,
+              "coherence": 0.8571124467152034,
+              "command_psd": 0.00223623747338751
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.31091344746737914,
+              "phase_error_deg": -6.506646598647019,
+              "coherence": 0.7813831000659237,
+              "command_psd": 0.0005565109566992788
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 2.9475310523160223,
+              "phase_error_deg": -66.61835907306703,
+              "coherence": 0.7859418302685872,
+              "command_psd": 0.0009923617211490595
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7669449051587419,
+          "road_rms": 0.045675361571923825,
+          "sim_rms": 0.060305253027338586,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.1257028959404514,
+              "phase_error_deg": -20.557659961546015,
+              "coherence": 0.9615156953175578,
+              "command_psd": 0.0035501941086202556
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.7423605574216248,
+              "phase_error_deg": -59.4259620072541,
+              "coherence": 0.7921395509454027,
+              "command_psd": 0.00223623747338751
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.11331752501333073,
+              "phase_error_deg": 21.65695899332586,
+              "coherence": 0.31062882860453767,
+              "command_psd": 0.0005565109566992788
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.48767664790239296,
+              "phase_error_deg": -165.18711751651327,
+              "coherence": 0.691549564996083,
+              "command_psd": 0.0009923617211490595
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 0,
+      "speed": 0,
+      "lane": 1,
+      "start": 8210.824773898,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.08737499571524263,
+          "road_rms": 0.0026724478015164596,
+          "sim_rms": 0.006496564982343347,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.2550106826178014,
+              "phase_error_deg": -17.177258627184433,
+              "coherence": 0.17175511206139563,
+              "command_psd": 0.00018945931948801054
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.2241637860160688,
+              "phase_error_deg": -22.560780897668003,
+              "coherence": 0.7914166849661175,
+              "command_psd": 9.018176932217419e-05
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.3404362910448397,
+              "phase_error_deg": 29.053851317164014,
+              "coherence": 0.9872263276265228,
+              "command_psd": 0.0004835233942810118
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.8498931795529332,
+              "phase_error_deg": 137.5043228632642,
+              "coherence": 0.2985429760858533,
+              "command_psd": 0.00012297783037907306
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.39487398409920327,
+          "road_rms": 0.0224304817973825,
+          "sim_rms": 0.030891616748510507,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 1.9019788090314658,
+              "phase_error_deg": -29.915365964453173,
+              "coherence": 0.14698619405049285,
+              "command_psd": 0.00018945931948801054
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.8774872727960454,
+              "phase_error_deg": 45.472297890296396,
+              "coherence": 0.13263024978218282,
+              "command_psd": 9.018176932217419e-05
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.28490190908264323,
+              "phase_error_deg": 15.722400315217717,
+              "coherence": 0.9747301627484088,
+              "command_psd": 0.0004835233942810118
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.03062904021953394,
+              "phase_error_deg": -9.168119390783396,
+              "coherence": 0.9359655192569529,
+              "command_psd": 0.00012297783037907306
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 8359.124557227,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.8587938193687148,
+          "road_rms": 0.009436153360490397,
+          "sim_rms": 0.024279880848050276,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 3.846292112807369,
+              "phase_error_deg": 31.098153662075,
+              "coherence": 0.8880684251004718,
+              "command_psd": 0.012013343213800603
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.3497194232299816,
+              "phase_error_deg": -6.3857040009518835,
+              "coherence": 0.8070065379246902,
+              "command_psd": 0.010942875926974077
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 2.051540868026351,
+              "phase_error_deg": -7.230955380346324,
+              "coherence": 0.7922756392576772,
+              "command_psd": 0.006337637450910058
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.7795402534067777,
+              "phase_error_deg": -30.893265669199096,
+              "coherence": 0.9415278121486643,
+              "command_psd": 0.004677570513024203
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.7233255743776228,
+          "road_rms": 0.05331194347035762,
+          "sim_rms": 0.09413226249282518,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.438617423033956,
+              "phase_error_deg": 30.75136165257683,
+              "coherence": 0.9142296374982409,
+              "command_psd": 0.012013343213800603
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 0.8648987533832597,
+              "phase_error_deg": -3.3769505387806356,
+              "coherence": 0.9362550323999576,
+              "command_psd": 0.010942875926974077
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.8728652164154393,
+              "phase_error_deg": 13.484016924813394,
+              "coherence": 0.5448977480574784,
+              "command_psd": 0.006337637450910058
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 0.2594204398325482,
+              "phase_error_deg": -38.17993097020223,
+              "coherence": 0.7670288703625356,
+              "command_psd": 0.004677570513024203
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "000001ae",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 8379.124557227,
+      "metrics": [
+        {
+          "output": "wheel",
+          "corr": 0.9068096994190737,
+          "road_rms": 0.01011916585932088,
+          "sim_rms": 0.024615235946931737,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.578920892768847,
+              "phase_error_deg": -3.422163840648708,
+              "coherence": 0.9747528547781542,
+              "command_psd": 0.024966294356752117
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.3432280725700803,
+              "phase_error_deg": -19.141785652577198,
+              "coherence": 0.9601266512099437,
+              "command_psd": 0.008303996656749886
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 1.2676635672420853,
+              "phase_error_deg": 4.240082123848534,
+              "coherence": 0.9546846645843489,
+              "command_psd": 0.008224748083784827
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 3.214909068501212,
+              "phase_error_deg": 82.58630807350933,
+              "coherence": 0.34969631997371436,
+              "command_psd": 0.0011163614478306104
+            }
+          ]
+        },
+        {
+          "output": "yaw_acceleration",
+          "corr": 0.8589371993077074,
+          "road_rms": 0.04987524475356493,
+          "sim_rms": 0.09659394112359365,
+          "bins": [
+            {
+              "frequency": 0.5,
+              "actual_bin": 0.5,
+              "gain_ratio": 2.2247228009122924,
+              "phase_error_deg": -3.9474191008070343,
+              "coherence": 0.9675020932844199,
+              "command_psd": 0.024966294356752117
+            },
+            {
+              "frequency": 1.0,
+              "actual_bin": 1.0,
+              "gain_ratio": 1.1962801996189436,
+              "phase_error_deg": -18.379456961935627,
+              "coherence": 0.9705828039633791,
+              "command_psd": 0.008303996656749886
+            },
+            {
+              "frequency": 1.5,
+              "actual_bin": 1.5,
+              "gain_ratio": 0.9491046214691564,
+              "phase_error_deg": 2.791999912368571,
+              "coherence": 0.8736470859592302,
+              "command_psd": 0.008224748083784827
+            },
+            {
+              "frequency": 2.0,
+              "actual_bin": 2.0,
+              "gain_ratio": 1.7775438390582783,
+              "phase_error_deg": -10.99893374452772,
+              "coherence": 0.11254593455045657,
+              "command_psd": 0.0011163614478306104
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "coherence_threshold": 0.7
+}

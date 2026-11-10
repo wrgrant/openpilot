@@ -1,0 +1,2057 @@
+{
+  "rows": [
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 138.882490259,
+      "road": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.08475415350655797,
+        "command_rms": 0.08298882298261516,
+        "wheel_rms_deg": 0.40824810139715334,
+        "body_rms": 0.03517491993826537,
+        "peak_per_second": 1.7578125
+      },
+      "sim": {
+        "crossings_s": 5.571428571428571,
+        "after_crossing": 0.09975302464535458,
+        "command_rms": 0.10046616345451402,
+        "wheel_rms_deg": 0.5391378977129094,
+        "body_rms": 0.03939915850356037,
+        "peak_per_second": 0.5859375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.571428571428571,
+          "after_crossing": 0.10063041508405515,
+          "command_rms": 0.10046616345451402,
+          "wheel_rms_deg": 0.5391378977129094,
+          "body_rms": 0.03939915850356037,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 5.714285714285714,
+          "after_crossing": 0.09975302464535458,
+          "command_rms": 0.10022253106048816,
+          "wheel_rms_deg": 0.46506200649433305,
+          "body_rms": 0.03424623710609769,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 5.571428571428571,
+          "after_crossing": 0.09687768263545557,
+          "command_rms": 0.11738967919620412,
+          "wheel_rms_deg": 0.614115368249653,
+          "body_rms": 0.045752204440516614,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 1.1769691574777637,
+        "command_rms": 1.2105987269582084,
+        "wheel_rms_deg": 1.3206133619919114,
+        "body_rms": 1.1200923434284673
+      },
+      "peak_error": 1.171875
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 158.882490259,
+      "road": {
+        "crossings_s": 4.428571428571429,
+        "after_crossing": 0.04500781860719949,
+        "command_rms": 0.10392596957504407,
+        "wheel_rms_deg": 0.3553188290405333,
+        "body_rms": 0.054586473618788336,
+        "peak_per_second": 0.48828125
+      },
+      "sim": {
+        "crossings_s": 5.857142857142857,
+        "after_crossing": 0.07544658077605679,
+        "command_rms": 0.13199072970311174,
+        "wheel_rms_deg": 0.8094897218410645,
+        "body_rms": 0.062389062894261334,
+        "peak_per_second": 0.48828125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 5.857142857142857,
+          "after_crossing": 0.07544658077605679,
+          "command_rms": 0.17497829780238022,
+          "wheel_rms_deg": 0.8381778216980379,
+          "body_rms": 0.06526742119557218,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 5.857142857142857,
+          "after_crossing": 0.06892255002736997,
+          "command_rms": 0.12468713835608955,
+          "wheel_rms_deg": 0.5896703589683839,
+          "body_rms": 0.044685898875215554,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 5.285714285714286,
+          "after_crossing": 0.09119785327370827,
+          "command_rms": 0.13199072970311174,
+          "wheel_rms_deg": 0.8094897218410645,
+          "body_rms": 0.062389062894261334,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.3225806451612903,
+        "after_crossing": 1.6762994322055031,
+        "command_rms": 1.270045689665684,
+        "wheel_rms_deg": 2.278206657460084,
+        "body_rms": 1.1429399768514703
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 390.00274709,
+      "road": {
+        "crossings_s": 3.9285714285714284,
+        "after_crossing": 0.18116287267786957,
+        "command_rms": 0.2216508379809005,
+        "wheel_rms_deg": 0.4933964793205655,
+        "body_rms": 0.10380281712379054,
+        "peak_per_second": 1.7578125
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.922116956441316,
+        "wheel_rms_deg": 10.998375005559472,
+        "body_rms": 1.9090460711210742,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.922116956441316,
+          "wheel_rms_deg": 11.350087356815587,
+          "body_rms": 1.9566038689008836,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9217699754196006,
+          "wheel_rms_deg": 10.932598053413816,
+          "body_rms": 1.894549588054011,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9224209259419209,
+          "wheel_rms_deg": 10.998375005559472,
+          "body_rms": 1.9090460711210742,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.38181818181818183,
+        "after_crossing": 5.519894806360937,
+        "command_rms": 4.160223190858291,
+        "wheel_rms_deg": 22.291150153128065,
+        "body_rms": 18.391081514140723
+      },
+      "peak_error": 0.9765625
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 410.00274709,
+      "road": {
+        "crossings_s": 4.714285714285714,
+        "after_crossing": 0.12392895504583155,
+        "command_rms": 0.18597389935449776,
+        "wheel_rms_deg": 0.4266505169567371,
+        "body_rms": 0.0911555277406976,
+        "peak_per_second": 0.87890625
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9205225197781349,
+        "wheel_rms_deg": 11.349682613797377,
+        "body_rms": 2.047160016008371,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9205225197781349,
+          "wheel_rms_deg": 11.4187093652365,
+          "body_rms": 2.0778517974201307,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9203279737446847,
+          "wheel_rms_deg": 11.118414283030116,
+          "body_rms": 2.0151878526412212,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9355979289087017,
+          "wheel_rms_deg": 11.349682613797377,
+          "body_rms": 2.047160016008371,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.3181818181818182,
+        "after_crossing": 8.06913928734555,
+        "command_rms": 4.949740382780613,
+        "wheel_rms_deg": 26.601825528663895,
+        "body_rms": 22.457881236031604
+      },
+      "peak_error": 0.09765625
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 433.452612907,
+      "road": {
+        "crossings_s": 4.571428571428571,
+        "after_crossing": 0.10916913884341484,
+        "command_rms": 0.18121232010983904,
+        "wheel_rms_deg": 0.41530441767389975,
+        "body_rms": 0.09937337985700125,
+        "peak_per_second": 1.26953125
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.92488276323978,
+        "wheel_rms_deg": 12.709530756576477,
+        "body_rms": 2.611107509862777,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.92488276323978,
+          "wheel_rms_deg": 12.705428651843059,
+          "body_rms": 2.611107509862777,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9315653980967054,
+          "wheel_rms_deg": 12.799029850332643,
+          "body_rms": 2.6067449564145515,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9242457205856246,
+          "wheel_rms_deg": 12.709530756576477,
+          "body_rms": 2.619827135168812,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.328125,
+        "after_crossing": 9.160097904906399,
+        "command_rms": 5.103862489477408,
+        "wheel_rms_deg": 30.60292695117946,
+        "body_rms": 26.275724078421934
+      },
+      "peak_error": 0.48828125
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 453.452612907,
+      "road": {
+        "crossings_s": 3.5,
+        "after_crossing": 0.1979983241199227,
+        "command_rms": 0.351832895371578,
+        "wheel_rms_deg": 0.6858749433321413,
+        "body_rms": 0.15990452255352508,
+        "peak_per_second": 1.3671875
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9267604404635891,
+        "wheel_rms_deg": 12.840643314754109,
+        "body_rms": 2.591090580630488,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9267604404635891,
+          "wheel_rms_deg": 12.392180998780418,
+          "body_rms": 2.489352788690004,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9256278028184372,
+          "wheel_rms_deg": 12.840643314754109,
+          "body_rms": 2.5941028363491108,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9304452167384714,
+          "wheel_rms_deg": 12.957516349111144,
+          "body_rms": 2.591090580630488,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.42857142857142855,
+        "after_crossing": 5.050547798547652,
+        "command_rms": 2.6340926407259846,
+        "wheel_rms_deg": 18.7215518507955,
+        "body_rms": 16.203985598738576
+      },
+      "peak_error": 0.5859375
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 493.453011113,
+      "road": {
+        "crossings_s": 2.642857142857143,
+        "after_crossing": 0.1789244407412801,
+        "command_rms": 0.24127333133605644,
+        "wheel_rms_deg": 0.7006058168249125,
+        "body_rms": 0.1363445229748984,
+        "peak_per_second": 1.3671875
+      },
+      "sim": {
+        "crossings_s": 1.4285714285714286,
+        "after_crossing": 1.0,
+        "command_rms": 0.6601044932551018,
+        "wheel_rms_deg": 6.911937045747173,
+        "body_rms": 1.3868671295430828,
+        "peak_per_second": 0.87890625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.6968760434664801,
+          "wheel_rms_deg": 6.911937045747173,
+          "body_rms": 1.3868671295430828,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.1428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.6601044932551018,
+          "wheel_rms_deg": 7.937031843343332,
+          "body_rms": 1.5753927791320221,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.4285714285714286,
+          "after_crossing": 0.6657445359528933,
+          "command_rms": 0.5945361435205325,
+          "wheel_rms_deg": 5.69832991712695,
+          "body_rms": 1.1863052973953883,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.5405405405405406,
+        "after_crossing": 5.588951380018412,
+        "command_rms": 2.735919836642361,
+        "wheel_rms_deg": 9.865657520617654,
+        "body_rms": 10.171784676663622
+      },
+      "peak_error": 0.48828125
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 513.453011113,
+      "road": {
+        "crossings_s": 0.7142857142857143,
+        "after_crossing": 0.4359932348783967,
+        "command_rms": 0.2518144466839011,
+        "wheel_rms_deg": 0.4269951688341079,
+        "body_rms": 0.10045528278934697,
+        "peak_per_second": 1.26953125
+      },
+      "sim": {
+        "crossings_s": 1.6428571428571428,
+        "after_crossing": 1.0,
+        "command_rms": 0.8086327290362337,
+        "wheel_rms_deg": 6.675414705291955,
+        "body_rms": 1.4166819697495576,
+        "peak_per_second": 0.87890625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.7142857142857142,
+          "after_crossing": 0.856441317352703,
+          "command_rms": 0.7480304580807615,
+          "wheel_rms_deg": 5.819734447748475,
+          "body_rms": 1.2227849949501213,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.8559261996448125,
+          "wheel_rms_deg": 7.75010896020382,
+          "body_rms": 1.6101186689045546,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.8086327290362337,
+          "wheel_rms_deg": 6.675414705291955,
+          "body_rms": 1.4166819697495576,
+          "peak_per_second": 0.87890625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 2.3,
+        "after_crossing": 2.2936135701254883,
+        "command_rms": 3.211224533321943,
+        "wheel_rms_deg": 15.633466588202602,
+        "body_rms": 14.102612927986234
+      },
+      "peak_error": 0.390625
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 570.003092334,
+      "road": {
+        "crossings_s": 2.5714285714285716,
+        "after_crossing": 0.05931312183900048,
+        "command_rms": 0.06850021298519875,
+        "wheel_rms_deg": 0.1904796341841372,
+        "body_rms": 0.06452370393502192,
+        "peak_per_second": 1.46484375
+      },
+      "sim": {
+        "crossings_s": 4.142857142857143,
+        "after_crossing": 0.047117919823296155,
+        "command_rms": 0.08026029057838385,
+        "wheel_rms_deg": 0.38932002848142383,
+        "body_rms": 0.08394642081312365,
+        "peak_per_second": 0.48828125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.0,
+          "after_crossing": 0.047117919823296155,
+          "command_rms": 0.08026029057838385,
+          "wheel_rms_deg": 0.3952093902115354,
+          "body_rms": 0.08984811020208755,
+          "peak_per_second": 0.48828125
+        },
+        {
+          "crossings_s": 4.571428571428571,
+          "after_crossing": 0.04237654658572942,
+          "command_rms": 0.07135554843643847,
+          "wheel_rms_deg": 0.3140350512124728,
+          "body_rms": 0.06955894019439507,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 4.142857142857143,
+          "after_crossing": 0.05829963821916656,
+          "command_rms": 0.08075596451460165,
+          "wheel_rms_deg": 0.38932002848142383,
+          "body_rms": 0.08394642081312365,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.6111111111111112,
+        "after_crossing": 0.7943928487054353,
+        "command_rms": 1.171679431065801,
+        "wheel_rms_deg": 2.0438931970284395,
+        "body_rms": 1.3010167689328749
+      },
+      "peak_error": 0.9765625
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 590.003092334,
+      "road": {
+        "crossings_s": 3.357142857142857,
+        "after_crossing": 0.09024650643457949,
+        "command_rms": 0.0835091922684839,
+        "wheel_rms_deg": 0.4706055898434607,
+        "body_rms": 0.10003083216850318,
+        "peak_per_second": 0.68359375
+      },
+      "sim": {
+        "crossings_s": 3.5714285714285716,
+        "after_crossing": 0.08128543164984012,
+        "command_rms": 0.08690336188833292,
+        "wheel_rms_deg": 0.7179358658963764,
+        "body_rms": 0.15654666490120922,
+        "peak_per_second": 0.68359375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.5714285714285716,
+          "after_crossing": 0.09193145630046931,
+          "command_rms": 0.08690336188833292,
+          "wheel_rms_deg": 0.7406055879844547,
+          "body_rms": 0.15877500694545352,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 5.714285714285714,
+          "after_crossing": 0.08128543164984012,
+          "command_rms": 0.08490579927039439,
+          "wheel_rms_deg": 0.5536893958362673,
+          "body_rms": 0.1186092336352969,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 3.4285714285714284,
+          "after_crossing": 0.06688653794587024,
+          "command_rms": 0.09337278725506597,
+          "wheel_rms_deg": 0.7179358658963764,
+          "body_rms": 0.15654666490120922,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.0638297872340425,
+        "after_crossing": 0.9007044689177488,
+        "command_rms": 1.0406442635552826,
+        "wheel_rms_deg": 1.525557454885281,
+        "body_rms": 1.5649841304679382
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 613.463011015,
+      "road": {
+        "crossings_s": 3.357142857142857,
+        "after_crossing": 0.11043982683318058,
+        "command_rms": 0.09154972677762967,
+        "wheel_rms_deg": 0.2984430330218201,
+        "body_rms": 0.06402467327338571,
+        "peak_per_second": 0.390625
+      },
+      "sim": {
+        "crossings_s": 4.642857142857143,
+        "after_crossing": 0.08084150708295029,
+        "command_rms": 0.07967852805975227,
+        "wheel_rms_deg": 0.518179900069497,
+        "body_rms": 0.104486291360287,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.642857142857143,
+          "after_crossing": 0.08609090124974478,
+          "command_rms": 0.07967852805975227,
+          "wheel_rms_deg": 0.5789680932874166,
+          "body_rms": 0.1193581181333657,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 4.357142857142857,
+          "after_crossing": 0.06640350842979807,
+          "command_rms": 0.08648321795953959,
+          "wheel_rms_deg": 0.49546363604590227,
+          "body_rms": 0.10146829687274306,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 4.928571428571429,
+          "after_crossing": 0.08084150708295029,
+          "command_rms": 0.07818089261944391,
+          "wheel_rms_deg": 0.518179900069497,
+          "body_rms": 0.104486291360287,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.3829787234042554,
+        "after_crossing": 0.7319959601626452,
+        "command_rms": 0.8703305937033321,
+        "wheel_rms_deg": 1.7362774222697677,
+        "body_rms": 1.6319691459280075
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 798.592001466,
+      "road": {
+        "crossings_s": 3.7142857142857144,
+        "after_crossing": 0.03828402661639712,
+        "command_rms": 0.07163785062680557,
+        "wheel_rms_deg": 0.22498796692220077,
+        "body_rms": 0.018302387000452263,
+        "peak_per_second": 0.48828125
+      },
+      "sim": {
+        "crossings_s": 4.0,
+        "after_crossing": 0.055378773654043305,
+        "command_rms": 0.08111808288937822,
+        "wheel_rms_deg": 0.3099207453746069,
+        "body_rms": 0.018403306376989358,
+        "peak_per_second": 0.48828125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 5.0,
+          "after_crossing": 0.055378773654043305,
+          "command_rms": 0.08111808288937822,
+          "wheel_rms_deg": 0.2636323468917802,
+          "body_rms": 0.016081128833067147,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 3.4285714285714284,
+          "after_crossing": 0.03194496155089958,
+          "command_rms": 0.07859829050811527,
+          "wheel_rms_deg": 0.3099207453746069,
+          "body_rms": 0.018403306376989358,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 4.0,
+          "after_crossing": 0.06714784020419512,
+          "command_rms": 0.09526124931929816,
+          "wheel_rms_deg": 0.42168604116327474,
+          "body_rms": 0.026142100730365457,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.0769230769230769,
+        "after_crossing": 1.446524270002583,
+        "command_rms": 1.132335520672717,
+        "wheel_rms_deg": 1.3774992041319938,
+        "body_rms": 1.0055140007986172
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 818.592001466,
+      "road": {
+        "crossings_s": 1.8571428571428572,
+        "after_crossing": 0.024400671052942913,
+        "command_rms": 0.045617129410438405,
+        "wheel_rms_deg": 0.08220467763527431,
+        "body_rms": 0.01205878810436559,
+        "peak_per_second": 0.390625
+      },
+      "sim": {
+        "crossings_s": 2.7142857142857144,
+        "after_crossing": 0.05869054386339366,
+        "command_rms": 0.08238234753375269,
+        "wheel_rms_deg": 0.33335239310746323,
+        "body_rms": 0.025392586014294612,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 2.7142857142857144,
+          "after_crossing": 0.05869054386339366,
+          "command_rms": 0.08707087447832322,
+          "wheel_rms_deg": 0.33335239310746323,
+          "body_rms": 0.025392586014294612,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 2.4285714285714284,
+          "after_crossing": 0.061114016338843266,
+          "command_rms": 0.06952464775190426,
+          "wheel_rms_deg": 0.27677812316740485,
+          "body_rms": 0.02071540733609045,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 4.214285714285714,
+          "after_crossing": 0.047227894204695364,
+          "command_rms": 0.08238234753375269,
+          "wheel_rms_deg": 0.36879869310560554,
+          "body_rms": 0.02799283336218562,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.4615384615384615,
+        "after_crossing": 2.4052840078066264,
+        "command_rms": 1.8059520315827113,
+        "wheel_rms_deg": 4.055151150722603,
+        "body_rms": 2.1057328310712955
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ac",
+      "model": 1,
+      "speed": 1,
+      "lane": 0,
+      "start": 855.863471756,
+      "road": {
+        "crossings_s": 0.8571428571428571,
+        "after_crossing": 0.06013089005878909,
+        "command_rms": 0.058973344435056016,
+        "wheel_rms_deg": 0.08131258001401928,
+        "body_rms": 0.029133593485417258,
+        "peak_per_second": 0.48828125
+      },
+      "sim": {
+        "crossings_s": 4.357142857142857,
+        "after_crossing": 0.03788986284506776,
+        "command_rms": 0.0808978242043238,
+        "wheel_rms_deg": 0.26108528523367575,
+        "body_rms": 0.04026498242281592,
+        "peak_per_second": 0.68359375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.357142857142857,
+          "after_crossing": 0.04403678092182799,
+          "command_rms": 0.0808978242043238,
+          "wheel_rms_deg": 0.26108528523367575,
+          "body_rms": 0.0406752184466862,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 3.7142857142857144,
+          "after_crossing": 0.03403987954875923,
+          "command_rms": 0.08304808765697086,
+          "wheel_rms_deg": 0.263703491441225,
+          "body_rms": 0.04026498242281592,
+          "peak_per_second": 1.3671875
+        },
+        {
+          "crossings_s": 5.071428571428571,
+          "after_crossing": 0.03788986284506776,
+          "command_rms": 0.08001330093165673,
+          "wheel_rms_deg": 0.22315157327438287,
+          "body_rms": 0.03423307770898811,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 5.083333333333333,
+        "after_crossing": 0.6301230999245712,
+        "command_rms": 1.371769313395681,
+        "wheel_rms_deg": 3.21088428369462,
+        "body_rms": 1.3820808765993955
+      },
+      "peak_error": 0.1953125
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 0,
+      "lane": 1,
+      "start": 987.173831654,
+      "road": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.17823401137789527,
+        "command_rms": 0.31476093324954874,
+        "wheel_rms_deg": 0.8541421097450651,
+        "body_rms": 0.07987250593067782,
+        "peak_per_second": 1.46484375
+      },
+      "sim": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.8940008068860261,
+        "wheel_rms_deg": 5.61848414786579,
+        "body_rms": 0.3981894440779261,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.8940008068860261,
+          "wheel_rms_deg": 5.865512542358772,
+          "body_rms": 0.41396714717009825,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.8834800394200756,
+          "wheel_rms_deg": 5.61848414786579,
+          "body_rms": 0.3981894440779261,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9013394263652169,
+          "wheel_rms_deg": 5.36969007568879,
+          "body_rms": 0.3807359769038701,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.5641025641025641,
+        "after_crossing": 5.610601434985269,
+        "command_rms": 2.8402533874089277,
+        "wheel_rms_deg": 6.577926651506192,
+        "body_rms": 4.985313024027553
+      },
+      "peak_error": 0.68359375
+    },
+    {
+      "name": "000001ac",
+      "model": 2,
+      "speed": 0,
+      "lane": 1,
+      "start": 1007.173831654,
+      "road": {
+        "crossings_s": 2.5,
+        "after_crossing": 0.11479363458779948,
+        "command_rms": 0.16466430593984005,
+        "wheel_rms_deg": 0.45771944350817084,
+        "body_rms": 0.038412947625394406,
+        "peak_per_second": 0.78125
+      },
+      "sim": {
+        "crossings_s": 1.6428571428571428,
+        "after_crossing": 1.0,
+        "command_rms": 0.8901627955227855,
+        "wheel_rms_deg": 5.162746735102481,
+        "body_rms": 0.3765607171600036,
+        "peak_per_second": 0.87890625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.8813593046881893,
+          "wheel_rms_deg": 5.162746735102481,
+          "body_rms": 0.3765607171600036,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9062605689072949,
+          "wheel_rms_deg": 5.723041352304502,
+          "body_rms": 0.41619925397743807,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.7142857142857142,
+          "after_crossing": 1.0,
+          "command_rms": 0.8901627955227855,
+          "wheel_rms_deg": 5.112751023163592,
+          "body_rms": 0.3678156612797252,
+          "peak_per_second": 0.87890625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.6571428571428571,
+        "after_crossing": 8.711284415645483,
+        "command_rms": 5.4059244378560445,
+        "wheel_rms_deg": 11.279282119922266,
+        "body_rms": 9.802963334973628
+      },
+      "peak_error": 0.09765625
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1110.002644263,
+      "road": {
+        "crossings_s": 2.7142857142857144,
+        "after_crossing": 0.06559205038172489,
+        "command_rms": 0.07856662890881862,
+        "wheel_rms_deg": 0.40345472880597794,
+        "body_rms": 0.08319981628150791,
+        "peak_per_second": 0.390625
+      },
+      "sim": {
+        "crossings_s": 4.285714285714286,
+        "after_crossing": 0.05653968734722867,
+        "command_rms": 0.10434741537027073,
+        "wheel_rms_deg": 0.613050103991982,
+        "body_rms": 0.05428973537087593,
+        "peak_per_second": 0.5859375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.0,
+          "after_crossing": 0.05653968734722867,
+          "command_rms": 0.10653436247948347,
+          "wheel_rms_deg": 0.6336299081061424,
+          "body_rms": 0.05518289988349898,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 4.285714285714286,
+          "after_crossing": 0.04349293860996965,
+          "command_rms": 0.09960701109715978,
+          "wheel_rms_deg": 0.43693154088851827,
+          "body_rms": 0.037683190820017025,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 4.285714285714286,
+          "after_crossing": 0.06586088012607573,
+          "command_rms": 0.10434741537027073,
+          "wheel_rms_deg": 0.613050103991982,
+          "body_rms": 0.05428973537087593,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.5789473684210524,
+        "after_crossing": 0.8619899365576417,
+        "command_rms": 1.3281391453281302,
+        "wheel_rms_deg": 1.5195015951512092,
+        "body_rms": 0.6525222986933739
+      },
+      "peak_error": 0.1953125
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1130.002644263,
+      "road": {
+        "crossings_s": 2.7857142857142856,
+        "after_crossing": 0.0872028908883355,
+        "command_rms": 0.06394448411932113,
+        "wheel_rms_deg": 0.25090657445636394,
+        "body_rms": 0.040687496169010434,
+        "peak_per_second": 1.3671875
+      },
+      "sim": {
+        "crossings_s": 5.142857142857143,
+        "after_crossing": 0.09146806900136736,
+        "command_rms": 0.0919568218070548,
+        "wheel_rms_deg": 0.43462096189243077,
+        "body_rms": 0.038487282640646735,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.571428571428571,
+          "after_crossing": 0.12005384347736008,
+          "command_rms": 0.09173647098710652,
+          "wheel_rms_deg": 0.43462096189243077,
+          "body_rms": 0.038487282640646735,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 6.857142857142857,
+          "after_crossing": 0.08695670798731386,
+          "command_rms": 0.0919568218070548,
+          "wheel_rms_deg": 0.47429778062534,
+          "body_rms": 0.04140821218115178,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 5.142857142857143,
+          "after_crossing": 0.09146806900136736,
+          "command_rms": 0.09643666194160253,
+          "wheel_rms_deg": 0.4344123523176475,
+          "body_rms": 0.03829469405675593,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.8461538461538465,
+        "after_crossing": 1.0489109715237936,
+        "command_rms": 1.4380727763079977,
+        "wheel_rms_deg": 1.7322023658970214,
+        "body_rms": 0.9459240863771929
+      },
+      "peak_error": 0.9765625
+    },
+    {
+      "name": "000001ac",
+      "model": 0,
+      "speed": 0,
+      "lane": 0,
+      "start": 1153.474974611,
+      "road": {
+        "crossings_s": 2.5714285714285716,
+        "after_crossing": 0.17333723876680762,
+        "command_rms": 0.09535434261732749,
+        "wheel_rms_deg": 0.309596484672652,
+        "body_rms": 0.04378196165620862,
+        "peak_per_second": 1.26953125
+      },
+      "sim": {
+        "crossings_s": 5.142857142857143,
+        "after_crossing": 0.13993099548840648,
+        "command_rms": 0.13470999592652003,
+        "wheel_rms_deg": 0.6302100091005824,
+        "body_rms": 0.048224049083714846,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 5.0,
+          "after_crossing": 0.13736981230153153,
+          "command_rms": 0.11675437084561271,
+          "wheel_rms_deg": 0.6303726674476393,
+          "body_rms": 0.048458402760326515,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 5.142857142857143,
+          "after_crossing": 0.1678657691925412,
+          "command_rms": 0.13470999592652003,
+          "wheel_rms_deg": 0.6302100091005824,
+          "body_rms": 0.048224049083714846,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 5.571428571428571,
+          "after_crossing": 0.13993099548840648,
+          "command_rms": 0.1520335689826561,
+          "wheel_rms_deg": 0.6231189289629238,
+          "body_rms": 0.047817112546058964,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 2.0,
+        "after_crossing": 0.8072760157247981,
+        "command_rms": 1.4127305818376117,
+        "wheel_rms_deg": 2.035585157780222,
+        "body_rms": 1.101459305601404
+      },
+      "peak_error": 0.87890625
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6717.613232749,
+      "road": {
+        "crossings_s": 3.0714285714285716,
+        "after_crossing": 0.23054185738014576,
+        "command_rms": 0.2906248440098181,
+        "wheel_rms_deg": 0.7319236445902666,
+        "body_rms": 0.16488481736939253,
+        "peak_per_second": 1.171875
+      },
+      "sim": {
+        "crossings_s": 3.2857142857142856,
+        "after_crossing": 0.3323176373759393,
+        "command_rms": 0.41619417786665164,
+        "wheel_rms_deg": 3.0427518974596355,
+        "body_rms": 0.7063293755587792,
+        "peak_per_second": 0.9765625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.2857142857142856,
+          "after_crossing": 0.35366398750384176,
+          "command_rms": 0.4233549770897862,
+          "wheel_rms_deg": 2.851531712231359,
+          "body_rms": 0.6588776346846896,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 2.9285714285714284,
+          "after_crossing": 0.3323176373759393,
+          "command_rms": 0.41619417786665164,
+          "wheel_rms_deg": 3.149322862991196,
+          "body_rms": 0.7243862186060471,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 4.357142857142857,
+          "after_crossing": 0.2029396391793168,
+          "command_rms": 0.4047454387384994,
+          "wheel_rms_deg": 3.0427518974596355,
+          "body_rms": 0.7063293755587792,
+          "peak_per_second": 0.9765625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.069767441860465,
+        "after_crossing": 1.441463347057073,
+        "command_rms": 1.432066757006471,
+        "wheel_rms_deg": 4.157198527399642,
+        "body_rms": 4.283774496813645
+      },
+      "peak_error": 0.1953125
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6737.613232749,
+      "road": {
+        "crossings_s": 3.2142857142857144,
+        "after_crossing": 0.1461442060565071,
+        "command_rms": 0.18872694715523655,
+        "wheel_rms_deg": 0.5178343146726435,
+        "body_rms": 0.11259161267192935,
+        "peak_per_second": 1.07421875
+      },
+      "sim": {
+        "crossings_s": 3.0714285714285716,
+        "after_crossing": 0.4079229833701454,
+        "command_rms": 0.48154917958274424,
+        "wheel_rms_deg": 3.472731483240172,
+        "body_rms": 0.7382751780163054,
+        "peak_per_second": 1.07421875
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.214285714285714,
+          "after_crossing": 0.1533761672624645,
+          "command_rms": 0.25636751494153254,
+          "wheel_rms_deg": 1.0388173623658559,
+          "body_rms": 0.24684270238477476,
+          "peak_per_second": 1.3671875
+        },
+        {
+          "crossings_s": 2.5714285714285716,
+          "after_crossing": 0.4890321979826622,
+          "command_rms": 0.5156429255364418,
+          "wheel_rms_deg": 4.29048913786843,
+          "body_rms": 0.8931005867498503,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 3.0714285714285716,
+          "after_crossing": 0.4079229833701454,
+          "command_rms": 0.48154917958274424,
+          "wheel_rms_deg": 3.472731483240172,
+          "body_rms": 0.7382751780163054,
+          "peak_per_second": 1.07421875
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.9555555555555556,
+        "after_crossing": 2.7912360973956143,
+        "command_rms": 2.551565565179455,
+        "wheel_rms_deg": 6.706259868922571,
+        "body_rms": 6.557106346522449
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6760.273621118,
+      "road": {
+        "crossings_s": 3.2142857142857144,
+        "after_crossing": 0.11216129224287608,
+        "command_rms": 0.15852664821458948,
+        "wheel_rms_deg": 0.45056358596686547,
+        "body_rms": 0.09435359900946805,
+        "peak_per_second": 1.26953125
+      },
+      "sim": {
+        "crossings_s": 3.2142857142857144,
+        "after_crossing": 0.4072000148195624,
+        "command_rms": 0.3840140634449866,
+        "wheel_rms_deg": 2.487583478260343,
+        "body_rms": 0.5281995605385171,
+        "peak_per_second": 1.171875
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.2142857142857144,
+          "after_crossing": 0.4072000148195624,
+          "command_rms": 0.3840140634449866,
+          "wheel_rms_deg": 2.2480470793805876,
+          "body_rms": 0.511060602626156,
+          "peak_per_second": 1.171875
+        },
+        {
+          "crossings_s": 4.428571428571429,
+          "after_crossing": 0.21033123632774117,
+          "command_rms": 0.3540375497534943,
+          "wheel_rms_deg": 2.487583478260343,
+          "body_rms": 0.5281995605385171,
+          "peak_per_second": 1.26953125
+        },
+        {
+          "crossings_s": 2.857142857142857,
+          "after_crossing": 0.5218370684014679,
+          "command_rms": 0.4573762391474568,
+          "wheel_rms_deg": 2.6294096546788808,
+          "body_rms": 0.5929472315232286,
+          "peak_per_second": 1.171875
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.0,
+        "after_crossing": 3.6304861211638344,
+        "command_rms": 2.422394390911276,
+        "wheel_rms_deg": 5.521048650485662,
+        "body_rms": 5.59808598806617
+      },
+      "peak_error": 0.09765625
+    },
+    {
+      "name": "000001ad",
+      "model": 1,
+      "speed": 1,
+      "lane": 1,
+      "start": 6780.273621118,
+      "road": {
+        "crossings_s": 3.642857142857143,
+        "after_crossing": 0.12326853290988335,
+        "command_rms": 0.16197671110058814,
+        "wheel_rms_deg": 0.45099456981238517,
+        "body_rms": 0.10297379347875046,
+        "peak_per_second": 1.3671875
+      },
+      "sim": {
+        "crossings_s": 2.5714285714285716,
+        "after_crossing": 0.5077544681127839,
+        "command_rms": 0.44614356205761524,
+        "wheel_rms_deg": 3.055074915190777,
+        "body_rms": 0.6524609856808995,
+        "peak_per_second": 1.07421875
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 2.142857142857143,
+          "after_crossing": 0.5361345534582783,
+          "command_rms": 0.5402589600506249,
+          "wheel_rms_deg": 4.5449021808749235,
+          "body_rms": 0.9638299254673074,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 2.5714285714285716,
+          "after_crossing": 0.5077544681127839,
+          "command_rms": 0.44614356205761524,
+          "wheel_rms_deg": 2.8471261620268766,
+          "body_rms": 0.6274926642637333,
+          "peak_per_second": 1.07421875
+        },
+        {
+          "crossings_s": 3.2857142857142856,
+          "after_crossing": 0.24057852005501093,
+          "command_rms": 0.39421951186953247,
+          "wheel_rms_deg": 3.055074915190777,
+          "body_rms": 0.6524609856808995,
+          "peak_per_second": 1.07421875
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.7058823529411765,
+        "after_crossing": 4.1190923273499385,
+        "command_rms": 2.754368569568982,
+        "wheel_rms_deg": 6.774083591431478,
+        "body_rms": 6.336184806239468
+      },
+      "peak_error": 0.29296875
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6892.093800026,
+      "road": {
+        "crossings_s": 3.4285714285714284,
+        "after_crossing": 0.12780262669906445,
+        "command_rms": 0.2047975671771815,
+        "wheel_rms_deg": 0.42047526948006647,
+        "body_rms": 0.09931547359886464,
+        "peak_per_second": 1.07421875
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9259515592428473,
+        "wheel_rms_deg": 12.30615748068154,
+        "body_rms": 2.3161299452588153,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9264861975988858,
+          "wheel_rms_deg": 12.069309062533042,
+          "body_rms": 2.279540783382249,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9259515592428473,
+          "wheel_rms_deg": 12.30615748068154,
+          "body_rms": 2.3161299452588153,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.925861050733273,
+          "wheel_rms_deg": 12.31333196313026,
+          "body_rms": 2.3186131847603186,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.4375,
+        "after_crossing": 7.824565314723068,
+        "command_rms": 4.521301556486539,
+        "wheel_rms_deg": 29.267256302370807,
+        "body_rms": 23.320937426263182
+      },
+      "peak_error": 0.29296875
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6912.093800026,
+      "road": {
+        "crossings_s": 3.2857142857142856,
+        "after_crossing": 0.3290989714456377,
+        "command_rms": 0.3311691290020727,
+        "wheel_rms_deg": 0.5952509565005778,
+        "body_rms": 0.11916918450881078,
+        "peak_per_second": 1.7578125
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9266032828686173,
+        "wheel_rms_deg": 11.761673832289581,
+        "body_rms": 2.2069809782707055,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9312846697412985,
+          "wheel_rms_deg": 12.177008327898141,
+          "body_rms": 2.2675428412563816,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9239229054131294,
+          "wheel_rms_deg": 11.579730499370715,
+          "body_rms": 2.165825278772432,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9266032828686173,
+          "wheel_rms_deg": 11.761673832289581,
+          "body_rms": 2.2069809782707055,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.4565217391304348,
+        "after_crossing": 3.0385995908990107,
+        "command_rms": 2.7979760240961893,
+        "wheel_rms_deg": 19.75918510309553,
+        "body_rms": 18.519728798744378
+      },
+      "peak_error": 0.9765625
+    },
+    {
+      "name": "000001ad",
+      "model": 2,
+      "speed": 1,
+      "lane": 0,
+      "start": 6940.272497768,
+      "road": {
+        "crossings_s": 3.5714285714285716,
+        "after_crossing": 0.17491773739965133,
+        "command_rms": 0.22066994427334816,
+        "wheel_rms_deg": 0.41859817362201257,
+        "body_rms": 0.09669482815441582,
+        "peak_per_second": 1.3671875
+      },
+      "sim": {
+        "crossings_s": 1.5,
+        "after_crossing": 1.0,
+        "command_rms": 0.9341085613997293,
+        "wheel_rms_deg": 12.010923707370187,
+        "body_rms": 2.2473364218701715,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9291953337724683,
+          "wheel_rms_deg": 12.032131395417228,
+          "body_rms": 2.2473364218701715,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9388665187524168,
+          "wheel_rms_deg": 11.942966691955373,
+          "body_rms": 2.221500473440449,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5,
+          "after_crossing": 1.0,
+          "command_rms": 0.9341085613997293,
+          "wheel_rms_deg": 12.010923707370187,
+          "body_rms": 2.2494517484329255,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.42,
+        "after_crossing": 5.7169731032777085,
+        "command_rms": 4.233057494420857,
+        "wheel_rms_deg": 28.693206192093562,
+        "body_rms": 23.241536954606406
+      },
+      "peak_error": 0.5859375
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7060.286553191,
+      "road": {
+        "crossings_s": 4.5,
+        "after_crossing": 0.05668810129468185,
+        "command_rms": 0.06494606544150097,
+        "wheel_rms_deg": 0.19766010045577986,
+        "body_rms": 0.06404537844692519,
+        "peak_per_second": 0.5859375
+      },
+      "sim": {
+        "crossings_s": 6.428571428571429,
+        "after_crossing": 0.07398734024774441,
+        "command_rms": 0.07125772041685097,
+        "wheel_rms_deg": 0.4091074096598963,
+        "body_rms": 0.08665250915804117,
+        "peak_per_second": 0.5859375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 5.285714285714286,
+          "after_crossing": 0.08356919300334781,
+          "command_rms": 0.06884710001940142,
+          "wheel_rms_deg": 0.3650258317446968,
+          "body_rms": 0.07744328078628533,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 6.428571428571429,
+          "after_crossing": 0.07269965835656247,
+          "command_rms": 0.07700911952258647,
+          "wheel_rms_deg": 0.4199223985603189,
+          "body_rms": 0.08980753686191836,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 6.714285714285714,
+          "after_crossing": 0.07398734024774441,
+          "command_rms": 0.07125772041685097,
+          "wheel_rms_deg": 0.4091074096598963,
+          "body_rms": 0.08665250915804117,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.4285714285714286,
+        "after_crossing": 1.305165256164356,
+        "command_rms": 1.0971830230583424,
+        "wheel_rms_deg": 2.069752108374654,
+        "body_rms": 1.352986136694479
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7138.08299561,
+      "road": {
+        "crossings_s": 0.6428571428571429,
+        "after_crossing": 0.25600776074863163,
+        "command_rms": 0.11991428623873121,
+        "wheel_rms_deg": 0.46579980720890257,
+        "body_rms": 0.05805118028459381,
+        "peak_per_second": 0.390625
+      },
+      "sim": {
+        "crossings_s": 0.42857142857142855,
+        "after_crossing": 0.2553816048227773,
+        "command_rms": 0.12145658346375732,
+        "wheel_rms_deg": 0.609016198741554,
+        "body_rms": 0.09201688011906335,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 0.2857142857142857,
+          "after_crossing": 0.2553816048227773,
+          "command_rms": 0.11874663565830003,
+          "wheel_rms_deg": 0.609016198741554,
+          "body_rms": 0.09201688011906335,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 0.5714285714285714,
+          "after_crossing": 0.36825890274838446,
+          "command_rms": 0.12145658346375732,
+          "wheel_rms_deg": 0.5081159702026766,
+          "body_rms": 0.07854413635803369,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 0.42857142857142855,
+          "after_crossing": 0.04196650552618618,
+          "command_rms": 0.14139398823192129,
+          "wheel_rms_deg": 0.700655443698401,
+          "body_rms": 0.11579986241483865,
+          "peak_per_second": 0.68359375
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.6666666666666666,
+        "after_crossing": 0.9975541525615343,
+        "command_rms": 1.0128616637216656,
+        "wheel_rms_deg": 1.3074633980439188,
+        "body_rms": 1.5850992119015312
+      },
+      "peak_error": 0.0
+    },
+    {
+      "name": "000001ad",
+      "model": 0,
+      "speed": 1,
+      "lane": 1,
+      "start": 7158.08299561,
+      "road": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.1991950246020298,
+        "command_rms": 0.079618856559445,
+        "wheel_rms_deg": 0.21116038464343756,
+        "body_rms": 0.054166820777705245,
+        "peak_per_second": 0.78125
+      },
+      "sim": {
+        "crossings_s": 3.2142857142857144,
+        "after_crossing": 0.12797490010834323,
+        "command_rms": 0.10232749228539027,
+        "wheel_rms_deg": 0.3900227504045796,
+        "body_rms": 0.06989246283808014,
+        "peak_per_second": 0.48828125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.5714285714285716,
+          "after_crossing": 0.06604529438240442,
+          "command_rms": 0.10232749228539027,
+          "wheel_rms_deg": 0.3900227504045796,
+          "body_rms": 0.06989246283808014,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 3.2142857142857144,
+          "after_crossing": 0.12797490010834323,
+          "command_rms": 0.09202784988081394,
+          "wheel_rms_deg": 0.36672036639001876,
+          "body_rms": 0.06850438506649638,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 2.7857142857142856,
+          "after_crossing": 0.13809094163183605,
+          "command_rms": 0.12186529290434756,
+          "wheel_rms_deg": 0.4861556168555305,
+          "body_rms": 0.09471811284010585,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.7894736842105264,
+        "after_crossing": 0.6424603243179556,
+        "command_rms": 1.2852168029942825,
+        "wheel_rms_deg": 1.847045084063313,
+        "body_rms": 1.2903187197364088
+      },
+      "peak_error": 0.29296875
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8017.535419701,
+      "road": {
+        "crossings_s": 4.071428571428571,
+        "after_crossing": 0.10981484414712864,
+        "command_rms": 0.17785860110950932,
+        "wheel_rms_deg": 0.4620268882611144,
+        "body_rms": 0.03925368552986114,
+        "peak_per_second": 0.9765625
+      },
+      "sim": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9166788429948953,
+        "wheel_rms_deg": 5.746934134050434,
+        "body_rms": 0.478651710218826,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9166788429948953,
+          "wheel_rms_deg": 5.852479960778059,
+          "body_rms": 0.4843978642473086,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9174916060671977,
+          "wheel_rms_deg": 5.746934134050434,
+          "body_rms": 0.478651710218826,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9038930873019664,
+          "wheel_rms_deg": 5.428603546076153,
+          "body_rms": 0.44852848180106025,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.3859649122807018,
+        "after_crossing": 9.106237028030671,
+        "command_rms": 5.15397533364432,
+        "wheel_rms_deg": 12.438527453844971,
+        "body_rms": 12.193803046970078
+      },
+      "peak_error": 0.1953125
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8037.535419701,
+      "road": {
+        "crossings_s": 4.142857142857143,
+        "after_crossing": 0.18818369232664434,
+        "command_rms": 0.2511992569867334,
+        "wheel_rms_deg": 0.5673534066768957,
+        "body_rms": 0.06491654312089767,
+        "peak_per_second": 1.171875
+      },
+      "sim": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9148906421132155,
+        "wheel_rms_deg": 5.9747537251341045,
+        "body_rms": 0.5492777797971782,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9148906421132155,
+          "wheel_rms_deg": 5.967666452001581,
+          "body_rms": 0.5492777797971782,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.9073625772380424,
+          "wheel_rms_deg": 6.012990192522695,
+          "body_rms": 0.5519599738291838,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9154494560398727,
+          "wheel_rms_deg": 5.9747537251341045,
+          "body_rms": 0.5460856712076814,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.3793103448275862,
+        "after_crossing": 5.31395673895178,
+        "command_rms": 3.6420913544403266,
+        "wheel_rms_deg": 10.530920683334665,
+        "body_rms": 8.461291273231042
+      },
+      "peak_error": 0.390625
+    },
+    {
+      "name": "000001ae",
+      "model": 2,
+      "speed": 0,
+      "lane": 0,
+      "start": 8059.114672758,
+      "road": {
+        "crossings_s": 3.7142857142857144,
+        "after_crossing": 0.1854507596445111,
+        "command_rms": 0.1846605484888007,
+        "wheel_rms_deg": 0.46172457495287367,
+        "body_rms": 0.06167343262303997,
+        "peak_per_second": 1.07421875
+      },
+      "sim": {
+        "crossings_s": 1.5714285714285714,
+        "after_crossing": 1.0,
+        "command_rms": 0.9131381721961952,
+        "wheel_rms_deg": 6.076479039219276,
+        "body_rms": 0.5939879612982519,
+        "peak_per_second": 0.78125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 1.6428571428571428,
+          "after_crossing": 1.0,
+          "command_rms": 0.9131381721961952,
+          "wheel_rms_deg": 6.166414086327511,
+          "body_rms": 0.6065788547727466,
+          "peak_per_second": 0.78125
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9102699810085837,
+          "wheel_rms_deg": 6.047971599839991,
+          "body_rms": 0.5880570370171226,
+          "peak_per_second": 0.87890625
+        },
+        {
+          "crossings_s": 1.5714285714285714,
+          "after_crossing": 1.0,
+          "command_rms": 0.9148659982455538,
+          "wheel_rms_deg": 6.076479039219276,
+          "body_rms": 0.5939879612982519,
+          "peak_per_second": 0.78125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 0.4230769230769231,
+        "after_crossing": 5.39226693876526,
+        "command_rms": 4.944955377144757,
+        "wheel_rms_deg": 13.160397710776987,
+        "body_rms": 9.631180494343846
+      },
+      "peak_error": 0.29296875
+    },
+    {
+      "name": "000001ae",
+      "model": 0,
+      "speed": 0,
+      "lane": 1,
+      "start": 8182.70582719,
+      "road": {
+        "crossings_s": 5.142857142857143,
+        "after_crossing": 0.11147031265369134,
+        "command_rms": 0.09956778980099476,
+        "wheel_rms_deg": 0.5989298289356997,
+        "body_rms": 0.045675361571923825,
+        "peak_per_second": 0.5859375
+      },
+      "sim": {
+        "crossings_s": 6.928571428571429,
+        "after_crossing": 0.1475483118313552,
+        "command_rms": 0.12347715776175318,
+        "wheel_rms_deg": 0.7049616478182645,
+        "body_rms": 0.05239206945110207,
+        "peak_per_second": 0.48828125
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 8.571428571428571,
+          "after_crossing": 0.12795605458504206,
+          "command_rms": 0.12347715776175318,
+          "wheel_rms_deg": 0.7049616478182645,
+          "body_rms": 0.05239206945110207,
+          "peak_per_second": 0.5859375
+        },
+        {
+          "crossings_s": 5.928571428571429,
+          "after_crossing": 0.1475483118313552,
+          "command_rms": 0.12291465681370058,
+          "wheel_rms_deg": 0.7521937026539491,
+          "body_rms": 0.053894986040623497,
+          "peak_per_second": 0.48828125
+        },
+        {
+          "crossings_s": 6.928571428571429,
+          "after_crossing": 0.1513489744964393,
+          "command_rms": 0.13935883766216678,
+          "wheel_rms_deg": 0.6887608609327599,
+          "body_rms": 0.05056400148376222,
+          "peak_per_second": 0.48828125
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.347222222222222,
+        "after_crossing": 1.3236556740425465,
+        "command_rms": 1.2401315526692502,
+        "wheel_rms_deg": 1.1770354618519898,
+        "body_rms": 1.147053195596528
+      },
+      "peak_error": 0.09765625
+    },
+    {
+      "name": "000001ae",
+      "model": 0,
+      "speed": 0,
+      "lane": 1,
+      "start": 8210.824773898,
+      "road": {
+        "crossings_s": 1.9285714285714286,
+        "after_crossing": 0.033777189216214545,
+        "command_rms": 0.04285575297263486,
+        "wheel_rms_deg": 0.15311997999591287,
+        "body_rms": 0.0224304817973825,
+        "peak_per_second": 2.05078125
+      },
+      "sim": {
+        "crossings_s": 4.5,
+        "after_crossing": 0.04322259481761855,
+        "command_rms": 0.06704567738589177,
+        "wheel_rms_deg": 0.46618721730199203,
+        "body_rms": 0.04137417975606873,
+        "peak_per_second": 0.390625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 4.928571428571429,
+          "after_crossing": 0.04322259481761855,
+          "command_rms": 0.06704567738589177,
+          "wheel_rms_deg": 0.46618721730199203,
+          "body_rms": 0.04137417975606873,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 2.357142857142857,
+          "after_crossing": 0.051248848990134585,
+          "command_rms": 0.05896531175754074,
+          "wheel_rms_deg": 0.4146311223813082,
+          "body_rms": 0.03634890587329796,
+          "peak_per_second": 0.390625
+        },
+        {
+          "crossings_s": 4.5,
+          "after_crossing": 0.04196457113765893,
+          "command_rms": 0.07739736096746741,
+          "wheel_rms_deg": 0.4806659696162201,
+          "body_rms": 0.042485200306216366,
+          "peak_per_second": 0.390625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 2.3333333333333335,
+        "after_crossing": 1.2796385910308308,
+        "command_rms": 1.5644498751125238,
+        "wheel_rms_deg": 3.0445877625796167,
+        "body_rms": 1.8445515406136683
+      },
+      "peak_error": 1.66015625
+    },
+    {
+      "name": "000001ae",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 8359.124557227,
+      "road": {
+        "crossings_s": 2.642857142857143,
+        "after_crossing": 0.09607684946745847,
+        "command_rms": 0.1443545564044508,
+        "wheel_rms_deg": 0.5406517623942995,
+        "body_rms": 0.05331194347035762,
+        "peak_per_second": 1.5625
+      },
+      "sim": {
+        "crossings_s": 3.142857142857143,
+        "after_crossing": 0.12441556276643914,
+        "command_rms": 0.1802988988166887,
+        "wheel_rms_deg": 0.9106275073687425,
+        "body_rms": 0.06074595275369627,
+        "peak_per_second": 0.9765625
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.142857142857143,
+          "after_crossing": 0.12441556276643914,
+          "command_rms": 0.16231393652254117,
+          "wheel_rms_deg": 0.7628969123089167,
+          "body_rms": 0.05075627984244332,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 3.142857142857143,
+          "after_crossing": 0.11732932847552441,
+          "command_rms": 0.1802988988166887,
+          "wheel_rms_deg": 0.9106275073687425,
+          "body_rms": 0.06074595275369627,
+          "peak_per_second": 0.9765625
+        },
+        {
+          "crossings_s": 3.857142857142857,
+          "after_crossing": 0.13017142775801577,
+          "command_rms": 0.24870339921159007,
+          "wheel_rms_deg": 1.2140918000158885,
+          "body_rms": 0.08319666094767975,
+          "peak_per_second": 0.87890625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.1891891891891893,
+        "after_crossing": 1.2949588111606334,
+        "command_rms": 1.2490004008708218,
+        "wheel_rms_deg": 1.6843143233936566,
+        "body_rms": 1.1394435993028857
+      },
+      "peak_error": 0.5859375
+    },
+    {
+      "name": "000001ae",
+      "model": 1,
+      "speed": 0,
+      "lane": 0,
+      "start": 8379.124557227,
+      "road": {
+        "crossings_s": 2.9285714285714284,
+        "after_crossing": 0.0892377526574431,
+        "command_rms": 0.15507775490283032,
+        "wheel_rms_deg": 0.5797854959319525,
+        "body_rms": 0.04987524475356493,
+        "peak_per_second": 0.68359375
+      },
+      "sim": {
+        "crossings_s": 4.642857142857143,
+        "after_crossing": 0.10500053818904871,
+        "command_rms": 0.1567507993879672,
+        "wheel_rms_deg": 0.8280363563489366,
+        "body_rms": 0.05671018868075784,
+        "peak_per_second": 0.68359375
+      },
+      "seed_stats": [
+        {
+          "crossings_s": 3.5,
+          "after_crossing": 0.11762969311060878,
+          "command_rms": 0.17562761407632427,
+          "wheel_rms_deg": 0.9042369391591222,
+          "body_rms": 0.06203078576893063,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 5.642857142857143,
+          "after_crossing": 0.08589901377339607,
+          "command_rms": 0.1489558637618357,
+          "wheel_rms_deg": 0.7985075282155195,
+          "body_rms": 0.05399052669754128,
+          "peak_per_second": 0.68359375
+        },
+        {
+          "crossings_s": 4.642857142857143,
+          "after_crossing": 0.10500053818904871,
+          "command_rms": 0.1567507993879672,
+          "wheel_rms_deg": 0.8280363563489366,
+          "body_rms": 0.05671018868075784,
+          "peak_per_second": 0.87890625
+        }
+      ],
+      "ratios": {
+        "crossings_s": 1.5853658536585369,
+        "after_crossing": 1.1766380826746523,
+        "command_rms": 1.0107884234343294,
+        "wheel_rms_deg": 1.4281770795558508,
+        "body_rms": 1.1370408097436828
+      },
+      "peak_error": 0.0
+    }
+  ],
+  "seeds": 3
+}

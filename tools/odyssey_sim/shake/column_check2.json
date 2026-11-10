@@ -1,0 +1,532 @@
+{
+  "rows": [
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.6598884520393129,
+      "rms_ratio": 0.9614103995781633,
+      "wheel_rmse_deg": 0.5926173137683193
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.5995471109173138,
+      "rms_ratio": 0.8468441232516584,
+      "wheel_rmse_deg": 0.6131661489050777
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.6450430482573599,
+      "rms_ratio": 0.9513944802737195,
+      "wheel_rmse_deg": 0.602617924446339
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.796612121971917,
+      "rms_ratio": 1.201023387498125,
+      "wheel_rmse_deg": 0.37696324718934004
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.766730298852921,
+      "rms_ratio": 1.084601701297856,
+      "wheel_rmse_deg": 0.3710962798712044
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7923811248951728,
+      "rms_ratio": 1.19322212848296,
+      "wheel_rmse_deg": 0.3782648323481343
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7255367307543878,
+      "rms_ratio": 0.8900734323276387,
+      "wheel_rmse_deg": 0.3188634641311452
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.7081991666451156,
+      "rms_ratio": 0.6945920198571621,
+      "wheel_rmse_deg": 0.3182018487309634
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7341029251145775,
+      "rms_ratio": 0.8543008445676448,
+      "wheel_rmse_deg": 0.3107744026847716
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7148880336647072,
+      "rms_ratio": 1.2124637380879528,
+      "wheel_rmse_deg": 0.38706217341760957
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.7087414136367061,
+      "rms_ratio": 0.976080847986667,
+      "wheel_rmse_deg": 0.34024642106045555
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7181776018856615,
+      "rms_ratio": 1.170355399219228,
+      "wheel_rmse_deg": 0.3742768744952013
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7705141132526289,
+      "rms_ratio": 1.1793834425075334,
+      "wheel_rmse_deg": 0.6008100365770196
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.7344728460239093,
+      "rms_ratio": 1.133511980892813,
+      "wheel_rmse_deg": 0.624556651834243
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7651435720529568,
+      "rms_ratio": 1.1976895775952845,
+      "wheel_rmse_deg": 0.6153894649468428
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7726804657118096,
+      "rms_ratio": 0.7510354031378245,
+      "wheel_rmse_deg": 0.36890790795017087
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.7710960607356848,
+      "rms_ratio": 0.6565599743239118,
+      "wheel_rmse_deg": 0.3757415914738651
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7697898506102163,
+      "rms_ratio": 0.7337880016719609,
+      "wheel_rmse_deg": 0.3713146591486398
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.6727338388011151,
+      "rms_ratio": 1.3278674808136395,
+      "wheel_rmse_deg": 0.41599544024897966
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.6881801698918265,
+      "rms_ratio": 1.1349677663437951,
+      "wheel_rmse_deg": 0.35862192585208164
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.6747782756449657,
+      "rms_ratio": 1.2879414582758721,
+      "wheel_rmse_deg": 0.4038997248873722
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.8158524057108607,
+      "rms_ratio": 0.8893630167130206,
+      "wheel_rmse_deg": 0.3470732645839309
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.8114964190361313,
+      "rms_ratio": 0.7717299472776294,
+      "wheel_rmse_deg": 0.3487472399850492
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.815403612901752,
+      "rms_ratio": 0.863157391188498,
+      "wheel_rmse_deg": 0.34584013796615076
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7245863223494169,
+      "rms_ratio": 1.133019377227645,
+      "wheel_rmse_deg": 0.3354031751491766
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.7540854921533217,
+      "rms_ratio": 0.9332208008434224,
+      "wheel_rmse_deg": 0.2850546346307462
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7273164481762339,
+      "rms_ratio": 1.0921177675578164,
+      "wheel_rmse_deg": 0.3254133596356171
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7824829070300707,
+      "rms_ratio": 2.7880820115468024,
+      "wheel_rmse_deg": 0.42891374589843284
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.8302403188833638,
+      "rms_ratio": 2.3786700649532198,
+      "wheel_rmse_deg": 0.3361154868606903
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7951116699290114,
+      "rms_ratio": 2.694343275228707,
+      "wheel_rmse_deg": 0.40719553113353774
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.8698056513041209,
+      "rms_ratio": 2.3385432601124037,
+      "wheel_rmse_deg": 0.30659152306555454
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.8864954411475333,
+      "rms_ratio": 2.0755288575676056,
+      "wheel_rmse_deg": 0.25253069229928254
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.8854662654285548,
+      "rms_ratio": 2.2861292906579735,
+      "wheel_rmse_deg": 0.292038591987118
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.6513684103135114,
+      "rms_ratio": 1.9941957762331497,
+      "wheel_rmse_deg": 0.7184758959556367
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.6292373837923424,
+      "rms_ratio": 2.0291469693270305,
+      "wheel_rmse_deg": 0.7458824528729124
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.6450010913410246,
+      "rms_ratio": 2.0279452917368217,
+      "wheel_rmse_deg": 0.7360189497037878
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7208652847541027,
+      "rms_ratio": 2.2357492081677846,
+      "wheel_rmse_deg": 0.35190468088853083
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.6495102397059409,
+      "rms_ratio": 2.0924583829435286,
+      "wheel_rmse_deg": 0.3444322000131719
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.7093100783797596,
+      "rms_ratio": 2.206666742387135,
+      "wheel_rmse_deg": 0.34956760063116377
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Coulomb",
+      "wheel_corr": 0.8187764468333822,
+      "rms_ratio": 2.7164550227855373,
+      "wheel_rmse_deg": 0.37866576152105164
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "Dahl",
+      "wheel_corr": 0.8259993488548156,
+      "rms_ratio": 2.3972256060085755,
+      "wheel_rmse_deg": 0.3188250491180508
+    },
+    {
+      "route": "000001ad",
+      "speed": 1,
+      "friction": "LuGre",
+      "wheel_corr": 0.8171125673137375,
+      "rms_ratio": 2.6349794188486486,
+      "wheel_rmse_deg": 0.36426134042412506
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7247741335317457,
+      "rms_ratio": 0.9129757979558769,
+      "wheel_rmse_deg": 0.32999308106409514
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.6839857007821922,
+      "rms_ratio": 0.7711735639344744,
+      "wheel_rmse_deg": 0.3394572702376207
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.7127900022015266,
+      "rms_ratio": 0.8987229857746948,
+      "wheel_rmse_deg": 0.3352507670282373
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7475949075449737,
+      "rms_ratio": 0.6966642341204535,
+      "wheel_rmse_deg": 0.3779272857947086
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.7263668265051457,
+      "rms_ratio": 0.5914579084191126,
+      "wheel_rmse_deg": 0.39740878359871207
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.7453970018896708,
+      "rms_ratio": 0.6838430319070611,
+      "wheel_rmse_deg": 0.3798320905015388
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.788179481383665,
+      "rms_ratio": 1.3085037141861877,
+      "wheel_rmse_deg": 0.3721250962501776
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.7736470095867893,
+      "rms_ratio": 1.1932908336917798,
+      "wheel_rmse_deg": 0.3509094731812023
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.7855527300721,
+      "rms_ratio": 1.309439875854278,
+      "wheel_rmse_deg": 0.37436865455517826
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.5040886900500566,
+      "rms_ratio": 1.0510933729707632,
+      "wheel_rmse_deg": 0.9850360547266505
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.5024637754533069,
+      "rms_ratio": 1.1550748618993445,
+      "wheel_rmse_deg": 1.0437989137438386
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.5036603104654966,
+      "rms_ratio": 1.0972879760649412,
+      "wheel_rmse_deg": 1.0100173406647122
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7080637826236111,
+      "rms_ratio": 1.0701381296708379,
+      "wheel_rmse_deg": 0.47534641868849203
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.7043210239999703,
+      "rms_ratio": 1.150642832934829,
+      "wheel_rmse_deg": 0.5023642500219899
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.7069997155099985,
+      "rms_ratio": 1.1106267643853713,
+      "wheel_rmse_deg": 0.4877853923525848
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.2305212396420129,
+      "rms_ratio": 2.0914753653765303,
+      "wheel_rmse_deg": 0.32428930780811893
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.21809109661988432,
+      "rms_ratio": 1.9420314695346406,
+      "wheel_rmse_deg": 0.30651272327749807
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.22334203260258897,
+      "rms_ratio": 2.0808407136723943,
+      "wheel_rmse_deg": 0.3240281686102441
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.7414612960815684,
+      "rms_ratio": 1.521940860320236,
+      "wheel_rmse_deg": 0.5565156767584863
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.7417117198831303,
+      "rms_ratio": 1.5321758160713927,
+      "wheel_rmse_deg": 0.5604842067282927
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.7417239143595751,
+      "rms_ratio": 1.5475082196872445,
+      "wheel_rmse_deg": 0.5668467479806868
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Coulomb",
+      "wheel_corr": 0.8868409648252182,
+      "rms_ratio": 1.151482562794392,
+      "wheel_rmse_deg": 0.30873385952673155
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "Dahl",
+      "wheel_corr": 0.8628313978584169,
+      "rms_ratio": 1.1120692372754297,
+      "wheel_rmse_deg": 0.3267720103380781
+    },
+    {
+      "route": "000001ae",
+      "speed": 0,
+      "friction": "LuGre",
+      "wheel_corr": 0.8813644700241281,
+      "rms_ratio": 1.1611526138786823,
+      "wheel_rmse_deg": 0.3183467311285112
+    }
+  ]
+}

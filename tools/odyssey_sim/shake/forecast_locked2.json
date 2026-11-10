@@ -1,0 +1,92 @@
+{
+  "target": "next highway drive after creation; >45 mph; 20s eligible windows; 5s warmup/1s trim",
+  "locked_before_target_seen": true,
+  "validated": false,
+  "interval_kind": "conditional empirical 95% window/seed range; excludes parameter/model uncertainty",
+  "forecasts": [
+    {
+      "controller": "stock_NNLC",
+      "smoothed_lane_correction": false,
+      "windows_seeds": 100,
+      "metrics": {
+        "crossings_s": {
+          "median": 4.071428571428571,
+          "interval95": [
+            0.0,
+            7.071428571428571
+          ]
+        },
+        "after_crossing": {
+          "median": 0.04454786987496841,
+          "interval95": [
+            0.0,
+            0.3626047980408731
+          ]
+        },
+        "command_rms": {
+          "median": 0.06316865688051343,
+          "interval95": [
+            0.04534642772603106,
+            0.11681458818600238
+          ]
+        },
+        "wheel_rms_deg": {
+          "median": 0.29135959765276265,
+          "interval95": [
+            0.19633663763781373,
+            0.5569643699225248
+          ]
+        },
+        "body_rms": {
+          "median": 0.05939292303423341,
+          "interval95": [
+            0.033488856710790084,
+            0.12291260417575846
+          ]
+        }
+      }
+    },
+    {
+      "controller": "stock_NNLC",
+      "smoothed_lane_correction": true,
+      "windows_seeds": 100,
+      "metrics": {
+        "crossings_s": {
+          "median": 4.535714285714286,
+          "interval95": [
+            0.0,
+            8.116071428571425
+          ]
+        },
+        "after_crossing": {
+          "median": 0.05390515728105956,
+          "interval95": [
+            0.0,
+            0.3389967305855224
+          ]
+        },
+        "command_rms": {
+          "median": 0.06718107119594616,
+          "interval95": [
+            0.04970819762962891,
+            0.120854330657182
+          ]
+        },
+        "wheel_rms_deg": {
+          "median": 0.31835275256280027,
+          "interval95": [
+            0.22089315133028684,
+            0.6030878664687453
+          ]
+        },
+        "body_rms": {
+          "median": 0.06507922480739273,
+          "interval95": [
+            0.0379791705478029,
+            0.13780401116430185
+          ]
+        }
+      }
+    }
+  ]
+}
