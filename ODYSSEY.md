@@ -52,6 +52,7 @@ Steering hardware:
 - Below about 15 mph the EPS gives less at full command: about 15% of that cap under 3 mph, 30% at 3-5 mph, 40-60% from 5 to 15 mph, and all of it from about 17 mph. The same motor puts out a median of 175 and up to 608 units when the driver steers hard by hand under 10 mph, so the hardware has several times more torque than lane keeping may use.
 - At full command the van reaches about 0.7 m/s² at 18-30 mph, 1.2 at 30-45 mph and 1.0-1.7 above 45 mph. comma's fleet table (`opendbc/car/torque_data/params.toml`) lists the Odyssey's maximum at 0.84 m/s², against 1.3-2.2 for Toyotas and 1.9-2.7 for Hyundais. While a curve asks for more than 1 m/s², the command is at 100% for 77% of the time at 10-30 mph, 16% at 30-45 mph and 3-4% above 45 mph.
 - EPS firmware is `39990-THR-A020` (SuperG SH2A, application at 0xC000, 0x74000 bytes). Its lane-keeping torque table has inputs 0, 128, ... 1024 and outputs 0, 2019, 3230, 3980, 4345, 4577, 4721, 4864, 4864, stored six times. Stock and a community-modified image (table x2.0-2.5, identity `39990-THR,A020`), with decode and diff scripts, are in `~/comma-logs/odyssey-eps/` on the Studio. Nothing has been flashed.
+- Nothing points to a fault in this van's steering. Its learned friction (0.145 m/s²) is below comma's fleet value for the Odyssey (0.21) and near Toyota and Hyundai (0.12-0.16). On straight highway it holds its line with a mean command of 0.04-0.05 of max and the wheel about 2° off the sensor's zero, both ordinary for road crown. Self-centring torque is proportional to cornering force, so near straight-ahead every car's wheel stays where friction leaves it; what differs here is that lane-keeping torque below about 3% of max does nothing.
 - Stick-slip friction is much larger: equivalent to 0.29 / 0.20 / 0.14 command at 10 / 20 / 30 m/s.
 - Aggregate steering lag is about 0.87 s.
 - Gain is 1.66 / 2.45 / 3.73 m/s² per unit command at 10 / 20 / 30 m/s, against 1.03 / 2.09 / 2.27 for the public-data Odyssey.
@@ -91,6 +92,7 @@ Analysis tools:
 
 - Ask William what he noticed and where before scoring anything. He feels what the metrics filter out, and a mismatch between his report and a metric is a fault in the metric.
 - Report sideways motion in units he can feel: the push on an 80 kg person in newtons (80 × the typical peak of speed × yaw rate at 0.3-3 Hz, over 5 s) and how many times a second it changes direction. Earlier drives are ±7-9 N at about 0.3 Hz. S5 on US-169 was ±20 N typical, ±40-50 N at worst, 2.7 direction changes a second, with 1.1 m/s³ rms of jerk.
+- William's target (he weighs 75 kg, so forces quoted for 80 kg read 6% high for him): single-digit newtons, under once a second and ideally nearer 0.2 times a second. Small reversals that keep the van straight are welcome as long as he cannot feel them.
 - Map the drive by test arm, push, speed band and what the scorer counted (the 2026-11-09 map is `~/comma-logs/odyssey-evidence/maps/`), so he can match stretches of road to what he felt.
 
 ## Working on the van (pitfalls)
