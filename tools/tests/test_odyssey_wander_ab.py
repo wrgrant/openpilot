@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from tools.odyssey_wander import FS, ab_report, ab_split, stretches
+from tools.odyssey_wander import FS, ab_report, ab_split, shake, stretches
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_MODEL_ARMS
 
 
@@ -37,6 +37,18 @@ def report(d):
 
 
 class TestOdysseyWanderAB(unittest.TestCase):
+  def test_shake_counts_time_with_the_wheel_pressed(self):
+    d = route()
+    arm = (d['t'] // 180).astype(int) % 3
+    amplitude = np.choose(arm, [0.02, 0.05, 0.12])  # the third arm shakes the van at 1 Hz
+    d['body'] = amplitude * np.sin(2 * np.pi * 1.0 * d['t'])
+    d['pressed'] = (arm == 2).astype(float)  # and trips the press sensor the whole time
+    got = shake(d, NNLC_MODEL_ARMS, 180, 25)
+    self.assertEqual([len(got[a]) for a in NNLC_MODEL_ARMS], [2, 2, 2])
+    for name, amp in zip(NNLC_MODEL_ARMS, (0.02, 0.05, 0.12), strict=True):
+      np.testing.assert_allclose(got[name], amp / np.sqrt(2), rtol=0.05)
+    self.assertEqual(ab_split(d, stretches(d, 25, 45), 45, NNLC_MODEL_ARMS, 180, 30.0)[-1][0], 'S3', "wander never scores the shaking arm")
+
   def test_clock_settling_and_autonomous_selection(self):
     d = route()
     d['pressed'][(d['t'] >= 235) & (d['t'] < 240)] = 1

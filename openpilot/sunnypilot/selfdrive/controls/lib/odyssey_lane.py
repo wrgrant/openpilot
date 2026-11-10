@@ -9,8 +9,9 @@ driven yet.
 Lane pose comes from the model's two inner lane lines, fitted over the first 25 m. Model frame: y is positive to the
 van's right (verified on drives 1a7/1aa/1ab: the lane centre moves toward +y with the left blinker on), and openpilot
 curvature is positive for a right turn, so a van right of centre gets a negative (leftward) correction.
-It stays off below 25 mph, during lane changes and with blinkers on, when either inner line is unsure, and when the
-model output is stale; then the model's curvature passes through unchanged.
+The correction is low-passed (SMOOTH_S) so only its slow part reaches the steering.
+It stays off below 25 mph, during lane changes and with blinkers on, and when the model output is stale; then the
+model's curvature passes through unchanged. When either inner line is unsure it fades to zero.
 """
 import math
 import time
@@ -27,6 +28,9 @@ V_MIN = 11.2  # m/s (25 mph)
 FIT_X = 25.0  # m of lane line used for the centre fit
 MIN_PROB = 0.5  # both inner lane lines must be at least this likely
 MAX_MODEL_AGE = 0.2  # s: the model runs at 20 Hz
+SMOOTH_S = 0.5  # s: low-pass on the correction. The lane heading is noisy frame to frame: unsmoothed, the correction
+# carried as much 0.5-3 Hz content as 7-20 s content and doubled the fast swing of the request (drives 1ac/1ad).
+# 0.5 s cuts that to under a third and keeps 95% of the slow part, 0.45 s later.
 MAX_OFFSET, MAX_HEADING = 1.5, 0.1  # m, rad: beyond these the fit is not a lane-keeping situation
 
 
@@ -72,9 +76,13 @@ class LaneCentering:
     """Call once per new modelV2 message. Does nothing while both params are off."""
     if not (self.on or self.ab):
       return
+    mono_s = time.monotonic() if mono_s is None else mono_s
     pose = lane_pose(md)
-    self.delta = 0.0 if pose is None else correction(pose[0], pose[1], v_ego)
-    self.model_mono = time.monotonic() if mono_s is None else mono_s
+    raw = 0.0 if pose is None else correction(pose[0], pose[1], v_ego)
+    dt = mono_s - self.model_mono
+    # after a gap start from the new value; otherwise smooth, and fade out when the lines are lost
+    self.delta = raw if not 0.0 < dt <= MAX_MODEL_AGE else self.delta + (raw - self.delta) * dt / (SMOOTH_S + dt)
+    self.model_mono = mono_s
 
   def apply(self, curvature: float, v_ego: float, lat_active: bool, lane_change: bool, mono_s: float | None = None) -> float:
     """The model's desired curvature plus the correction, or unchanged whenever the correction should not run."""

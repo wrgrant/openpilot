@@ -15,6 +15,8 @@ it reports, in the 7-20 s band:
   PYTHONPATH=$PWD .venv/bin/python tools/odyssey_wander.py ~/comma-logs/<dongle>_<route> [--min-mph 25] [--min-s 45] [--ab]
 
   presses  (--ab only) how often the driver put torque on the wheel, per 10 minutes of openpilot steering
+  shake    (--ab only) body lateral accel swing at 0.5-3 Hz, over all steering time, wheel presses included. Read
+           this first: an arm that shakes the wheel leaves few press-free stretches, so its wander goes unscored
   sway     body lateral accel swing (v x yaw rate, m/s^2 rms). It does not use the lane lines, so it cross-checks
            wander: a change that only makes the van chase the model's lane estimate lowers wander but not sway
 
@@ -35,6 +37,8 @@ import numpy as np
 
 FS = 20.0
 BAND = (1 / 20, 1 / 7)  # Hz: 7-20 s periods
+SHAKE_BAND = (0.5, 3.0)  # Hz: the fast side-to-side shake a driver feels as a jerky wheel
+SHAKE_WINDOW_S, SHAKE_SETTLE_S = 5.0, 5.0
 AB_FLAGS = {"deadband": "SteerDeadbandCompAB", "nnlc": "NnlcAB", "wander": "OdysseyWanderAB", "nnlc_model": "NnlcModelAB",
             "lane": "OdysseyLaneCenterAB"}
 
@@ -82,13 +86,13 @@ def load(route_dir: str) -> dict[str, np.ndarray]:
   return {**{c: data[:, i] for i, c in enumerate(cols)}, "lanes": np.array(lane_rows), "ab_params": ab_params or {}}
 
 
-def bandpass(x: np.ndarray) -> np.ndarray:
+def bandpass(x: np.ndarray, band: tuple[float, float] = BAND) -> np.ndarray:
   """Zero-phase band-pass by FFT mask, after removing the linear trend."""
   n = len(x)
   x = x - np.polyval(np.polyfit(np.arange(n), x, 1), np.arange(n))
   f = np.fft.rfftfreq(n, 1 / FS)
   X = np.fft.rfft(x)
-  X[(f < BAND[0]) | (f > BAND[1])] = 0
+  X[(f < band[0]) | (f > band[1])] = 0
   return np.fft.irfft(X, n)
 
 
@@ -274,6 +278,36 @@ def nudges(d: dict[str, np.ndarray], arms: tuple[str, ...], block_s: float, sett
   return {a: (int(starts[arm == a].sum()), float(ok[arm == a].sum() / FS / 60)) for a in arms}
 
 
+def shake(d: dict[str, np.ndarray], arms: tuple[str, ...], block_s: float, min_mph: float) -> dict[str, list[float]]:
+  """Per arm, one value per A/B block: the median over 5 s windows of the body's lateral accel swing at 0.5-3 Hz
+  (m/s2 rms). Every window where openpilot steers above min_mph with no blinker counts, wheel presses included: a
+  controller that shakes the wheel trips the press sensor, so scoring only press-free stretches hides the arm that
+  shakes (drives 1ac-1ae: S3 and S5 shook the van four times as hard as stock and scored as "too little data")."""
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import ab_arm
+  n = int(SHAKE_WINDOW_S * FS)
+  ok = (d["lat_active"] > 0) & (d["blinker"] == 0) & (d["v"] > min_mph / 2.237) & np.isfinite(d["body"])
+  per_block: dict[tuple[str, int], list[float]] = {}
+  for a in range(0, len(ok) - n, n):
+    t0, t1 = d["t"][a], d["t"][a + n - 1]
+    if ok[a:a + n].all() and t1 - t0 < SHAKE_WINDOW_S + 0.3 and t0 // block_s == t1 // block_s and t0 % block_s >= SHAKE_SETTLE_S:
+      per_block.setdefault((ab_arm(t0, arms, block_s), int(t0 // block_s)), []).append(float(np.std(bandpass(d["body"][a:a + n], SHAKE_BAND))))
+  out: dict[str, list[float]] = {arm: [] for arm in arms}
+  for (arm, _), values in sorted(per_block.items(), key=lambda kv: kv[0][1]):
+    if len(values) >= 3:  # at least 15 s of the block
+      out[arm].append(float(np.median(values)))
+  return out
+
+
+def shake_report(shakes: dict[str, list[float]], arms: tuple[str, ...]) -> None:
+  print("fast shake, 0.5-3 Hz body lateral accel, all steering time including wheel presses (m/s2 rms; 0.035 is this "
+        + "van's normal, and S5 at 0.08-0.11 felt very jerky):")
+  print("  " + ", ".join(f"{a} {np.mean(shakes[a]) if shakes[a] else float('nan'):.3f} ({len(shakes[a])} blocks)" for a in arms))
+  for arm in arms[1:]:
+    delta, ci = block_difference(np.array(shakes[arm]), np.array(shakes[arms[0]]))
+    interval = f"[{ci[0]:+.3f}, {ci[1]:+.3f}]" if ci is not None else "[too few blocks for an interval]"
+    print(f"  {arm} - {arms[0]} shake: {delta:+.3f} {interval} m/s2")
+
+
 def ab_pieces(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arms: tuple[str, ...],
               block_s: float | None = None) -> list[tuple[str, dict, np.ndarray]]:
   settle = 30.0 if block_s and block_s >= 120 else 0.0  # long-block tests skip each block's first 30 s
@@ -293,6 +327,7 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
   arms, block = tests[name]
   pieces: list[tuple[str, dict, np.ndarray]] = []
   pressed = {a: [0, 0.0] for a in arms}
+  shakes: dict[str, list[float]] = {a: [] for a in arms}
   for path, d in zip(paths, routes, strict=True):
     on = {k for k, flag in AB_FLAGS.items() if d["ab_params"].get(flag)}
     label = os.path.basename(os.path.normpath(path))
@@ -318,8 +353,11 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
     for a, (count, minutes) in nudges(d, arms, block, 30.0 if block >= 120 else 0.0, min_mph).items():
       pressed[a][0] += count
       pressed[a][1] += minutes
+    for a, values in shake(d, arms, block, min_mph).items():
+      shakes[a] += values
   print()
   summarize_pieces(pieces, arms, block)
+  shake_report(shakes, arms)
   print("driver hands on the wheel (presses per 10 min of openpilot steering, no blinker): "
         + ", ".join(f"{a} {10 * n / m if m else float('nan'):.1f} ({n} in {m:.0f} min)" for a, (n, m) in pressed.items()))
 

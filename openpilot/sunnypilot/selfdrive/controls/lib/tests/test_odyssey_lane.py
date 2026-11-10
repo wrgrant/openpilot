@@ -67,6 +67,19 @@ class TestOdysseyLane(OpenpilotTestCase):
     self.assertEqual(lc.apply(k, ol.V_MIN - 0.1, True, False, mono_s=10.05), k)  # below 25 mph
     self.assertEqual(lc.apply(k, V, True, False, mono_s=10.0 + ol.MAX_MODEL_AGE + 0.01), k)  # stale model
 
+  def test_correction_is_smoothed(self):
+    lc = lane()
+    lc.update_model(model(), V, mono_s=10.0)
+    target = ol.correction(0.2, 0.0, V)
+    for i in range(1, 11):  # the van is suddenly 0.2 m right of centre, for 0.5 s of model frames
+      lc.update_model(model(centre=-0.2), V, mono_s=10.0 + 0.05 * i)
+    self.assertAlmostEqual(lc.delta / target, 1 - (ol.SMOOTH_S / (ol.SMOOTH_S + 0.05))**10, places=6)
+    self.assertTrue(0.55 < lc.delta / target < 0.7)
+    lc.update_model(model(centre=-0.2, probs=(0.9, 0.4, 0.9, 0.9)), V, mono_s=10.55)  # lines lost: fades, no step
+    self.assertTrue(0.5 < lc.delta / target < 0.65)
+    lc.update_model(model(centre=-0.2), V, mono_s=20.0)  # after a gap it starts from the new value
+    self.assertAlmostEqual(lc.delta, target)
+
   def test_off_does_no_work(self):
     lc = lane(on=False)
     lc.update_model(None, V, mono_s=10.0)  # would raise if it touched the model message
