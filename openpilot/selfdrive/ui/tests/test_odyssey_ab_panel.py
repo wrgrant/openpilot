@@ -101,6 +101,33 @@ class TestOdysseyPanel(OpenpilotTestCase):
         for i in range(602):
           worker.update(i*.01, cs, md, True, 0.)
         self.assertTrue(worker.status['good'])
+        worker.close()
+        for name, reason in (('wait', 'waiting for a straight'), ('lead-in', 'lead-in'), ('pulse', 'pulsing'),
+                             ('tail', 'tail'), ('recover', 're-centring'), ('paused', "you're steering"), ('done', 'done')):
+          params.put('OdysseyABExperiment', 'pulse', block=True)
+          params.put('OdysseyABStatus', json.dumps({'experiment': 'pulse', 'mono_s': time.monotonic(),
+                     'state': name, 'reason': reason, 'finished': 21, 'total': 336, 'band': '45-70',
+                     'last_result': '5% 0.2s: wheel +0.30°', 'paused': name == 'paused'}), block=True)
+          panel.last_read = 0
+          rl.begin_texture_mode(texture)
+          rl.clear_background(rl.Color(38, 44, 52, 255))
+          panel.render_in(rl.Rectangle(0, 0, 2160, 1080))
+          rl.end_texture_mode()
+          image = rl.load_image_from_texture(texture.texture)
+          Image.frombytes('RGBA', (2160, 1080), image.to_bytes(2160*1080*4)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(output / f'pulse_{name}.png')
+          rl.unload_image(image)
+          self.assertFalse(panel.broken)
+        params.put_bool('OdysseyPulsePaused', False, block=True)
+        panel._handle_mouse_release(MousePos(100, 400))
+        time.sleep(.05)
+        self.assertTrue(params.get_bool('OdysseyPulsePaused'))
+        from openpilot.selfdrive.ui.sunnypilot.layouts.settings.vehicle.brands.honda import HondaSettings
+        params.put_bool('OdysseyPulsePaused', False, block=True)
+        HondaSettings._select_experiment('pulse')
+        time.sleep(.05)
+        self.assertFalse(params.get('OdysseyABArm'), 'pulse has no arms')
+        self.assertTrue(params.get_bool('OdysseyPulsePaused'))
+
     finally:
       gui_app.close()
 

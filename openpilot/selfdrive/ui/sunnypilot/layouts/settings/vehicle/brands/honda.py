@@ -41,16 +41,29 @@ class HondaSettings(BrandSettings):
 
     names = ["", *EXPERIMENTS]
     self.ab_experiment = multiple_button_item_sp("Odyssey A/B experiment", "Select while parked; lowspeed also needs SteerLowSpeedAngle, models need NNLC.",
-                                               ["None", *EXPERIMENTS], callback=lambda i: self._select_experiment(names[i]), inline=False)
+                                               ["None", *(self.LABELS.get(e, e) for e in EXPERIMENTS)], button_width=220,
+                                               callback=lambda i: self._select_experiment(names[i]), inline=False)  # six buttons must fit the page
     self.ab_manual = toggle_item_sp("Driver selects A/B arm", initial_state=ui_state.params.get_bool("OdysseyABManual"),
                                    callback=lambda v: ui_state.params.put_bool("OdysseyABManual", v))
     self.ab_reset = button_item_sp("Odyssey A/B totals", "Reset", callback=reset_totals)
-    self.items = [self.enforce_stock_longitudinal, self.ab_experiment, self.ab_manual, self.ab_reset]
+    self.pulse_reset = button_item_sp("Pulse shots", "Reset", callback=self._reset_pulse)
+    self.items = [self.enforce_stock_longitudinal, self.ab_experiment, self.ab_manual, self.ab_reset, self.pulse_reset]
+
+  LABELS = {"nnlc_model": "model", "lowspeed": "low speed"}
+
+  @staticmethod
+  def _reset_pulse():
+    def confirmed(result):
+      if result == DialogResult.CONFIRM:
+        ui_state.params.put_bool("OdysseyPulseReset", True)
+    gui_app.push_widget(ConfirmDialog("Reset completed pulse shots in both speed bands?", "Reset", callback=confirmed))
 
   @staticmethod
   def _select_experiment(name):
-    ui_state.params.put("OdysseyABArm", EXPERIMENTS[name][0] if name else "")
+    ui_state.params.put("OdysseyABArm", EXPERIMENTS[name][0] if name and EXPERIMENTS[name] else "")
     ui_state.params.put("OdysseyABExperiment", name)
+    if name == "pulse":
+      ui_state.params.put_bool("OdysseyPulsePaused", True)
 
 
   def _on_enable_enforce_stock_longitudinal(self, state: bool):
@@ -71,7 +84,7 @@ class HondaSettings(BrandSettings):
       ui_state.params.put_bool("HondaEnforceStockLongitudinal", False)
 
   def update_settings(self):
-    for item in (self.ab_experiment, self.ab_manual, self.ab_reset):
+    for item in (self.ab_experiment, self.ab_manual, self.ab_reset, self.pulse_reset):
       item.action_item.set_enabled(ui_state.is_offroad())
     names = ["", *EXPERIMENTS]
     current = ui_state.params.get("OdysseyABExperiment") or ""

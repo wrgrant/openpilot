@@ -5,6 +5,7 @@ from numbers import Number
 
 from openpilot.cereal import log
 from opendbc.car.structs import car
+from opendbc.car.honda.values import CAR as HONDA_CAR
 import openpilot.cereal.messaging as messaging
 from openpilot.common.constants import CV
 from openpilot.common.params import Params
@@ -24,6 +25,7 @@ from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LiveAB
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import PulseRuntime
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane import LaneCentering
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_steer import OdysseySteer
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
@@ -76,6 +78,12 @@ class Controls(ControlsExt):
     # Odyssey add-ons on the torque command, whichever torque controller class runs
     self.odyssey_steer = OdysseySteer() if self.CP.lateralTuning.which() == 'torque' else None
     self.odyssey_ab = LiveAB(self.params)
+    self.odyssey_pulse = None
+    if self.odyssey_steer is not None and self.CP.carFingerprint == HONDA_CAR.HONDA_ODYSSEY:
+      try:
+        self.odyssey_pulse = PulseRuntime(self.params)
+      except Exception:
+        cloudlog.exception("odyssey_pulse initialization disabled")
     self.odyssey_lane = LaneCentering()  # Odyssey lane-centring correction on the model's curvature (off by default)
 
   def update(self):
@@ -170,9 +178,19 @@ class Controls(ControlsExt):
                                        getattr(lac_log, "desiredLateralAccel", float("nan")),
                                        getattr(lac_log, "actualLateralAccel", float("nan")))
     actuators.torque = float(steer)
-    if self.sm.valid['lateralManeuverPlan'] and CC.latActive:
-      # steering characterization: a short torque pulse on top of lane keeping (tools/lateral_maneuvers/odyssey_suite.py)
-      actuators.torque = float(min(max(steer + self.sm["lateralManeuverPlan"].torqueOffset, -1.0), 1.0))
+    if self.odyssey_pulse is not None:
+      try:
+        # the test keeps time on the message clock of the service that paces this loop, so a replay runs it as the road did
+        now = self.sm.logMonoTime['selfdriveState'] * 1e-9
+        actuators.torque = float(self.odyssey_pulse.update(
+          now, steer, CS, model_v2, CC.latActive, self.sm.updated['modelV2'],
+          self.sm.all_checks(['carState', 'modelV2', 'carOutput']) and not self.sm.valid['lateralManeuverPlan'],
+          now - self.sm.logMonoTime['modelV2'] * 1e-9, self.sm['carOutput'].actuatorsOutput.torque))
+        if self.odyssey_pulse.controller.in_shot:
+          self.LaC.reset()  # keep computing feedback, discard integral accumulation during experiment ownership
+      except Exception:
+        self.odyssey_pulse = None  # last-resort containment: faults in the experiment never stop lane keeping
+        actuators.torque = float(steer)
     if self.CP.steerControlType == car.CarParams.SteerControlType.curvature:
       actuators.curvature = float(lateral_output)
     else:

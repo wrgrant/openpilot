@@ -19,6 +19,9 @@ ROWS_Y, ROW_H, BAR_W = 250, 98, 280
 
 def next_arm(params):
   e = params.get("OdysseyABExperiment") or ""
+  if e == "pulse":
+    params.put_bool("OdysseyPulsePaused", not params.get_bool("OdysseyPulsePaused"))
+    return
   if e not in EXPERIMENTS or not params.get_bool("OdysseyABManual"):
     return
   arms = EXPERIMENTS[e]
@@ -35,7 +38,7 @@ def reset_totals():
 
 
 def panel_rect(content: rl.Rectangle, experiment: str) -> rl.Rectangle:
-  rows = len(EXPERIMENTS.get(experiment, ()))
+  rows = 2 if experiment == "pulse" else len(EXPERIMENTS.get(experiment, ()))
   return rl.Rectangle(content.x + PANEL_X, content.y + PANEL_Y, PANEL_W, ROWS_Y + rows * ROW_H + 2 * PAD)
 
 
@@ -89,6 +92,19 @@ class OdysseyABPanel(Widget):
     def text(s, dx, dy, size, color=rl.WHITE):
       rl.draw_text_ex(self.font, s, rl.Vector2(x + dx, y + dy), size, 0, color)
 
+    if self.e == "pulse":
+      live = self.status.get("experiment") == "pulse" and time.monotonic() - self.status.get("mono_s", 0) < 2
+      status = self.status if live else {}
+      text("pulse test • tap to pause / resume", 0, 0, HEADER, rl.LIGHTGRAY)
+      state = {"wait": "waiting", "recover": "re-centring"}.get(status.get("state"), str(status.get("state", "waiting")))
+      headline = "paused" if status.get("paused") else state
+      reason = str(status.get("reason", "waiting for controls"))
+      text(headline, 0, 50, 86)
+      if reason != headline:  # say why only when it adds something
+        text(reason, 0, 170, 36, rl.YELLOW)
+      text(f"{status.get('finished', 0)} / {status.get('total', 336)} shots • {status.get('band', '')} mph", 0, 250, 38)
+      text(str(status.get("last_result", "")), 0, 330, 30)
+      return
     text(f"{self.e} test" + ("  •  tap for next" if self.manual else "  •  by the clock"), 0, 0, HEADER, rl.LIGHTGRAY)
     live = self.status.get("experiment") == self.e and time.monotonic() - self.status.get("mono_s", 0) < 2
     good = bool(live and self.status.get("good"))

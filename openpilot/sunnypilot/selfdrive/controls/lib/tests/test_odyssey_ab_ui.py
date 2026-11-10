@@ -8,6 +8,9 @@ from openpilot.sunnypilot.selfdrive.controls.lib import odyssey_ab as ab
 class TestOdysseyAB(unittest.TestCase):
   def test_selection(self):
     for e, arms in ab.EXPERIMENTS.items():
+      if e == 'pulse':
+        self.assertEqual(ab.selection(e, 'bad', True, 99), 'off')
+        continue
       for arm in arms:
         self.assertEqual(ab.selection(e, arm, True, 999), arm)
       self.assertEqual(ab.selection(e, 'bad', True, 99), arms[0])

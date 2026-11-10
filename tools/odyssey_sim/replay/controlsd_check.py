@@ -11,6 +11,10 @@ added, and fails if controlsd dies or puts out a non-finite command. Then it pri
 command compares with what the van logged. The replay is open loop: the recorded van does not respond to the new
 command, so the comparison shows direction and size, not how the van would drive.
 Use OdysseyABExperiment, OdysseyABManual and OdysseyABArm to force one arm, or --all-manual for every safe arm.
+--pulse checks the pulse test (odyssey_pulse.py) on a straight minute: with the test selected but paused the output
+must equal the output with it off, and with it running there must be shots (stretches of exactly zero command and
+exact pulse heights). The test keeps time on the message clock, so the replay runs it as the road did; the recorded
+van does not react to the pulses, so this proves the wiring and the commands, not the van's response.
 """
 import argparse
 import json
@@ -64,13 +68,37 @@ def logged(lr: list) -> dict[str, np.ndarray]:
   return {"torque": a[:, 0], "v": a[:, 1], "active": a[:, 2] > 0}
 
 
+def pulse_check(lr: list) -> bool:
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import MAX_TORQUE, plan
+  off = replay(lr, BASE)
+  paused = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": True})
+  run = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": False})
+  n = min(len(off["torque"]), len(paused["torque"]), len(run["torque"]))
+  same = bool(np.array_equal(off["torque"][:n], paused["torque"][:n]))
+  tq = run["torque"][:n]
+  zero = np.flatnonzero(tq == 0.0)
+  shots = [r for r in np.split(zero, np.where(np.diff(zero) > 1)[0] + 1) if len(r) >= 20] if len(zero) else []
+  changed = np.flatnonzero(tq != off["torque"][:n])
+  # the log stores the command as a 32-bit float: compare against the plan's heights at that precision, not rounded
+  heights = sorted({abs(float(x)) for x in tq[changed]} & {float(np.float32(c.height)) for _, c in plan() if c.height})
+  limit = max(MAX_TORQUE, float(np.max(np.abs(off["torque"][:n]))))
+  bounded = bool(np.isfinite(tq).all()) and (not len(changed) or float(np.max(np.abs(tq[changed]))) <= limit)
+  print(f"pulse off: {n} frames. Selected but paused: output identical to off: {same}")
+  print(f"running: {len(shots)} stretches of exactly zero command, pulse heights sent {[round(h, 3) for h in heights]}, {len(changed)} frames differ from off, "
+        + f"largest step between frames {np.max(np.abs(np.diff(tq))):.3f} (off: {np.max(np.abs(np.diff(off['torque'][:n]))):.3f})")
+  return same and bounded and len(shots) > 0 and len(heights) > 0 and bool(run["torque_controller"][run["active"]].all())
+
+
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("rlog")
   parser.add_argument("params", nargs="?", default="{}")
   parser.add_argument("--all-manual", action="store_true", help="replay every safe experiment/arm in manual mode")
+  parser.add_argument("--pulse", action="store_true", help="check the pulse test: paused equals off, running produces shots")
   args = parser.parse_args()
   lr = list(LogReader(args.rlog))
+  if args.pulse:
+    sys.exit(0 if pulse_check(lr) else "FAILED: the pulse test changed the output while paused, sent no shots, or left its bounds")
   params = json.loads(args.params)
   log = logged(lr)
   runs = {"as driven": replay(lr, BASE), "with params": replay(lr, {**BASE, **params})}

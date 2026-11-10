@@ -21,12 +21,6 @@ TIMER = 2.0 # sec stable conditions before starting maneuver
 class Maneuver(_Maneuver):
   _baseline_curvature: float = 0.0
   follow_lane: bool = False  # add the maneuver to the model's live curvature instead of the curvature at the start
-  torque: bool = False  # the actions are steering torque (fraction of max) added to lane keeping, not lateral accel
-
-  def hold_correction(self, steer_now: float) -> float:
-    """Torque to add so the command ignores lane keeping's own changes for a moment (see odyssey_suite)."""
-    return 0.0
-
   def get_accel(self, v_ego: float, lat_active: bool, curvature: float, roll: float) -> float:
     self._run_completed = False
     # only start maneuver on straight, flat roads
@@ -114,15 +108,8 @@ def main():
   sm = messaging.SubMaster(['carState', 'carControl', 'controlsState', 'selfdriveState', 'modelV2'], poll='modelV2')
   pm = messaging.PubMaster(['lateralManeuverPlan', 'alertDebug'])
 
-  suite = params.get("LateralManeuverSuite", return_default=True)
-  if suite == "odyssey":
-    from openpilot.tools.lateral_maneuvers.odyssey_suite import maneuvers as odyssey_maneuvers
-    # finished maneuvers are remembered across drives, so the suite can be done a piece at a time
-    done = set(params.get("LateralManeuverDone") or [])
-    maneuvers = iter([m for m in odyssey_maneuvers() if m.description not in done])
-  else:
-    done = None
-    maneuvers = iter(MANEUVERS)
+  # Characterization is now the 100 Hz pulse experiment; this daemon retains stock curvature maneuvers only.
+  maneuvers = iter([] if params.get("LateralManeuverSuite") == "odyssey" else MANEUVERS)
   maneuver = None
   complete_cnt = 0
   aborted_cnt = 0
@@ -172,8 +159,6 @@ def main():
         if maneuver.description.startswith('sine'):
           freq = maneuver.description.split()[1]
           alert_msg.alertDebug.alertText1 = f'Active sine {freq} {max(action_remaining, 0):.1f}s'
-        elif maneuver.torque:
-          alert_msg.alertDebug.alertText1 = f'Active torque pulses {max(action_remaining, 0):.1f}s'
         else:
           alert_msg.alertDebug.alertText1 = f'Active {accel:+.1f}m/s² {max(action_remaining, 0):.1f}s'
         alert_msg.alertDebug.alertText2 = maneuver.description
@@ -193,9 +178,6 @@ def main():
         alert_msg.alertDebug.alertText2 = maneuver.description
     else:
       alert_msg.alertDebug.alertText1 = 'Maneuvers Finished'
-      if done:
-        done = set()
-        params.remove("LateralManeuverDone")  # the next session starts the suite over
 
     # prevent flickering text
     setup = ('Set speed', 'Starting', 'Waiting')
@@ -213,19 +195,10 @@ def main():
     plan_send.valid = maneuver is not None and maneuver.active and complete_cnt == 0
     if plan_send.valid:
       base = sm['modelV2'].action.desiredCurvature if maneuver.follow_lane else maneuver._baseline_curvature
-      if maneuver.torque:
-        plan_send.lateralManeuverPlan.desiredCurvature = base
-        lcs = sm['controlsState'].lateralControlState
-        steer_now = lcs.torqueState.output if lcs.which() == 'torqueState' else 0.0  # lane keeping's torque, before the offset
-        plan_send.lateralManeuverPlan.torqueOffset = accel + maneuver.hold_correction(steer_now)
-      else:
-        plan_send.lateralManeuverPlan.desiredCurvature = base + accel / max(v_ego, MIN_SPEED) ** 2
+      plan_send.lateralManeuverPlan.desiredCurvature = base + accel / max(v_ego, MIN_SPEED) ** 2
     pm.send('lateralManeuverPlan', plan_send)
 
     if maneuver is not None and maneuver.finished and complete_cnt == 0:
-      if done is not None:
-        done.add(maneuver.description)
-        params.put("LateralManeuverDone", sorted(done))
       maneuver = None
 
 
