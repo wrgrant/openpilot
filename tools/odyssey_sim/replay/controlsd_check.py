@@ -10,9 +10,9 @@ It replays the segment twice, once with the recorded drive's own settings (NNLC 
 added, and fails if controlsd dies or puts out a non-finite command. Then it prints, by speed band, how the torque
 command compares with what the van logged. The replay is open loop: the recorded van does not respond to the new
 command, so the comparison shows direction and size, not how the van would drive.
-A/B params switch arms on this machine's clock; to check one arm, use its always-on param (OdysseyLaneCenter,
-NnlcModelOverride).
+Use OdysseyABExperiment, OdysseyABManual and OdysseyABArm to force one arm, or --all-manual for every safe arm.
 """
+import argparse
 import json
 import sys
 
@@ -65,10 +65,22 @@ def logged(lr: list) -> dict[str, np.ndarray]:
 
 
 def main():
-  lr = list(LogReader(sys.argv[1]))
-  params = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument("rlog")
+  parser.add_argument("params", nargs="?", default="{}")
+  parser.add_argument("--all-manual", action="store_true", help="replay every safe experiment/arm in manual mode")
+  args = parser.parse_args()
+  lr = list(LogReader(args.rlog))
+  params = json.loads(args.params)
   log = logged(lr)
   runs = {"as driven": replay(lr, BASE), "with params": replay(lr, {**BASE, **params})}
+  if args.all_manual:
+    from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS
+    for experiment, arms in EXPERIMENTS.items():
+      for arm in arms:
+        runs[f"{experiment}/{arm}"] = replay(lr, {**BASE, **params, "OdysseyABExperiment": experiment,
+                                                "OdysseyABManual": True, "OdysseyABArm": arm,
+                                                "SteerLowSpeedAngle": True})
   n = min(len(log["torque"]), *(len(r["torque"]) for r in runs.values()))
   failed = False
   for name, r in runs.items():

@@ -19,7 +19,7 @@ import time
 import numpy as np
 
 from openpilot.common.params import Params
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LANE_ARMS, WANDER_BLOCK_S, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LANE_ARMS, WANDER_BLOCK_S, runtime_arm, manual_experiment, clock_enabled
 
 K_OFFSET = 0.3  # m/s² of lateral accel per metre off the lane centre
 K_HEADING = 1.2  # m/s² per m/s of sideways drift (speed × heading)
@@ -65,16 +65,16 @@ class LaneCentering:
     self.ab = p.get_bool("OdysseyLaneCenterAB")
     self.delta = 0.0  # m/s², from the latest model frame
     self.model_mono = -math.inf
-    if self.on or self.ab:
+    if self.on or self.ab or p.get("OdysseyABExperiment") == "lane":
       # numpy's first polyfit takes about 60 ms on the comma; pay that here, not in the 100 Hz loop
       np.polynomial.polynomial.polyfit(np.arange(8.0), np.zeros(8), 3)
 
   def active_arm(self, mono_s: float) -> bool:
-    return ab_arm(mono_s, LANE_ARMS, WANDER_BLOCK_S) == "on" if self.ab else self.on
+    return runtime_arm("lane", mono_s, LANE_ARMS, WANDER_BLOCK_S) == "on" if clock_enabled("lane", self.ab) or manual_experiment("lane") else self.on
 
   def update_model(self, md, v_ego: float, mono_s: float | None = None) -> None:
     """Call once per new modelV2 message. Does nothing while both params are off."""
-    if not (self.on or self.ab):
+    if not (self.on or self.ab or manual_experiment("lane") or clock_enabled("lane", False)):
       return
     mono_s = time.monotonic() if mono_s is None else mono_s
     pose = lane_pose(md)
@@ -87,7 +87,7 @@ class LaneCentering:
   def apply(self, curvature: float, v_ego: float, lat_active: bool, lane_change: bool, mono_s: float | None = None) -> float:
     """The model's desired curvature plus the correction, or unchanged whenever the correction should not run."""
     mono_s = time.monotonic() if mono_s is None else mono_s
-    if (not (self.on or self.ab) or not lat_active or lane_change or not v_ego >= V_MIN
+    if (not (self.on or self.ab or manual_experiment("lane") or clock_enabled("lane", False)) or not lat_active or lane_change or not v_ego >= V_MIN
         or mono_s - self.model_mono > MAX_MODEL_AGE or not math.isfinite(curvature) or not self.active_arm(mono_s)):
       return curvature
     return curvature + self.delta / (v_ego * v_ego)

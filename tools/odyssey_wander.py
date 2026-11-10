@@ -46,7 +46,10 @@ AB_FLAGS = {"deadband": "SteerDeadbandCompAB", "nnlc": "NnlcAB", "wander": "Odys
 def load(route_dir: str) -> dict[str, np.ndarray]:
   from openpilot.tools.lib.logreader import LogReader
   cols = ("t", "seg", "v", "lat_active", "pressed", "blinker", "des_la", "act_la", "l_y", "r_y", "l_p", "r_p", "body")
-  rows, lane_rows = [], []
+  rows, lane_rows, records = [], [], []
+  gps = (np.nan, np.nan, np.nan)
+  lane_change = False
+  extras = []
   ab_params: dict[str, bool] | None = None
   segs = sorted(glob.glob(os.path.join(route_dir, "*--*")), key=lambda d: int(d.rsplit("--", 1)[1]))
   for d in segs:
@@ -58,7 +61,21 @@ def load(route_dir: str) -> dict[str, np.ndarray]:
     last_t = -1.0
     for m in sorted(LogReader(os.path.join(d, "rlog.zst")), key=lambda m: m.logMonoTime):
       w = m.which()
-      if w == "initData" and ab_params is None:
+      if w == "logMessage":
+        from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import parse_record
+        record = parse_record(m.logMessage)
+        if record is not None:
+          records.append((record.get("mono_s", m.logMonoTime / 1e9), record))
+      elif w == "gpsLocation" and m.gpsLocation.hasFix:
+        g = m.gpsLocation
+        gps = (g.latitude, g.longitude, g.bearingDeg)
+      elif w == "modelV2":
+        lane_change = str(m.modelV2.meta.laneChangeState) != "off"
+        if len(m.modelV2.laneLines) == 4:
+          lanes = np.array([m.modelV2.laneLines[i].y for i in (1, 2)])
+          st.update(l_y=m.modelV2.laneLines[1].y[0], r_y=m.modelV2.laneLines[2].y[0],
+                    l_p=m.modelV2.laneLineProbs[1], r_p=m.modelV2.laneLineProbs[2])
+      elif w == "initData" and ab_params is None:
         on = {e.key for e in m.initData.params.entries if e.value == b"1"}
         ab_params = {flag: flag in on for flag in AB_FLAGS.values()}
       elif w == "carState":
@@ -70,6 +87,7 @@ def load(route_dir: str) -> dict[str, np.ndarray]:
           st["t"] = last_t = t
           rows.append([st[c] for c in cols])
           lane_rows.append(lanes)
+          extras.append((*gps, lane_change))
       elif w == "carControl":
         st["lat_active"] = float(m.carControl.latActive)
         angular = m.carControl.angularVelocity
@@ -83,8 +101,42 @@ def load(route_dir: str) -> dict[str, np.ndarray]:
         st.update(l_y=m.modelV2.laneLines[1].y[0], r_y=m.modelV2.laneLines[2].y[0],
                   l_p=m.modelV2.laneLineProbs[1], r_p=m.modelV2.laneLineProbs[2])
   data = np.array(rows, dtype=float)
-  return {**{c: data[:, i] for i, c in enumerate(cols)}, "lanes": np.array(lane_rows), "ab_params": ab_params or {}}
+  return {**{c: data[:, i] for i, c in enumerate(cols)}, "lanes": np.array(lane_rows), "ab_params": ab_params or {},
+          "records": records, **{k: np.array(extras)[:, i] for i, k in enumerate(("latitude", "longitude", "heading", "lane_change"))}}
 
+
+
+def logged_arm(d, t, arms, block_s=60.):
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS, ab_arm
+  names = [e for e, a in EXPERIMENTS.items() if tuple(arms) == a or (e == "nnlc_model" and tuple(arms) == ("stock", "S3", "S5"))]
+  for when, record in reversed(d.get("records", [])):
+    if when <= t:
+      if record["experiment"] in names:
+        return record["arm"]
+      break
+  return ab_arm(t, arms, block_s)
+
+
+def good_frames(d, experiment="lane", arms=("off", "on"), block_s=180.):
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import good_data
+  result, switched, pressed, last_arm, last_t = [], -1e9, None, None, -1e9
+  changes = d.get("lane_change", np.zeros(len(d["t"])))
+  for i, t in enumerate(d["t"]):
+    arm = logged_arm(d, t, arms, block_s)
+    if arm != last_arm or t-last_t > .2:
+      switched, last_arm = t, arm
+    pressed = (t if pressed is None else pressed) if d["pressed"][i] else None
+    result.append(good_data(experiment, active=bool(d["lat_active"][i]), speed=d["v"][i], blinker=bool(d["blinker"][i]),
+                            lane_change=bool(changes[i]), since_switch=t-switched,
+                            pressed_s=t-pressed if pressed is not None else 0., lane_probs=(d["l_p"][i], d["r_p"][i]),
+                            desired_accel=d["des_la"][i]))
+    # New logs carry the live decision, including the exact switch and press history.
+    latest = next((r for when, r in reversed(d.get("records", [])) if when <= t), None)
+    if latest is not None:
+      result[-1] = ((latest["good"], latest["reason"], latest["kind"]) if latest["experiment"] == experiment
+                    else (False, "experiment inactive", result[-1][2]))
+    last_t = t
+  return result
 
 def bandpass(x: np.ndarray, band: tuple[float, float] = BAND) -> np.ndarray:
   """Zero-phase band-pass by FFT mask, after removing the linear trend."""
@@ -106,7 +158,10 @@ def peak_period(x: np.ndarray) -> float:
 
 
 def stretches(d: dict[str, np.ndarray], min_mph: float, min_s: float) -> list[np.ndarray]:
-  ok = (d["lat_active"] > 0) & (d["pressed"] == 0) & (d["blinker"] == 0) & (d["v"] > min_mph / 2.237)
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS
+  experiment = d.get("_experiment", "lane")
+  arms = EXPERIMENTS.get(experiment, ("off", "on"))
+  ok = np.array([g[0] for g in good_frames(d, experiment, arms, 60 if experiment in ("bump", "lowspeed") else 180)]) & (d["v"] > min_mph / 2.237)
   idx = np.where(ok)[0]
   if not len(idx):
     return []
@@ -136,16 +191,17 @@ def ab_split(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, arm
              block_s: float | None = None, settle_s: float = 0.0) -> list[tuple[str, np.ndarray]]:
   """Cut each stretch where the A/B test switches arm, dropping the first settle_s of each block; keep pieces of at
   least min_s."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S, ab_arm
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S
   block_s = AB_BLOCK_S if block_s is None else block_s
   out = []
   for r in runs:
-    r = r[(d["t"][r] % block_s) >= settle_s]
+    if not d.get("records"):
+      r = r[(d["t"][r] % block_s) >= settle_s]
     for rr in np.split(r, np.where(np.diff(r) > 1)[0] + 1) if len(r) else []:
-      arm = np.array([ab_arm(t, arms, block_s) for t in d["t"][rr]])
+      arm = np.array([logged_arm(d, t, arms, block_s) for t in d["t"][rr]])
       for piece in np.split(rr, np.where(arm[1:] != arm[:-1])[0] + 1):
         if len(piece) >= min_s * FS:
-          out.append((ab_arm(d["t"][piece[0]], arms, block_s), piece))
+          out.append((logged_arm(d, d["t"][piece[0]], arms, block_s), piece))
   return out
 
 
@@ -269,12 +325,11 @@ def summarize_pieces(pieces: list[tuple[str, dict, np.ndarray]], arms: tuple[str
 def nudges(d: dict[str, np.ndarray], arms: tuple[str, ...], block_s: float, settle_s: float, min_mph: float) -> dict[str, tuple[int, float]]:
   """Per arm: how often the driver put torque on the wheel while openpilot was steering with no blinker above min_mph,
   and the minutes that covers. A press counts once: touches less than 2 s apart are one press."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import ab_arm
   ok = (d["lat_active"] > 0) & (d["blinker"] == 0) & (d["v"] > min_mph / 2.237) & ((d["t"] % block_s) >= settle_s)
   on = d["pressed"] > 0
   recent = np.convolve(on, np.ones(int(2 * FS)), mode="full")[:len(on)] - on  # presses in the 2 s before each frame
   starts = ok & on & (recent == 0)
-  arm = np.array([ab_arm(t, arms, block_s) for t in d["t"]])
+  arm = np.array([logged_arm(d, t, arms, block_s) for t in d["t"]])
   return {a: (int(starts[arm == a].sum()), float(ok[arm == a].sum() / FS / 60)) for a in arms}
 
 
@@ -283,14 +338,13 @@ def shake(d: dict[str, np.ndarray], arms: tuple[str, ...], block_s: float, min_m
   (m/s2 rms). Every window where openpilot steers above min_mph with no blinker counts, wheel presses included: a
   controller that shakes the wheel trips the press sensor, so scoring only press-free stretches hides the arm that
   shakes (drives 1ac-1ae: S3 and S5 shook the van four times as hard as stock and scored as "too little data")."""
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import ab_arm
   n = int(SHAKE_WINDOW_S * FS)
   ok = (d["lat_active"] > 0) & (d["blinker"] == 0) & (d["v"] > min_mph / 2.237) & np.isfinite(d["body"])
   per_block: dict[tuple[str, int], list[float]] = {}
   for a in range(0, len(ok) - n, n):
     t0, t1 = d["t"][a], d["t"][a + n - 1]
     if ok[a:a + n].all() and t1 - t0 < SHAKE_WINDOW_S + 0.3 and t0 // block_s == t1 // block_s and t0 % block_s >= SHAKE_SETTLE_S:
-      per_block.setdefault((ab_arm(t0, arms, block_s), int(t0 // block_s)), []).append(float(np.std(bandpass(d["body"][a:a + n], SHAKE_BAND))))
+      per_block.setdefault((logged_arm(d, t0, arms, block_s), int(t0 // block_s)), []).append(float(np.std(bandpass(d["body"][a:a + n], SHAKE_BAND))))
   out: dict[str, list[float]] = {arm: [] for arm in arms}
   for (arm, _), values in sorted(per_block.items(), key=lambda kv: kv[0][1]):
     if len(values) >= 3:  # at least 15 s of the block
@@ -330,10 +384,12 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
   shakes: dict[str, list[float]] = {a: [] for a in arms}
   for path, d in zip(paths, routes, strict=True):
     on = {k for k, flag in AB_FLAGS.items() if d["ab_params"].get(flag)}
+    on.update("deadband" if r["experiment"] == "bump" else r["experiment"] for _, r in d.get("records", []) if r["experiment"])
     label = os.path.basename(os.path.normpath(path))
     if name not in on and not force:
       print(f"{label}: skipped, {AB_FLAGS[name]} was not on (on: {', '.join(sorted(on)) or 'none'})")
       continue
+    d["_experiment"] = "bump" if name == "deadband" else name if name in ("lane", "nnlc_model") else "bump"
     got = ab_pieces(d, stretches(d, min_mph, min_s), min_s, arms, block)
     note = "" if name in on else " (forced: a null test, the arms are only time blocks)"
     if name == "nnlc_model" and "lane" in on:
@@ -369,9 +425,16 @@ def main():
   ap.add_argument("--min-s", type=float, default=45)
   ap.add_argument("--ab", choices=("deadband", "nnlc", "wander", "nnlc_model", "lane"),
                   help="compare the arms of an A/B test, pooled over the given drives")
+  ap.add_argument("--road-matched", action="store_true", help="pair push by 50 m GPS cell and heading")
   ap.add_argument("--force", action="store_true", help="score drives where the A/B test was not on, as a null test")
   args = ap.parse_args()
 
+  if args.road_matched:
+    from tools.odyssey_drive_map import points_for, road_matched
+    experiment = "bump" if args.ab == "deadband" else args.ab or "lane"
+    points = [p for route in args.route_dir for p in points_for(Path(route), experiment)]
+    print(json.dumps(road_matched(points), indent=2))
+    return
   routes = [load(p) for p in args.route_dir]
   if args.ab:
     return ab_report_routes(args.route_dir, routes, args.ab, args.min_mph, args.min_s, args.force)

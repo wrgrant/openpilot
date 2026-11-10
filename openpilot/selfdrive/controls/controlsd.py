@@ -23,6 +23,7 @@ from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LiveAB
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane import LaneCentering
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_steer import OdysseySteer
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
@@ -74,6 +75,7 @@ class Controls(ControlsExt):
     self.LaC = ControlsExt.initialize_lateral_control(self, self.LaC, self.CI, DT_CTRL)
     # Odyssey add-ons on the torque command, whichever torque controller class runs
     self.odyssey_steer = OdysseySteer() if self.CP.lateralTuning.which() == 'torque' else None
+    self.odyssey_ab = LiveAB(self.params)
     self.odyssey_lane = LaneCentering()  # Odyssey lane-centring correction on the model's curvature (off by default)
 
   def update(self):
@@ -142,6 +144,8 @@ class Controls(ControlsExt):
     # accel PID loop
     pid_accel_limits = self.CI.get_pid_accel_limits(self.CP, self.CP_SP, CS.vEgo, CS.vCruise * CV.KPH_TO_MS)
     actuators.accel = float(self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits))
+
+    self.odyssey_ab.update(time.monotonic(), CS, model_v2, CC.latActive, model_v2.action.desiredCurvature * CS.vEgo**2)
 
     # Steering PID loop and lateral MPC
     # Reset desired curvature to current to avoid violating the limits on engage

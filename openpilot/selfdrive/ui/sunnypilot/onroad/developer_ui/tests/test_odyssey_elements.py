@@ -1,3 +1,4 @@
+import unittest
 from types import SimpleNamespace as NS
 
 from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui.elements import CurveSpeedElement, SteeringTorquePercentElement
@@ -15,7 +16,7 @@ def sm_for(v_ego=25.0, rate=None, vel=None, torque=0.0, lat_active=True, steerin
   }
 
 
-class TestCurveSpeed:
+class TestCurveSpeed(unittest.TestCase):
   def test_straight_road_shows_nothing(self):
     assert CurveSpeedElement().update(sm_for(), False).value == "-"
 
@@ -42,7 +43,7 @@ class TestCurveSpeed:
     assert el.unit == "km/h" and el.value == "73"
 
 
-class TestSteeringTorquePercent:
+class TestSteeringTorquePercent(unittest.TestCase):
   def test_percent_and_colours(self):
     e = SteeringTorquePercentElement()
     assert e.update(sm_for(torque=-0.42), False).value == "42"

@@ -52,8 +52,8 @@ class TestOdysseyTakeovers(unittest.TestCase):
     d["torque"][:30 * FS] = -0.5
     d["torque"][30 * FS:] = -1.0
     band, secs, share, free_s, cmd, full = low_speed(d)[0]
-    self.assertEqual((band, secs, share, free_s), ("<10", 60.0, 1.0, 60.0))
-    self.assertAlmostEqual(full, 0.5)
+    self.assertEqual((band, secs, share, free_s), ("<10", 60.0, 1.0, 55.0))
+    self.assertAlmostEqual(full, 30 / 55)
     arm = np.arange(len(d["t"])) < 30 * FS
     self.assertEqual(low_speed(d, arm)[0][5], 0.0)
     self.assertEqual(low_speed(d, ~arm)[0][5], 1.0)

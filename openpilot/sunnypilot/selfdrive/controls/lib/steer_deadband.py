@@ -17,7 +17,7 @@ import math
 import time
 
 from openpilot.common.params import Params
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import DEADBAND_ARMS, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import DEADBAND_ARMS, runtime_arm, manual_experiment, clock_enabled
 
 SMOOTH_WIDTH = 0.01  # normalized torque over which the kick blends in around zero
 PARAMS_PERIOD_FRAMES = 500  # re-read the setting every 5 s at 100 Hz
@@ -60,7 +60,7 @@ class SteerDeadbandComp:
         self.amount, self.ab = 0.0, False
     self._frame += 1
     amount = self.amount
-    if self.ab:
-      amount = {"off": 0.0, "kick": AB_KICK, "bump": -AB_BUMP}[ab_arm(time.monotonic() if mono_s is None else mono_s, DEADBAND_ARMS)]
+    if clock_enabled("bump", self.ab) or manual_experiment("bump"):
+      amount = {"off": 0.0, "kick": AB_KICK, "bump": -AB_BUMP}[runtime_arm("bump", time.monotonic() if mono_s is None else mono_s, DEADBAND_ARMS)]
     out = bump_comp(torque, -amount, self._frame) if amount < 0 else deadband_comp(torque, amount)
     return max(-steer_max, min(steer_max, out))

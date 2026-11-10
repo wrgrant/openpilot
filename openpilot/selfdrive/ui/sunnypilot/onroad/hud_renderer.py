@@ -6,6 +6,7 @@ See the LICENSE.md file in the root directory for more details.
 """
 import raylib_nb as rl
 
+from openpilot.selfdrive.ui.sunnypilot.onroad.odyssey_ab_panel import OdysseyABPanel
 from openpilot.common.constants import CV
 from openpilot.selfdrive.ui.mici.onroad.torque_bar import TorqueBar
 from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui import DeveloperUiRenderer, DeveloperUiState, get_bottom_dev_ui_offset
@@ -28,6 +29,7 @@ SLA_ACTIVE_COLOR = rl.Color(0x91, 0x9b, 0x95, 0xff)
 class HudRendererSP(HudRenderer):
   def __init__(self):
     super().__init__()
+    self.odyssey_ab_panel = OdysseyABPanel()
     self.developer_ui = DeveloperUiRenderer()
     self.road_name_renderer = RoadNameRenderer()
     self.rocket_fuel = RocketFuel()
@@ -138,6 +140,7 @@ class HudRendererSP(HudRenderer):
         torque_rect = rl.Rectangle(rect.x, rect.y, rect.width, rect.height - get_bottom_dev_ui_offset())
       self._torque_bar.render(torque_rect)
 
+    self.odyssey_ab_panel.render_in(rect)
     self.developer_ui.render(rect)
     self.road_name_renderer.render(rect)
     self.speed_limit_renderer.render(rect)

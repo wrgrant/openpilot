@@ -18,7 +18,9 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext_base import sign
 from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_jerk_aware import LatControlTorqueJerkAware
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import NNLC_ARMS, NNLC_MODEL_ARMS, NNLC_MODEL_FILES, WANDER_BLOCK_S, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import (
+  NNLC_ARMS, NNLC_MODEL_ARMS, NNLC_MODEL_FILES, WANDER_BLOCK_S, runtime_arm, manual_experiment, clock_enabled, register_model_arms,
+)
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.helpers import MOCK_MODEL_PATH, get_nn_model_override, validated_model_path
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.model import NNTorqueModel
 from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.safe_model import SafeNNTorqueModel
@@ -85,6 +87,7 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     super().__init__(lac_torque, CP, CP_SP, CI)
     self.params = Params()
     self.enabled = self.params.get_bool("NeuralNetworkLateralControl")
+    self.always_enabled = self.enabled
     # Odyssey: NnlcAB rotates NNLC on and off in odyssey_ab blocks to compare it with the stock torque controller
     self.ab = self.params.get_bool("NnlcAB")
     stock_path = CP_SP.neuralNetworkLateralControl.model.path
@@ -107,9 +110,11 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
         self.model = NNTorqueModel(stock_path)
 
     # Odyssey: NnlcModelAB rotates stock / van-specific models in WANDER_BLOCK_S blocks (odyssey_ab.NNLC_MODEL_ARMS)
+    self.always_model = (self.model, self.response_shaper)
     self.model_ab = None
-    if self.has_nn_model and self.params.get_bool("NnlcModelAB"):
-      arms = {"stock": (self.model, self.response_shaper)}
+    self.model_ab_enabled = self.params.get_bool("NnlcModelAB")
+    if self.has_nn_model and (self.params.get_bool("NnlcModelAB") or self.params.get("OdysseyABExperiment") == "nnlc_model"):
+      arms = {"stock": (NNTorqueModel(stock_path), None)}
       for arm, name in NNLC_MODEL_FILES.items():
         path = validated_model_path(name)
         if path is None:
@@ -118,9 +123,11 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
           arms[arm] = (SafeNNTorqueModel(path, stock_path), NnlcResponseShaper.load(path))
         except (OSError, ValueError, TypeError):
           continue
-      if len(arms) > 1:
+      register_model_arms(arms)
+      if len(arms) > 1 or self.params.get("OdysseyABExperiment") == "nnlc_model":
+        arms["always"] = self.always_model
         self.model_ab = arms
-        self.model_arm = "stock"
+        self.model_arm = None
 
     self.pitch = FirstOrderFilter(0.0, 0.5, 0.01)
     self.pitch_last = 0.0
@@ -164,10 +171,10 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self._ff += get_friction_in_torque_space(self._desired_lateral_accel - self._actual_lateral_accel, self._lateral_accel_deadzone,
                                              FRICTION_THRESHOLD, self.torque_params)
 
-  def update_ab(self, mono_s: float) -> None:
+  def update_ab(self, mono_s: float, want=None) -> None:
     """Switch NNLC for the current A/B block. The two modes run the PID in different units (torque vs lateral accel),
     so a switch resets it and sets its limits for the new mode."""
-    want = ab_arm(mono_s, NNLC_ARMS) == "on"
+    want = runtime_arm("nnlc", mono_s, NNLC_ARMS) == "on" if want is None else want
     if want == self.enabled:
       return
     self.enabled = want
@@ -177,9 +184,9 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self.lac_torque.update_limits()
     self.update_limits()
 
-  def update_model_ab(self, mono_s: float) -> None:
+  def update_model_ab(self, mono_s: float, arm=None) -> None:
     """Switch to this block's model (missing candidates fall back to stock); reset the PID and shaper on a switch."""
-    arm = ab_arm(mono_s, NNLC_MODEL_ARMS, WANDER_BLOCK_S)
+    arm = runtime_arm("nnlc_model", mono_s, NNLC_MODEL_ARMS, WANDER_BLOCK_S) if arm is None else arm
     arm = arm if arm in self.model_ab else "stock"
     if arm == self.model_arm:
       return
@@ -190,10 +197,14 @@ class NeuralNetworkLateralControl(LatControlTorqueJerkAware):
     self._pid.reset()
 
   def update_neural_network_feedforward(self, CS, params, calibrated_pose) -> None:
-    if self.ab:
+    if clock_enabled("nnlc", self.ab):
       self.update_ab(time.monotonic())
-    if self.model_ab is not None:
+    elif self.ab:
+      self.update_ab(time.monotonic(), self.always_enabled)
+    if self.model_ab is not None and (clock_enabled("nnlc_model", self.model_ab_enabled) or manual_experiment("nnlc_model")):
       self.update_model_ab(time.monotonic())
+    elif self.model_ab is not None:
+      self.update_model_ab(time.monotonic(), "always")
     if not self._nnlc_enabled:
       return
 

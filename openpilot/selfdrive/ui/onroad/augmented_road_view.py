@@ -103,7 +103,10 @@ class AugmentedRoadView(CameraView, AugmentedRoadViewSP):
     # Draw colored border based on driving state
     self._draw_border(rect)
 
-  def _handle_mouse_press(self, _):
+  def _handle_mouse_press(self, pos):
+    panel = getattr(self._hud_renderer, "odyssey_ab_panel", None)
+    if panel is not None and panel.contains(pos):
+      return  # a touch on the Odyssey A/B panel switches the arm; it must not also open the sidebar
     if self._click_callback is not None:
       self._click_callback()
 

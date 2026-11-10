@@ -79,14 +79,14 @@ class TestOdysseyWanderAB(unittest.TestCase):
     self.assertIn('inside predicted interval: no', text)
     self.assertIn('not calibrated prediction intervals', text)
 
-  def test_no_curve_visibility_keeps_jerk_and_null_width(self):
+  def test_no_lane_visibility_excludes_lane_scoring(self):
     d = route()
     d['l_p'][:] = 0.1
     text = report(d)
     self.assertIn('stock curve_run_wide_m: unavailable m (0 blocks)', text)
     self.assertIn('S3 - stock curve_run_wide_m: unavailable [CI unavailable] m;', text)
     self.assertIn('inside predicted interval: unavailable', text)
-    self.assertIn('S3 - stock body_jerk_rms_mps3: +1.000000', text)
+    self.assertIn('S3 - stock body_jerk_rms_mps3: unavailable', text)
 
   def test_single_blocks_have_difference_but_no_interval(self):
     text = report(route(3))

@@ -10,7 +10,7 @@ Applying our add-ons here, to the controller's output in actuators.torque sign, 
 import time
 
 from openpilot.common.params import Params
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import WANDER_ARMS, WANDER_BLOCK_S, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import WANDER_ARMS, WANDER_BLOCK_S, ab_arm, clock_enabled
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_wander import FrictionAssist
 from openpilot.sunnypilot.selfdrive.controls.lib.low_speed_angle import LowSpeedAngleSteer
 from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import SteerDeadbandComp
@@ -27,7 +27,7 @@ class OdysseySteer:
     self.friction_arm = "off"
 
   def friction_enabled(self, mono_s: float) -> bool:
-    if self.friction_ab:
+    if clock_enabled("wander", self.friction_ab):
       arm = ab_arm(mono_s, WANDER_ARMS, WANDER_BLOCK_S)
       if arm != self.friction_arm:
         self.friction.reset()  # each block starts from the same state

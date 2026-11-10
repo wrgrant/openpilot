@@ -13,7 +13,7 @@ import time
 import numpy as np
 
 from openpilot.common.params import Params
-from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LOWSPEED_ARMS, ab_arm
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LOWSPEED_ARMS, runtime_arm, manual_experiment, clock_enabled
 
 V_FULL, V_OFF = 4.5, 8.0  # m/s (10 and 18 mph): all angle steering below V_FULL, all stock above V_OFF
 K_HOLD = 0.02  # torque (fraction of max) per degree of wanted wheel angle, to hold the wheel there
@@ -43,9 +43,9 @@ class LowSpeedAngleSteer:
     self.ab = self.enabled and bool(p.get_bool("SteerLowSpeedAngleAB"))
 
   def k_err(self, mono_s: float | None = None) -> float:
-    if not self.ab:
+    if not (clock_enabled("lowspeed", self.ab) or manual_experiment("lowspeed")):
       return K_ERR
-    firm = ab_arm(time.monotonic() if mono_s is None else mono_s, LOWSPEED_ARMS) == "firm"
+    firm = runtime_arm("lowspeed", time.monotonic() if mono_s is None else mono_s, LOWSPEED_ARMS) == "firm"
     return K_ERR_FIRM if firm else K_ERR
 
   def blend(self, steer: float, v_ego: float, angle_deg: float, VM, live_params, desired_curvature: float,

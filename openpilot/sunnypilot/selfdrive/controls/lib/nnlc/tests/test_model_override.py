@@ -94,7 +94,10 @@ class TestModelAB(OpenpilotTestCase):
 
   def test_model_ab_switches_model_and_resets(self):
     from openpilot.sunnypilot.selfdrive.controls.lib.nnlc.nnlc import NeuralNetworkLateralControl
+    from openpilot.sunnypilot.selfdrive.controls.lib import odyssey_ab
     from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import WANDER_BLOCK_S
+    odyssey_ab.register_model_arms({"stock", "S3", "S5"})  # as NNLC does at start-up for the models that loaded
+    self.addCleanup(odyssey_ab.register_model_arms, {"stock"})
     calls = []
     shaper = SimpleNamespace(reset=lambda: calls.append("shaper"))
     fake = SimpleNamespace(model_ab={"stock": ("m0", None), "S3": ("m3", shaper), "S5": ("m5", shaper)}, model_arm="stock",

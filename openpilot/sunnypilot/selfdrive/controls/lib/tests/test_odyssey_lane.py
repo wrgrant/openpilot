@@ -16,6 +16,9 @@ class FakeParams:
   def __init__(self, **values):
     self.values = values
 
+  def get(self, key):
+    return self.values.get(key)
+
   def get_bool(self, key):
     return bool(self.values.get(key, False))
 

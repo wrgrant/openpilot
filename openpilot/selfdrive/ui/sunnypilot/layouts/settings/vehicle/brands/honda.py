@@ -6,6 +6,9 @@ See the LICENSE.md file in the root directory for more details.
 """
 from openpilot.selfdrive.ui.sunnypilot.layouts.settings.vehicle.brands.base import BrandSettings
 from openpilot.selfdrive.ui.ui_state import ui_state
+from openpilot.selfdrive.ui.sunnypilot.onroad.odyssey_ab_panel import reset_totals
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS
+from openpilot.system.ui.sunnypilot.widgets.list_view import multiple_button_item_sp, button_item_sp
 from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.ui.lib.multilang import tr, tr_noop
 from openpilot.system.ui.widgets import DialogResult
@@ -36,7 +39,19 @@ class HondaSettings(BrandSettings):
       enabled=lambda: ui_state.is_offroad(),
     )
 
-    self.items = [self.enforce_stock_longitudinal, ]
+    names = ["", *EXPERIMENTS]
+    self.ab_experiment = multiple_button_item_sp("Odyssey A/B experiment", "Select while parked; lowspeed also needs SteerLowSpeedAngle, models need NNLC.",
+                                               ["None", *EXPERIMENTS], callback=lambda i: self._select_experiment(names[i]), inline=False)
+    self.ab_manual = toggle_item_sp("Driver selects A/B arm", initial_state=ui_state.params.get_bool("OdysseyABManual"),
+                                   callback=lambda v: ui_state.params.put_bool("OdysseyABManual", v))
+    self.ab_reset = button_item_sp("Odyssey A/B totals", "Reset", callback=reset_totals)
+    self.items = [self.enforce_stock_longitudinal, self.ab_experiment, self.ab_manual, self.ab_reset]
+
+  @staticmethod
+  def _select_experiment(name):
+    ui_state.params.put("OdysseyABArm", EXPERIMENTS[name][0] if name else "")
+    ui_state.params.put("OdysseyABExperiment", name)
+
 
   def _on_enable_enforce_stock_longitudinal(self, state: bool):
     if state:
@@ -56,6 +71,11 @@ class HondaSettings(BrandSettings):
       ui_state.params.put_bool("HondaEnforceStockLongitudinal", False)
 
   def update_settings(self):
+    for item in (self.ab_experiment, self.ab_manual, self.ab_reset):
+      item.action_item.set_enabled(ui_state.is_offroad())
+    names = ["", *EXPERIMENTS]
+    current = ui_state.params.get("OdysseyABExperiment") or ""
+    self.ab_experiment.action_item.set_selected_button(names.index(current) if current in names else 0)
     bosch = ui_state.CP is not None and bool(ui_state.CP.flags & HondaFlags.BOSCH)
     self.enforce_stock_longitudinal.action_item.set_enabled(ui_state.is_offroad() and not bosch)
 

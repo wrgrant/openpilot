@@ -4,7 +4,8 @@ lagged the request at low speed. This is the outcome measure: hands-off driving 
 
   PYTHONPATH=$PWD .venv/bin/python tools/odyssey_takeovers.py ~/comma-logs/<dongle>_<route> [more routes] [-v]
 
-Presses (above 18 mph, steering on, no blinker, at least 0.3 s; shorter ones are torque-sensor blips, not a hand):
+Presses (above 18 mph, steering on, no blinker, at least 0.3 s; shorter ones are torque-sensor blips, not a hand.
+The A/B good-data rule uses 1 s instead: it must not be cut by the sensor, while this count must not miss a quick grab):
   curve, at the limit   the driver added turn and the command had been at 100% for most of the second before:
                         the EPS was out of torque
   curve, adding turn    the driver added turn with torque to spare (often a second grab in the same curve)
@@ -15,8 +16,7 @@ needs, and, when it was short with hands off, the command it was getting. Short 
 command is the controller. A drive that ran SteerLowSpeedAngleAB is split by arm.
 
 Signs (verified on drives 1a7-1ae): steeringTorque and steeringAngleDeg share a sign (r = 0.8-0.9 in hand driving), and
-openpilot's curvature has the opposite sign to both (r = -0.98). Each route's 100 Hz table is cached in the route folder
-as takeovers.npz.
+openpilot's curvature has the opposite sign to both (r = -0.98). The table is extracted fresh so new A/B records cannot be hidden by an old cache.
 """
 import argparse
 import glob
@@ -32,24 +32,25 @@ CURVE_ACCEL = 0.5  # m/s2 requested: a curve
 SHORT_DEG = 5.0
 KINDS = ("curve, at the limit", "curve, adding turn", "curve, easing turn", "straight")
 BANDS = ((0.5, 4.5, "<10"), (4.5, 8.0, "10-18"), (8.0, 11.2, "18-25"))
-COLS = ("t", "seg", "v", "lat", "pressed", "drv", "blinker", "angle", "torque", "des_curv", "cur_curv")
+COLS = ("t", "seg", "v", "lat", "pressed", "drv", "blinker", "angle", "torque", "des_curv", "cur_curv", "lane_change")
 
 
 def load(route_dir: str) -> dict:
   from openpilot.tools.lib.logreader import LogReader
   segs = sorted(glob.glob(os.path.join(route_dir, "*--*")), key=lambda d: int(d.rsplit("--", 1)[1]))
-  cache = os.path.join(route_dir, "takeovers.npz")
-  if os.path.exists(cache):
-    d = dict(np.load(cache))
-    if int(d["segments"]) == len(segs):
-      return d
   rows, lowspeed_ab = [], None
+  records = []
   for path in segs:
     st = dict.fromkeys(COLS, 0.0)
     st["seg"] = int(path.rsplit("--", 1)[1])
     for m in sorted(LogReader(os.path.join(path, "rlog.zst")), key=lambda m: m.logMonoTime):
       w = m.which()
-      if w == "initData" and lowspeed_ab is None:
+      if w == "logMessage":
+        from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import parse_record
+        record = parse_record(m.logMessage)
+        if record is not None:
+          records.append((record.get("mono_s", m.logMonoTime / 1e9), record))
+      elif w == "initData" and lowspeed_ab is None:
         lowspeed_ab = any(e.key == "SteerLowSpeedAngleAB" and e.value == b"1" for e in m.initData.params.entries)
       elif w == "carState":
         cs = m.carState
@@ -58,12 +59,14 @@ def load(route_dir: str) -> dict:
         rows.append([st[c] for c in COLS])
       elif w == "carControl":
         st.update(lat=float(m.carControl.latActive), torque=m.carControl.actuators.torque, cur_curv=m.carControl.currentCurvature)
+      elif w == "modelV2":
+        st["lane_change"] = float(str(m.modelV2.meta.laneChangeState) != "off")
       elif w == "controlsState":
         st["des_curv"] = m.controlsState.desiredCurvature
   a = np.array(rows, dtype=float)
   d = {c: a[:, i] for i, c in enumerate(COLS)}
   d.update(segments=np.array(len(segs)), lowspeed_ab=np.array(bool(lowspeed_ab)))
-  np.savez_compressed(cache, **d)
+  d["records"] = records
   return d
 
 
@@ -104,11 +107,22 @@ def low_speed(d: dict, arm: np.ndarray | None = None) -> list[tuple]:
   moving = v > 3
   deg_per_curv = np.linalg.lstsq(d["cur_curv"][moving, None], d["angle"][moving], rcond=None)[0][0]
   short = (d["des_curv"] - d["cur_curv"]) * deg_per_curv * np.sign(d["des_curv"] * deg_per_curv)
-  hands_on = np.convolve(d["pressed"] > 0, np.ones(FS), mode="same") > 0
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import good_data, LOWSPEED_ARMS
+  from tools.odyssey_wander import logged_arm
+  eligible, switched, previous, pressed_since = [], -1e9, None, None
+  changes = d.get("lane_change", np.zeros(len(v)))
+  for i, t in enumerate(d["t"]):
+    current = logged_arm(d, t, LOWSPEED_ARMS)
+    if current != previous:
+      switched, previous = t, current
+    pressed_since = (t if pressed_since is None else pressed_since) if d["pressed"][i] else None
+    eligible.append(good_data("lowspeed", active=bool(lat[i]), speed=v[i], blinker=bool(d["blinker"][i]),
+                              lane_change=bool(changes[i]), since_switch=t-switched,
+                              pressed_s=t-pressed_since if pressed_since is not None else 0., desired_accel=d["des_curv"][i]*v[i]**2)[0])
   out = []
   for lo, hi, band in BANDS:
     m = lat & (v >= lo) & (v < hi) & (arm if arm is not None else True)
-    free = m & (short > SHORT_DEG) & ~hands_on
+    free = m & (short > SHORT_DEG) & np.array(eligible)
     cmd = np.abs(d["torque"][free])
     out.append((band, m.sum() / FS, float(np.mean(short[m] > SHORT_DEG)) if m.any() else np.nan, free.sum() / FS,
                 float(np.median(cmd)) if len(cmd) else np.nan, float(np.mean(cmd >= 0.99)) if len(cmd) else np.nan))
@@ -127,7 +141,7 @@ def main():
   ap.add_argument("route_dir", nargs="+")
   ap.add_argument("-v", action="store_true", help="list every press")
   args = ap.parse_args()
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LOWSPEED_ARMS, ab_arm
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LOWSPEED_ARMS
 
   total, minutes = dict.fromkeys(KINDS, 0), 0.0
   for path in args.route_dir:
@@ -144,8 +158,9 @@ def main():
       for p in ps:
         print(f"    seg {p['seg']:>2} +{p['s']:>4.1f} s  {p['kind']:<20} {p['mph']:>3.0f} mph, held {p['dur']:>4.1f} s, "
               + f"asked {p['want']:+.2f} m/s2, got {p['got']:+.2f}")
-    if bool(d["lowspeed_ab"]):
-      arm = np.array([ab_arm(t, LOWSPEED_ARMS) for t in d["t"]])
+    if bool(d["lowspeed_ab"]) or any(r["experiment"] == "lowspeed" for _, r in d["records"]):
+      from tools.odyssey_wander import logged_arm
+      arm = np.array([logged_arm(d, t, LOWSPEED_ARMS) for t in d["t"]])
       for name in LOWSPEED_ARMS:
         print_low_speed(low_speed(d, arm == name), f"{name:>5} ")
     else:
