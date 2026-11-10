@@ -1,6 +1,6 @@
 # Odyssey branch: sunnypilot + factory longitudinal on Honda Nidec
 
-William's sunnypilot fork for his 2018 Honda Odyssey (Nidec) on a comma 3X: factory ACC for gas and brake while sunnypilot steers, plus Odyssey steering work, tools and UI changes listed below. Start with "What actually runs" before changing any steering code.
+William's sunnypilot fork for his 2019 Honda Odyssey Elite (Nidec) on a comma 3X: factory ACC for gas and brake while sunnypilot steers, plus Odyssey steering work, tools and UI changes listed below. Start with "What actually runs" before changing any steering code.
 
 ## Branches and base
 
