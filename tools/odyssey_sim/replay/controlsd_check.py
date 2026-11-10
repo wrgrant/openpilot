@@ -43,7 +43,7 @@ def replay(lr: list, params: dict) -> dict[str, np.ndarray]:
   cfg.pubs = list(cfg.pubs) + ["lateralDelay", "selfdriveStateSP", "radarState"]
   custom = get_custom_params_from_lr(lr)
   custom.update(params)
-  rows, state = [], "none"
+  rows, state = [], "torqueState"  # carControl frames before the first controlsState are not judged
   for m in replay_process(cfg, lr, custom_params=custom, disable_progress=True):
     if m.which() == 'controlsState':
       state = m.controlsState.lateralControlState.which()
