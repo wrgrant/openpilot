@@ -40,7 +40,7 @@ CAN signals (DBC `honda_odyssey_exl_2018_generated`):
 - `STEERING_SENSORS.STEER_ANGLE`: 0.1° steps.
 - `STEER_STATUS.STEER_ANGLE_RATE`: 0.1°/s steps, and moves before the angle ticks over. `tools/odyssey_eps_report.py fine_angle()` integrates it.
 - `STEER_STATUS.STEER_TORQUE_SENSOR`: the driver's hand torque.
-- The pose-filter yaw rate (`carControl.angularVelocity`) is about 85 ms later than the raw gyroscope in the 0.3-3 Hz band (1ac segment 7): the raw gyro follows the wheel angle by about 55 ms, the pose-filter yaw by about 140 ms. Fine for slow sway and for forces in newtons; for fitting the van's dynamics use the raw gyro in the vehicle frame, or model the delay.
+- The pose-filter yaw rate (`carControl.angularVelocity`) is 70-80 ms later than the raw gyroscope on every route (correlation 0.994 on 1ac segment 7): the raw gyro follows the wheel angle by about 70 ms, the pose-filter yaw by about 150 ms. Fine for slow sway and for forces in newtons; for fitting the van's dynamics use the raw gyro in the vehicle frame, or model the delay.
 - `VEHICLE_DYNAMICS.LAT_ACCEL` **is unusable**: uncorrelated with steering-derived lateral accel. Use steering-angle-derived lateral accel.
 
 ## Measured facts about this van
@@ -82,6 +82,8 @@ Closed-loop sim (`tools/odyssey_sim/closedloop/`, 1,400 runs; real V0 / NNLC / `
 - No plant is valid below about 10 mph, so low-speed angle steering is tuned on the road (see its measured facts above).
 
 The lane-wander simulator overstates wander by 1-3×: use it to reject fragile controllers, not to rank them.
+
+Physical shake simulator (`tools/odyssey_sim/shake/`, three passes, `report_shake*.md`): not validated; don't tune with it. With timing corrected, a single-track model predicts yaw from wheel angle with a median gain within about 10% up to 1.4 times a second, but individual windows scatter widely (gain 0.38-1.53) and at wheel swings under 0.15° the van yaws nearly twice what the measured angle implies: ordinary driving puts the steering input at the 0.1° sensor's resolution. The command-to-wheel link has never passed a forward check. It needs known inputs, which the pulse test (`BRIEF_PULSE.md`) provides.
 
 Analysis tools:
 - `tools/odyssey_wander.py`: wander and A/B scoring.

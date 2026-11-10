@@ -1,0 +1,15 @@
+{
+  "regression_tests": {
+    "passed": 10,
+    "runner": "tools/test_runner.py test_physics.py test_identify2.py test_timing3.py"
+  },
+  "without_scipy": {
+    "skipped": 2,
+    "failed": 0
+  },
+  "ruff_new_modules": "pass",
+  "gate_count_consistency": "pass",
+  "forecast2_hash_matches_original_lock": true,
+  "forecast2_sha256": "5ad607338770e34deb2e1639575ee6777e445794e99878cb729ba72de3756691",
+  "plot_visually_inspected": "/Users/williamgrant/comma-logs/odyssey-evidence/shake_plots/yaw_residual3.png"
+}
