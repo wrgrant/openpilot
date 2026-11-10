@@ -34,6 +34,16 @@ class TestLowSpeedAngle(OpenpilotTestCase):
     on = lsa.LowSpeedAngleSteer(params=NS(get_bool=lambda k: True))
     assert on.blend(0.3, lsa.V_OFF + 1, 0.0, vm, live, 0.01) == 0.3
 
+  def test_gain_ab_alternates_by_minute_and_needs_angle_steering_on(self):
+    vm, live = FakeVM(), NS(roll=0.0, angleOffsetDeg=0.0)
+    ab = lsa.LowSpeedAngleSteer(params=NS(get_bool=lambda k: True))
+    out = [ab.blend(0.0, 1.0, 5.0, vm, live, 0.0, mono_s=60.0 * block + 1) for block in range(4)]
+    assert out[0] == out[2] == -lsa.K_ERR * 5 and out[1] == out[3] == -lsa.K_ERR_FIRM * 5
+    plain = lsa.LowSpeedAngleSteer(params=NS(get_bool=lambda k: k == "SteerLowSpeedAngle"))
+    assert plain.blend(0.0, 1.0, 5.0, vm, live, 0.0, mono_s=61.0) == -lsa.K_ERR * 5
+    ab_only = lsa.LowSpeedAngleSteer(params=NS(get_bool=lambda k: k == "SteerLowSpeedAngleAB"))
+    assert ab_only.blend(0.3, 1.0, 5.0, vm, live, 0.0, mono_s=61.0) == 0.3
+
   def test_sign_matches_openpilot(self):
     # a left curve (+ curvature) wants a negative steering angle here (latcontrol_angle's convention); from a straight
     # wheel the command (actuators.torque, same sign as the steering angle) moves toward it, so it is negative

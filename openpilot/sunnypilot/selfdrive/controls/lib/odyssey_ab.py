@@ -12,6 +12,9 @@ NNLC_MODEL_ARMS = ("stock", "S3", "S5")
 # OdysseyLaneCenterAB: lane-centring correction off/on (odyssey_lane.py), WANDER_BLOCK_S blocks. With NnlcModelAB also on,
 # block k runs model arm k % 3 and lane arm k % 2, so every 6 blocks cover all six combinations once.
 LANE_ARMS = ("off", "on")
+# SteerLowSpeedAngleAB: low-speed angle steering's error gain, K_ERR vs K_ERR_FIRM (low_speed_angle.py), AB_BLOCK_S blocks.
+# It acts below 18 mph and the lane and model tests are scored above 25 mph, so they don't disturb each other.
+LOWSPEED_ARMS = ("base", "firm")
 NNLC_MODEL_FILES = {"S3": "HONDA_ODYSSEY_WILLIAM_S3.json", "S5": "HONDA_ODYSSEY_WILLIAM_S5.json"}
 
 

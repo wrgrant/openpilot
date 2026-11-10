@@ -317,6 +317,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"OdysseyWanderFriction", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"NnlcModelOverride", {PERSISTENT | BACKUP, STRING}},
     {"SteerLowSpeedAngle", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"SteerLowSpeedAngleAB", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"SteerLowSpeedKpCap", {PERSISTENT | BACKUP, FLOAT, "0.0"}},
     {"TorqueParamsOverrideLatAccelFactor", {PERSISTENT | BACKUP, FLOAT, "2.5"}},
 };

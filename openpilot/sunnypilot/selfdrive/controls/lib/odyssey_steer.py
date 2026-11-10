@@ -3,7 +3,7 @@
 sunnypilot picks the torque controller class at runtime (latcontrol_torque_v0.LatControlTorque unless
 EnforceTorqueControl is set, else openpilot's latcontrol_torque.LatControlTorque), and NNLC plugs into either.
 Applying our add-ons here, to the controller's output in actuators.torque sign, makes them work whichever runs:
-  - low-speed angle steering (SteerLowSpeedAngle, low_speed_angle.py)
+  - low-speed angle steering and its gain A/B (SteerLowSpeedAngle / SteerLowSpeedAngleAB, low_speed_angle.py)
   - the deadband kick / bump and their A/B (SteerDeadbandComp / SteerDeadbandCompAB, steer_deadband.py)
   - wander friction assistance and its A/B (OdysseyWanderFriction / OdysseyWanderAB, odyssey_wander.py)
 """
@@ -40,9 +40,10 @@ class OdysseySteer:
     if not lat_active:
       self.friction.reset()
       return steer
-    steer = self.low_speed_angle.blend(steer, CS.vEgo, CS.steeringAngleDeg, VM, live_params, desired_curvature)
+    mono_s = time.monotonic() if mono_s is None else mono_s
+    steer = self.low_speed_angle.blend(steer, CS.vEgo, CS.steeringAngleDeg, VM, live_params, desired_curvature, mono_s)
     steer = self.deadband_comp.update(steer, steer_max)
-    enabled = self.friction_enabled(time.monotonic() if mono_s is None else mono_s)
+    enabled = self.friction_enabled(mono_s)
     valid = not (CS.steeringPressed or CS.leftBlinker or CS.rightBlinker)
     # FrictionAssist is acceleration-positive; actuators.torque is the opposite sign
     steer = -self.friction.update(-steer, target=desired_lat_accel, actual=actual_lat_accel, speed=CS.vEgo,
