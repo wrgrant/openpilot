@@ -38,6 +38,8 @@ SQUARE_LEVELS, SQUARE_HALF_S = (.02, .04, .06, .08, .10, .12), .1  # +level then
 CHIRP_HZ, CHIRP_S = (.5, 3.), 1.5  # a sine sweeping these frequencies: the response the simulator has to match
 HANDOVER_STEP = .01  # normalized command per frame on the way back to lane keeping
 VERSION = 2
+QUEUE_MAX, QUEUE_HEIGHT = 12, .12  # extra shots a drive companion may queue (OdysseyPulseQueue), and their largest command
+KINDS = ('single', 'pair', 'train', 'ramp', 'square', 'chirp', 'sham')
 ACTIVE = ('lead-in', 'pulse', 'tail')
 
 
@@ -124,6 +126,35 @@ def session():
   )
 
 
+def parse_queue(raw):
+  """Extra shots queued from outside (tools/odyssey_drive_companion.py) as a JSON list of Condition fields. Anything
+  malformed, too long for a shot or over QUEUE_HEIGHT is dropped whole, never clipped into a different shot. Ids are
+  stable for the same queue text, so a shot already done is not run again when the queue is re-read."""
+  import json
+  import zlib
+  try:
+    items = json.loads(raw or '[]')
+  except (ValueError, TypeError):
+    return ()
+  out = []
+  for item in items[:QUEUE_MAX] if isinstance(items, list) else ():
+    try:
+      c = Condition(str(item['kind']), float(item['height']), float(item['duration']), 1 if float(item['direction']) > 0 else -1,
+                    float(item.get('period', 0.)), float(item.get('duty', 0.)))
+      values = (c.height, c.duration, c.period, c.duty)
+      ok = (c.kind in KINDS and all(math.isfinite(v) and v >= 0 for v in values) and
+            0 < c.duration < HARD_SHOT_S - LEAD_S - TAIL_S and
+            (c.kind != 'train' or (.1 <= c.period <= 1. and 0 < c.duty <= 1.)) and
+            (c.kind != 'pair' or (.02 <= c.period <= .4 and abs(c.duration - (2 * c.period + PAIR_GAP_S)) < .011)) and
+            max(abs(c.command(LEAD_S + k * .01)) for k in range(round(c.duration * 100))) <= QUEUE_HEIGHT + 1e-9)
+    except (KeyError, TypeError, ValueError, AttributeError):
+      continue
+    if ok:
+      tag = zlib.crc32(json.dumps(asdict(c), sort_keys=True).encode()) & 0xffffff
+      out.append((f'q:{tag:06x}:{len(out)}', c))
+  return tuple(out)
+
+
 def plan(passes=3):
   """The session, then the same again with every first push reversed, then as the first: repeats for the noise."""
   out = []
@@ -175,6 +206,7 @@ class Pulse:
     self.speed_band = '45-70'
     self.settle_speed = None
     self.base_sum, self.base_n, self.offset_start = 0., 0, 0.
+    self.extra = ()  # queued shots (parse_queue), run before what is left of the plan
     self.aborts = {}  # reason -> count since controls started, for the panel
     self.ignore_wheel = False  # the driver's override: the wheel torque sensor neither blocks nor stops a shot
     self.wheel_peak, self.wheel_peak_time = 0., -math.inf  # largest sensor reading in the last second, for the panel
@@ -184,7 +216,11 @@ class Pulse:
     return self.state in ACTIVE
 
   def progress(self):
-    return {'version': VERSION, 'done': {b: sorted(ids) for b, ids in self.done.items()}}
+    planned = {i for i, _ in self.plan}  # queued shots are not kept across drives
+    return {'version': VERSION, 'done': {b: sorted(ids & planned) for b, ids in self.done.items()}}
+
+  def queue_left(self):
+    return sum(i not in self.done[self.speed_band] for i, _ in self.extra)
 
   def gate(self, now, x):
     if not x.valid or not all(math.isfinite(v) for v in asdict(x).values()):
@@ -271,7 +307,7 @@ class Pulse:
       return normal  # safety aborts return control immediately, bypassing cosmetic slew
     if not self.in_shot:
       self.speed_band = band(x.speed)
-      candidates = [(i, c) for i, c in self.plan if i not in self.done[self.speed_band]]
+      candidates = [(i, c) for i, c in (*self.extra, *self.plan) if i not in self.done[self.speed_band]]
       if not candidates:
         if self.state == 'recover' and abs(normal-self.previous_command) > HANDOVER_STEP:
           self.previous_command += math.copysign(HANDOVER_STEP, normal-self.previous_command)
@@ -338,6 +374,7 @@ class PulseRuntime:
     self.controller = Pulse()
     self.config = (False, True, None)
     self.ignore_wheel = False
+    self.extra = ()
     self.heartbeat = time.monotonic()
     self.queue = queue.Queue(maxsize=512)
     self.stop = threading.Event()
@@ -363,6 +400,10 @@ class PulseRuntime:
       import os
       if self.params.get('OdysseyABExperiment') == 'pulse' and not os.environ.get('REPLAY'):
         self.params.put_bool('OdysseyPulsePaused', True)  # every drive starts paused: the driver taps the panel to begin
+      if not os.environ.get('REPLAY'):  # a queue or a note left from an earlier drive means nothing now
+        self.params.put('OdysseyPulseQueue', '[]')
+        mem.put('OdysseyAgentNote', '')
+      queue_raw, queue_read = None, -1.
       self.config = (False, True, raw)
       last_poll = -1.
       while not self.stop.is_set():
@@ -374,6 +415,10 @@ class PulseRuntime:
             raw = {}
             self.params.put_bool('OdysseyPulseReset', False)
           self.ignore_wheel = self.params.get_bool('OdysseyPulseIgnoreWheel')
+          if now - queue_read >= 1.:
+            queue_read, raw_queue = now, self.params.get('OdysseyPulseQueue') or '[]'
+            if raw_queue != queue_raw:
+              queue_raw, self.extra = raw_queue, parse_queue(raw_queue)
           self.config = (self.params.get('OdysseyABExperiment') == 'pulse', self.params.get_bool('OdysseyPulsePaused'), raw)
           last_poll = now
         try:
@@ -433,6 +478,7 @@ class PulseRuntime:
                  blinker=cs.leftBlinker or cs.rightBlinker, brake=cs.brakePressed, lane_change=str(md.meta.laneChangeState) not in ('off', '0'),
                  model_age=max(model_age, now-self.model_time), valid=valid, angle=cs.steeringAngleDeg, rate=cs.steeringRateDeg)
       c.ignore_wheel = getattr(self, 'ignore_wheel', False)
+      c.extra = getattr(self, 'extra', ())
       result = c.step(now, normal, x, selected, paused)
       while c.events:
         event = c.events[0]
@@ -445,9 +491,10 @@ class PulseRuntime:
                                        'command': result, 'carOutput': output, 'state': c.state}))
       if selected and now-self.last_status >= .1:
         self.queue.put_nowait(('status', {'experiment': 'pulse', 'mono_s': now, 'state': c.state, 'reason': c.reason,
-                                        'finished': len(c.done[c.speed_band]), 'total': len(c.plan), 'band': c.speed_band,
+                                        'finished': len(c.done[c.speed_band] & {i for i, _ in c.plan}), 'total': len(c.plan), 'band': c.speed_band,
                                         'last_result': c.last_result, 'paused': paused, 'wheel': round(c.wheel_peak),
-                                        'wheel_limit': DRIVER_TORQUE, 'ignore_wheel': c.ignore_wheel, 'aborts': dict(c.aborts)}))
+                                        'wheel_limit': DRIVER_TORQUE, 'ignore_wheel': c.ignore_wheel, 'aborts': dict(c.aborts),
+                                        'queue': c.queue_left()}))
         self.last_status = now
       return result
     except Exception:

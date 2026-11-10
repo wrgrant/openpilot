@@ -20,7 +20,8 @@ PAD, HEADER, ARM, REASON, ROW_NAME, ROW_VALUE = 22, 32, 110, 40, 36, 32
 HEAD_H, FOOT_H = 70, 120  # the touch strips: tall enough to hit without looking closely
 # one line per arm: the panel has to end above the driver-monitoring icon at the bottom left (about 430 px below its top)
 ROWS_Y, ROW_H, COL_STRAIGHT, COL_CURVES = HEAD_H + 226, 44, 190, 420
-PULSE_H = HEAD_H + 270 + FOOT_H
+PULSE_H = HEAD_H + 296 + FOOT_H
+NOTE_CHARS, NOTE_COLOR = 34, rl.Color(120, 200, 255, 255)  # a drive companion's note (OdysseyAgentNote): two short lines
 ONROAD_TESTS = ("pulse", "bump", "lane")  # the tests the top strip cycles through; the model test needs its models loaded at start
 
 
@@ -66,6 +67,12 @@ def panel_rect(content: rl.Rectangle, experiment: str) -> rl.Rectangle:
   return rl.Rectangle(content.x + PANEL_X, content.y + PANEL_Y, PANEL_W, height)
 
 
+def note_lines(raw) -> list[str]:
+  """Up to two lines of NOTE_CHARS from the companion's note; anything longer is cut, never wrapped over the panel."""
+  lines = [line.strip()[:NOTE_CHARS] for line in str(raw or "").splitlines() if line.strip()]
+  return lines[:2]
+
+
 class OdysseyABPanel(Widget):
   def __init__(self):
     super().__init__()
@@ -75,6 +82,7 @@ class OdysseyABPanel(Widget):
     self.last_read = 0.
     self.status_seen = -1e9
     self.drawn: list[str] = []
+    self.note: list[str] = []
     self.shown: rl.Rectangle | None = None  # where the panel was last drawn; None while hidden
     self.broken = False
 
@@ -117,6 +125,7 @@ class OdysseyABPanel(Widget):
       status = json.loads(self.mem.get("OdysseyABStatus") or "{}")
     except (ValueError, TypeError):
       status = {}
+    self.note = note_lines(self.mem.get("OdysseyAgentNote"))
     if status != self.status:
       # controls rewrites its status at least once a second. Judge freshness by when a new one arrived on this
       # process's clock: its own stamp may be on another clock (the pulse test stamps with message time).
@@ -148,9 +157,15 @@ class OdysseyABPanel(Widget):
       headline = "paused" if status.get("paused") else state
       reason = str(status.get("reason", "waiting for controls"))
       text(headline, 0, HEAD_H - 4, 86)
-      text("tap to start" if status.get("paused") else reason if reason != headline else "tap to pause", 0, HEAD_H + 96, 36, rl.YELLOW)
-      text(f"{status.get('finished', 0)} of {status.get('total', 0)} shots  •  {status.get('band', '')} mph", 0, HEAD_H + 146, 38)
-      text(str(status.get("last_result", "")), 0, HEAD_H + 198, 30)
+      hint = "tap to start" if status.get("paused") else "tap to pause" if headline in ("pulsing", reason) else reason
+      text(hint, 0, HEAD_H + 96, 36, rl.YELLOW)
+      shots = f"{status.get('finished', 0)} of {status.get('total', 0)} shots"
+      text(shots + (f"  +  {status.get('queue')} queued" if status.get("queue") else f"  •  {status.get('band', '')} mph"), 0, HEAD_H + 144, 38)
+      if self.note:  # the companion's note takes the place of the last shot's result
+        for i, line in enumerate(self.note):
+          text(line, 0, HEAD_H + 192 + 34 * i, 30, NOTE_COLOR)
+      else:
+        text(str(status.get("last_result", "")), 0, HEAD_H + 196, 30)
       foot = rect.height - FOOT_H - PAD
       rl.draw_rectangle(int(rect.x), int(rect.y + rect.height - FOOT_H), int(rect.width), 2, rl.GRAY)
       ignored = bool(status.get("ignore_wheel")) if live else ui_state.params.get_bool("OdysseyPulseIgnoreWheel")
@@ -161,7 +176,10 @@ class OdysseyABPanel(Widget):
       text("IGNORED  •  tap here to obey it" if ignored else "obeyed  •  tap here to ignore it", 0, foot + 58, 36,
            rl.YELLOW if ignored else rl.LIGHTGRAY)
       return
-    text("tap for the next arm" if self.manual else "arms switch by the clock", 0, HEAD_H, 30, rl.LIGHTGRAY)
+    if self.note:
+      text(self.note[0], 0, HEAD_H, 30, NOTE_COLOR)  # one line fits here; the pulse panel shows both
+    else:
+      text("tap for the next arm" if self.manual else "arms switch by the clock", 0, HEAD_H, 30, rl.LIGHTGRAY)
     live = self.status.get("experiment") == self.e and time.monotonic() - self.status_seen < 2
     good = bool(live and self.status.get("good"))
     text(str(self.status.get("arm", "")) if live else "waiting", 0, HEAD_H + 26, ARM)

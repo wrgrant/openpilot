@@ -152,6 +152,34 @@ class TestPulse(unittest.TestCase):
       q.ignore_wheel = True
       self.assertEqual(q.step(t + DT, .1, replace(Inputs(), **change), True), .1, "the driver's other ways out still work")
 
+  def test_queued_shots_run_first_once_and_only_if_they_are_inside_the_limits(self):
+    import json
+    good = [{'kind': 'single', 'height': .07, 'duration': .1, 'direction': 1},
+            {'kind': 'pair', 'height': .05, 'duration': 2 * .1 + op.PAIR_GAP_S, 'direction': -1, 'period': .1},
+            {'kind': 'train', 'height': .06, 'duration': 1., 'direction': 1, 'period': .25, 'duty': .5}]
+    bad = [{'kind': 'single', 'height': .2, 'duration': .1, 'direction': 1},  # over the queue's height limit
+           {'kind': 'single', 'height': .05, 'duration': 5., 'direction': 1},  # longer than a shot may be
+           {'kind': 'wiggle', 'height': .05, 'duration': .1, 'direction': 1},  # not a signal the test knows
+           {'kind': 'pair', 'height': .05, 'duration': 1.5, 'direction': 1, 'period': .1},  # duration does not match a pair
+           {'kind': 'single', 'height': float('nan'), 'duration': .1, 'direction': 1}, {'height': .05}, 7]
+    queue = op.parse_queue(json.dumps(bad + good).replace('NaN', 'null'))
+    self.assertEqual([c.label() for _, c in queue], ['single 7% 0.1s', 'pair 5% 0.1s', 'train 6% on 50%'])
+    self.assertEqual(op.parse_queue(json.dumps(bad + good).replace('NaN', 'null')), queue, "the same text gives the same ids")
+    for raw in ('', 'not json', '{"kind": "single"}', '[[]]'):
+      self.assertEqual(op.parse_queue(raw), ())
+    self.assertEqual(len(op.parse_queue(json.dumps(good * 10))), op.QUEUE_MAX)
+    p = Pulse()
+    p.extra = queue
+    ran = []
+    for n in range(round(12 / DT)):
+      p.step(n * DT, .02, Inputs(), True)
+      ran += [e['id'] for e in p.events if e.get('phase') == 'start']
+      p.events.clear()
+    self.assertEqual(ran[:3], [i for i, _ in queue], "queued shots go before the plan")
+    self.assertEqual(ran[3], p.plan[0][0])
+    self.assertEqual(p.queue_left(), 0)
+    self.assertNotIn(queue[0][0], p.progress()['done']['45-70'], "queued shots are not carried into the next drive's progress")
+
   def test_fault_latches_and_inactive_is_passthrough(self):
     p = Pulse()
     for n in range(100):

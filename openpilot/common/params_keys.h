@@ -314,6 +314,8 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"OdysseyPulseProgress", {PERSISTENT, STRING, "{}"}},
     {"OdysseyPulsePaused", {PERSISTENT, BOOL, "0"}},
     {"OdysseyPulseIgnoreWheel", {PERSISTENT, BOOL, "0"}},
+    {"OdysseyPulseQueue", {PERSISTENT, STRING, "[]"}},
+    {"OdysseyAgentNote", {PERSISTENT, STRING, ""}},
     {"OdysseyPulseReset", {PERSISTENT, BOOL, "0"}},
     {"OdysseyABReset", {PERSISTENT, BOOL, "0"}},
     {"SteerDeadbandComp", {PERSISTENT | BACKUP, FLOAT, "0.0"}},

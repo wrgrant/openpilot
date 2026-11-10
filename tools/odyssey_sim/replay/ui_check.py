@@ -206,6 +206,15 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
     record("controls runs a shot on the recorded road and the panel counts it", (ok or soak > 0) and any(count in line for line in panel.drawn),
            f"states seen {sorted(x for x in seen if x)}, last: {s.get('last_result')}, panel says {[line for line in panel.drawn if 'shots' in line]}")
 
+    # what a drive companion does from outside: queue an extra shot and leave a note
+    note = "3 of 26 good. Wheel moves at 5%.\nNeed: 2 sweeps, ramp left."
+    params.put("OdysseyPulseQueue", json.dumps([{"kind": "single", "height": .07, "duration": .1, "direction": 1}]), block=True)
+    mem.put("OdysseyAgentNote", note, block=True)
+    ok = yield from wait(lambda: str(status().get("last_result", "")).startswith("single 7%"), 45)
+    shown = all(line in panel.drawn for line in note.splitlines())
+    record("a queued shot runs before the plan and the note shows on the panel", (ok or soak > 0) and shown,
+           f"last shot: {status().get('last_result')}, queue left {status().get('queue')}, panel says {[line for line in panel.drawn if line in note]}")
+
     tap(*strip("bottom"))
     ok = yield from wait(lambda: params.get_bool("OdysseyPulseIgnoreWheel") and status().get("ignore_wheel") is True, 3)
     record("bottom strip makes controls ignore the wheel sensor", ok and not params.get_bool("OdysseyPulsePaused"),
