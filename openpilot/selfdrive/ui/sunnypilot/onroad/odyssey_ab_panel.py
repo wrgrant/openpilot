@@ -25,23 +25,26 @@ NOTE_CHARS, NOTE_COLOR = 34, rl.Color(120, 200, 255, 255)  # a drive companion's
 ONROAD_TESTS = ("pulse", "bump", "lane", "feel")  # the tests the top strip cycles through; the model test needs its models loaded at start
 
 
-FEEL_ROW_H = 200  # three rows of two tap zones under the status strip: 0|1, 2|3, 4|felt that
+FEEL_ROW_H = 150  # four rows under the status strip: 0|1, 2|3, 4|felt that, then redo across the full width
 FEEL_LABELS = ("didn't notice", "noticed", "mildly annoying", "annoying", "bad")
 FEEL_ACK_S = 1.5  # how long a tap's acknowledgement stays on the zone
 FEEL_STATE = {"wait": "waiting", "stimulus": "running", "rate": "rate it", "rest": "rated", "done": "plan done"}
 
 
 def feel_zone(dx, dy, width) -> str:
-  """Feel test grid zone at (dx, dy) below the status strip: 'rate0'..'rate4' or 'felt'."""
-  index = min(2, max(0, int(dy // FEEL_ROW_H))) * 2 + (1 if dx >= width / 2 else 0)
+  """Feel test grid zone at (dx, dy) below the status strip: 'rate0'..'rate4', 'felt' or 'redo'."""
+  row = min(3, max(0, int(dy // FEEL_ROW_H)))
+  if row == 3:
+    return "redo"
+  index = row * 2 + (1 if dx >= width / 2 else 0)
   return "felt" if index == 5 else f"rate{index}"
 
 
 def feel_tap(zone):
   """Send a feel rating or a 'felt that' mark to controls (odyssey_feel.post_input, a file in /dev/shm)."""
   from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_feel import post_input
-  if zone == "felt":
-    post_input("felt")
+  if zone in ("felt", "redo"):
+    post_input(zone)
   elif zone.startswith("rate"):
     post_input("rate", int(zone[4:]))
 
@@ -129,7 +132,7 @@ class OdysseyABPanel(Widget):
   def _handle_mouse_release(self, mouse_pos, /) -> None:
     # totals are reset in settings, parked: no dialogs while driving
     zone = self.zone(mouse_pos)
-    if zone.startswith("rate") or zone == "felt":
+    if zone.startswith("rate") or zone in ("felt", "redo"):
       try:  # a feel tap must never take the screen down
         feel_tap(zone)
         self.feel_ack = (zone, time.monotonic())
@@ -291,5 +294,10 @@ class OdysseyABPanel(Widget):
         fill = rl.Color(min(fill.r + 60, 255), min(fill.g + 60, 255), min(fill.b + 60, 255), 255)
       rl.draw_rectangle_rounded(cell, .12, 8, fill)
       dx, dy = zx - rect.x - PAD + 22, zy - rect.y - PAD + 14
-      text(number, dx, dy, 96, color)
-      text(label, dx, dy + 112, 40, color)
+      text(number, dx, dy, 80, color)
+      text(label, dx, dy + 92, 36, color)
+    zy = top + 3 * FEEL_ROW_H
+    fill = rl.Color(170, 90, 20, 255) if acked and ack_zone == "redo" else rl.Color(110, 55, 10, 255)
+    rl.draw_rectangle_rounded(rl.Rectangle(rect.x + 6, zy + 6, rect.width - 12, FEEL_ROW_H - 12), .12, 8, fill)
+    text("redo trial", 22 - PAD + 0, zy - rect.y - PAD + 30, 64, rl.WHITE)
+    text("truck / gust spoiled it", 22 - PAD + 330, zy - rect.y - PAD + 50, 36, rl.LIGHTGRAY)

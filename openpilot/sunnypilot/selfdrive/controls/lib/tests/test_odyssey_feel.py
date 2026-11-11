@@ -160,6 +160,35 @@ class TestTrials(unittest.TestCase):
     self.assertNotEqual(f.trial[1], first[1])
     self.assertEqual(f.trial[0], first[0] + 1)
 
+  def test_redo_voids_a_running_or_rated_trial(self):
+    f = Feel(seed=5)
+    t = first_start(f)
+    first = f.trial
+    out = run(f, t, t + 2, taps_at={round((t + 1) / DT): [('redo', None, t + 1)]})
+    self.assertEqual(out[-1][1:], (0., 0.), 'a redo hands the road straight back')
+    self.assertEqual(f.events[-1]['phase'], 'start' if f.state == 'stimulus' else f.events[-1]['phase'])
+    redo = [e for e in f.events if e['phase'] == 'redo']
+    self.assertEqual((redo[0]['trial'], redo[0]['id']), (first[0], first[1]))
+    self.assertNotIn(first[1], f.misses, 'a redo is not a miss')
+    # it settles again, then reruns the same condition
+    run(f, t + 2, t + 2 + of.SETTLE_S + .1)
+    self.assertEqual(f.state, 'stimulus')
+    self.assertEqual(f.trial[1], first[1])
+    second = f.trial
+    t = f.start
+    run(f, t, t + of.STIM_S + .05)
+    end = f.end
+    run(f, end, end + 2, taps_at={round((end + 1) / DT): [('rate', 3, end + 1)]})
+    self.assertEqual(f.done, {second[1]})
+    run(f, end + 2, end + 3, taps_at={round((end + 2.5) / DT): [('redo', None, end + 2.5)]})
+    self.assertEqual(f.done, set(), 'a redo after rating drops the rating')
+    self.assertTrue(f.dirty)
+    self.assertEqual((f.state, f.last_trial), ('wait', None))
+    run(f, end + 3, end + 4, taps_at={round((end + 3.5) / DT): [('redo', None, end + 3.5)]})
+    self.assertEqual(f.events[-1]['phase'] if f.state != 'stimulus' else 'stray_redo',
+                     'stray_redo', 'a second redo never voids an older trial')
+    self.assertEqual(of.parse_input(json.dumps({'kind': 'redo', 'tap_s': 1.})), ('redo', None, 1.))
+
   def test_felt_that_is_logged_any_time(self):
     f = Feel(seed=4)
     run(f, 0, 1, replace(Inputs(), active=False), taps_at={50: [('felt', None, .5)]})

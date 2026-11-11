@@ -134,6 +134,9 @@ def trials(d, route=''):
         row['rating'] = int(r['value'])  # the last tap wins: a later one corrects an earlier one
       elif phase == 'unrated':
         row['outcome'] = 'completed'
+      elif phase == 'redo':  # the driver voided it (a truck, a gust): drop it, it runs again later
+        rows.remove(row)
+        del by_trial[n]
   for row in rows:
     t0 = row['start']
     row['felt'] = sum(t0 <= f.get('tap_s', f['mono_s']) <= t0 + STIM_S + REST_S for f in felt)

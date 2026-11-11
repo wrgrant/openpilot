@@ -149,14 +149,15 @@ class Inputs:
 
 
 def parse_input(line):
-  """One panel tap: {"kind": "rate", "value": 0-4, "tap_s": t} or {"kind": "felt", "tap_s": t}; None if malformed."""
+  """One panel tap: {"kind": "rate", "value": 0-4, "tap_s": t}, {"kind": "felt", "tap_s": t} or {"kind": "redo", "tap_s": t};
+  None if malformed."""
   try:
     d = json.loads(line)
     tap = float(d['tap_s'])
-    if not math.isfinite(tap) or d.get('kind') not in ('rate', 'felt'):
+    if not math.isfinite(tap) or d.get('kind') not in ('rate', 'felt', 'redo'):
       return None
-    if d['kind'] == 'felt':
-      return ('felt', None, tap)
+    if d['kind'] in ('felt', 'redo'):
+      return (d['kind'], None, tap)
     value = d.get('value')
     if type(value) is not int or not 0 <= value < len(RATINGS):
       return None
@@ -281,6 +282,9 @@ class Feel:
       self.felt += 1
       self.events.append({'phase': 'felt', 'tap_s': tap_s, **self._context(now)})
       return
+    if kind == 'redo':
+      self.redo(now, tap_s)
+      return
     if self.state == 'stimulus' or self.last_trial is None:
       self.events.append({'phase': 'stray_rating', 'value': value, 'tap_s': tap_s, **self._context(now)})
       return
@@ -294,6 +298,25 @@ class Feel:
       self.dirty = True
     if self.state == 'rate':
       self.state = 'rest'
+
+  def redo(self, now, tap_s):
+    """The driver voids a trial something else spoiled (a passing truck, a gust): the running one, or else the last
+    completed one until the next starts. It goes back into the plan with no miss counted, and its rating is dropped."""
+    if self.state == 'stimulus':
+      number, trial_id, stim = self.trial
+      self.trial, self.state, self.reason = None, 'wait', 'redo'
+    elif self.last_trial is not None:
+      number, trial_id, stim = self.last_trial
+      self.last_trial, self.rating, self.state = None, None, 'wait'
+      if trial_id in self.done:
+        self.done.discard(trial_id)
+        self.dirty = True
+    else:
+      self.events.append({'phase': 'stray_redo', 'tap_s': tap_s, **self._context(now)})
+      return
+    self.clear_since = None  # settle again before the next trial
+    self.events.append({'phase': 'redo', 'trial': number, 'id': trial_id, 'tap_s': tap_s, 'mono_s': now,
+                        'stimulus': asdict(stim)})
 
   def step(self, now, x, selected, paused, taps=()):
     for kind, value, tap_s in taps:
