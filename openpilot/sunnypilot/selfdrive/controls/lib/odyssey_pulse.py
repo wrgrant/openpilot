@@ -15,19 +15,20 @@ from dataclasses import dataclass, asdict
 import math
 
 MAX_TORQUE = .15  # absolute controlsd request; panda and Honda rate limits still apply
-MAX_RELEASE = .06  # lane keeping's mean command over the settling time; more means a curve, strong crown or wind
+MAX_RELEASE = .10  # lane keeping's mean command over the settling time; more means a curve, strong crown or wind
 # m, low-passed lane pose. A 3.6 m lane leaves this 2.0 m van 0.8 m each side when centred: start within 0.25 m, and
 # stop 0.35 m short of the line, or as soon as the van has moved 0.25 m since the shot began.
-START_OFFSET, ABORT_OFFSET, MAX_DRIFT = .25, .45, .20
-START_HEADING, ABORT_HEADING = .003, .012  # rad, low-passed: about 0.23/0.69 degrees, limits accumulating lateral velocity
-MIN_LANE_WIDTH = 3.2  # m between the inner lines: no shots in narrow or merging lanes
-VAN_HALF_WIDTH, MIN_EDGE = 1.0, .30  # m: the van's side never gets closer than MIN_EDGE to an inner line during a shot
+START_OFFSET, ABORT_OFFSET, MAX_DRIFT = .45, .90, .60
+START_ROOM = .20  # m of room past MIN_EDGE needed to start an automatic shot
+START_HEADING, ABORT_HEADING = .006, .025  # rad, low-passed: about 0.23/0.69 degrees, limits accumulating lateral velocity
+MIN_LANE_WIDTH = 3.0  # m between the inner lines: no shots in narrow or merging lanes
+VAN_HALF_WIDTH, MIN_EDGE = 1.0, .05  # m: the van's side never gets closer than MIN_EDGE to an inner line during a shot
 POSE_SMOOTH_S = .5  # the lane heading is noisy frame to frame (about 0.0012 rad rms): gate on its low-passed value.
 # The offset is steadier (about 3 cm) and is gated raw, so drift is seen without the filter's half-second lag.
-MAX_CURVE_ACCEL = .25  # m/s² across full 3 s model horizon (a 2900 m radius at 60 mph), not just present curvature
+MAX_CURVE_ACCEL = .50  # m/s² across full 3 s model horizon (a 2900 m radius at 60 mph), not just present curvature
 MIN_SPEED, BAND_SPLIT, MAX_SPEED = 25 * .44704, 45 * .44704, 70 * .44704  # no unbounded 'above 45' band
-MAX_SPEED_CHANGE = .5  # m/s from shot entry; a changing speed changes the experiment
-MIN_LANE_PROB = .7  # both inner lane lines, stronger than ordinary lane correction
+MAX_SPEED_CHANGE = 2.5  # m/s from shot entry; a changing speed changes the experiment
+MIN_LANE_PROB = .5  # both inner lane lines, stronger than ordinary lane correction
 DRIVER_TORQUE, DRIVER_SECONDS, HARD_DRIVER_TORQUE = 800., .15, 1200.  # Honda raw sensor units; provisional
 MAX_MODEL_AGE, MAX_FRAME_GAP = .15, .03  # seconds; stale road or scheduler gap aborts
 SETTLE_S, LEAD_S, TAIL_S, HARD_SHOT_S = 1., .2, .5, 2.3  # a shot is lead-in + signal + tail: 1.5 to 2.2 s
@@ -263,7 +264,7 @@ class Pulse:
     if not self.ignore_wheel and (abs(x.driver_torque) >= HARD_DRIVER_TORQUE or
                                   (self.driver_since is not None and now - self.driver_since >= DRIVER_SECONDS)):
       return "you're steering"
-    if self.in_shot and (abs(x.speed - self.record['speed']) > MAX_SPEED_CHANGE or band(x.speed) != self.speed_band):
+    if self.in_shot and (abs(x.speed - self.record['speed']) > MAX_SPEED_CHANGE):
       return 'speed changed'
     measured = x.lane_prob >= MIN_LANE_PROB
     if manual and self.in_shot and measured and x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset) < MIN_EDGE:
@@ -357,7 +358,7 @@ class Pulse:
       if not speed_stable:
         self.settle_speed = x.speed
       room = x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset)  # from the van's side to the nearer inner line
-      ready = (speed_stable and abs(x.offset) <= START_OFFSET and room >= MIN_EDGE + MAX_DRIFT and abs(x.heading) <= START_HEADING and
+      ready = (speed_stable and abs(x.offset) <= START_OFFSET and room >= MIN_EDGE + START_ROOM and abs(x.heading) <= START_HEADING and
                abs(x.rate) <= .5 and (self.ignore_wheel or abs(x.driver_torque) < DRIVER_TORQUE))
       if not ready or self.stable is None:
         self.base_sum, self.base_n = 0., 0
