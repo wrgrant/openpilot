@@ -26,6 +26,7 @@ from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LiveAB
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import PulseRuntime
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_feel import FeelRuntime
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane import LaneCentering
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_steer import OdysseySteer
 from openpilot.sunnypilot.selfdrive.controls.controlsd_ext import ControlsExt
@@ -79,11 +80,16 @@ class Controls(ControlsExt):
     self.odyssey_steer = OdysseySteer() if self.CP.lateralTuning.which() == 'torque' else None
     self.odyssey_ab = LiveAB(self.params)
     self.odyssey_pulse = None
+    self.odyssey_feel = None
     if self.odyssey_steer is not None and self.CP.carFingerprint == HONDA_CAR.HONDA_ODYSSEY:
       try:
         self.odyssey_pulse = PulseRuntime(self.params)
       except Exception:
         cloudlog.exception("odyssey_pulse initialization disabled")
+      try:
+        self.odyssey_feel = FeelRuntime(self.params)  # the feel test's blind wander and bump trials (odyssey_feel.py)
+      except Exception:
+        cloudlog.exception("odyssey_feel initialization disabled")
     self.odyssey_lane = LaneCentering()  # Odyssey lane-centring correction on the model's curvature (off by default)
 
   def update(self):
@@ -154,6 +160,17 @@ class Controls(ControlsExt):
     actuators.accel = float(self.LoC.update(CC.longActive, CS, long_plan.aTarget, long_plan.shouldStop, pid_accel_limits))
 
     self.odyssey_ab.update(time.monotonic(), CS, model_v2, CC.latActive, model_v2.action.desiredCurvature * CS.vEgo**2)
+    feel_curvature, feel_torque = 0., 0.
+    if self.odyssey_feel is not None:
+      try:
+        # message clock, as the pulse test: a replay runs it as the road did
+        feel_now = self.sm.logMonoTime['selfdriveState'] * 1e-9
+        feel_curvature, feel_torque = self.odyssey_feel.update(
+          feel_now, CS, model_v2, CC.latActive, self.sm.all_checks(['carState', 'modelV2']),
+          feel_now - self.sm.logMonoTime['modelV2'] * 1e-9, self.sm.valid['lateralManeuverPlan'])
+      except Exception:
+        self.odyssey_feel = None  # last-resort containment: faults in the experiment never stop lane keeping
+        feel_curvature, feel_torque = 0., 0.
 
     # Steering PID loop and lateral MPC
     # Reset desired curvature to current to avoid violating the limits on engage
@@ -166,6 +183,8 @@ class Controls(ControlsExt):
         self.odyssey_lane.update_model(model_v2, CS.vEgo, now)
       lane_change = model_v2.meta.laneChangeState != LaneChangeState.off or CS.leftBlinker or CS.rightBlinker
       new_desired_curvature = self.odyssey_lane.apply(new_desired_curvature, CS.vEgo, CC.latActive, lane_change, now)
+      if CC.latActive:
+        new_desired_curvature += feel_curvature  # feel test wander: open-loop feedforward, zero unless a trial runs
     self.desired_curvature, curvature_limited = clip_curvature(CS.vEgo, self.desired_curvature, new_desired_curvature, lp.roll)
     lat_delay = self.sm["lateralDelay"].lateralDelay + LAT_SMOOTH_SECONDS
 
@@ -177,6 +196,8 @@ class Controls(ControlsExt):
       steer = self.odyssey_steer.apply(steer, CC.latActive, CS, self.VM, lp, self.desired_curvature, self.LaC.steer_max,
                                        getattr(lac_log, "desiredLateralAccel", float("nan")),
                                        getattr(lac_log, "actualLateralAccel", float("nan")))
+    if feel_torque and CC.latActive:
+      steer = max(-self.LaC.steer_max, min(self.LaC.steer_max, steer + feel_torque))  # feel test bump blips
     actuators.torque = float(steer)
     if self.odyssey_pulse is not None:
       try:

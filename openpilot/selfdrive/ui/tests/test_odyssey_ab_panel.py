@@ -147,12 +147,12 @@ class TestOdysseyPanel(OpenpilotTestCase):
         time.sleep(.05)
         self.assertFalse(params.get_bool('OdysseyPulseIgnoreWheel'))
         seen = []
-        for _ in range(3):  # the top strip: pulse -> bump -> lane -> pulse, each arriving safe
+        for _ in range(4):  # the top strip: pulse -> bump -> lane -> feel -> pulse, each arriving safe
           panel._handle_mouse_release(MousePos(100, top + 20))
           time.sleep(.05)
           seen.append((params.get('OdysseyABExperiment'), params.get('OdysseyABArm') or '', params.get_bool('OdysseyABManual')))
           panel.e = seen[-1][0]
-        self.assertEqual(seen, [('bump', 'off', True), ('lane', 'off', True), ('pulse', '', True)])
+        self.assertEqual(seen, [('bump', 'off', True), ('lane', 'off', True), ('feel', '', True), ('pulse', '', True)])
         self.assertTrue(params.get_bool('OdysseyPulsePaused'), 'the pulse test arrives paused')
         from openpilot.selfdrive.ui.sunnypilot.layouts.settings.vehicle.brands.honda import HondaSettings
         params.put_bool('OdysseyPulsePaused', False, block=True)
@@ -160,6 +160,59 @@ class TestOdysseyPanel(OpenpilotTestCase):
         time.sleep(.05)
         self.assertFalse(params.get('OdysseyABArm'), 'pulse has no arms')
         self.assertTrue(params.get_bool('OdysseyPulsePaused'))
+        params.put_bool('OdysseyPulsePaused', False, block=True)
+        HondaSettings._select_experiment('feel')
+        time.sleep(.05)
+        self.assertEqual(params.get('OdysseyABExperiment'), 'feel')
+        self.assertTrue(params.get_bool('OdysseyPulsePaused'), 'the feel test arrives paused')
+
+        # Feel test: blind status, rating grid, "felt that" any time; taps go to controls through the input file.
+        import tempfile
+        from openpilot.sunnypilot.selfdrive.controls.lib import odyssey_feel as of
+        from openpilot.selfdrive.ui.sunnypilot.onroad import odyssey_ab_panel as ap
+        self.assertEqual(ap.FEEL_LABELS, of.RATINGS)
+        self.assertEqual([ap.feel_zone(x, y, 720) for y in (10, 210, 410) for x in (10, 400)],
+                         ['rate0', 'rate1', 'rate2', 'rate3', 'rate4', 'felt'])
+        for name, state, paused, rating in (('feel_paused', 'wait', True, None), ('feel_wait', 'wait', False, None),
+                                            ('feel_running', 'stimulus', False, None), ('feel_rate', 'rate', False, None),
+                                            ('feel_rated', 'rest', False, 2)):
+          params.put('OdysseyABStatus', json.dumps({'experiment': 'feel', 'mono_s': time.monotonic(), 'state': state,
+                     'reason': {'wait': 'under 25 mph', 'stimulus': 'running', 'rate': 'rate it', 'rest': 'rest'}[state],
+                     'trial': 7, 'rated': 6, 'total': 120, 'rating': rating, 'felt': 1, 'paused': paused}), block=True)
+          panel.last_read = 0
+          rl.begin_texture_mode(texture)
+          rl.clear_background(rl.Color(38, 44, 52, 255))
+          hud._draw_current_speed(rect)
+          hud._draw_set_speed(rect)
+          panel.render_in(rl.Rectangle(0, 0, 2160, 1080))
+          rl.end_texture_mode()
+          image = rl.load_image_from_texture(texture.texture)
+          Image.frombytes('RGBA', (2160, 1080), image.to_bytes(2160*1080*4)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(output / f'{name}.png')
+          rl.unload_image(image)
+          self.assertFalse(panel.broken)
+          self.assertEqual(panel.shown.height, ap.HEAD_H + ap.PAUSE_H + 3 * ap.FEEL_ROW_H)
+          self.assertIn('felt', panel.drawn)
+          self.assertTrue(all(label in panel.drawn for label in ap.FEEL_LABELS))
+          if state == 'stimulus':
+            self.assertIn('trial 7  running', panel.drawn)
+          for secret in ('wander', 'bump', 'sham', 'amplitude'):
+            self.assertFalse(any(secret in line for line in panel.drawn), 'the panel is blind')
+        self.assertIn('trial 7  rated', panel.drawn)
+        top = panel.shown.y
+        with tempfile.TemporaryDirectory() as d, patch.object(of, 'INPUT_PATH', os.path.join(d, 'input')):
+          reader = of.InputReader()
+          grid = top + ap.HEAD_H + ap.PAUSE_H
+          for x, y in ((100, grid + 100), (500, grid + 300), (500, grid + 500)):  # rate 0, rate 3, felt that
+            panel._handle_mouse_release(MousePos(x, y))
+          self.assertEqual([(k, v) for k, v, _ in reader.read()], [('rate', 0), ('rate', 3), ('felt', None)])
+          self.assertEqual(panel.feel_ack[0], 'felt')
+        with patch.object(of, 'INPUT_PATH', '/nonexistent/dir/input'):
+          panel._handle_mouse_release(MousePos(100, grid + 100))  # a failed write is logged, never raised
+        self.assertFalse(panel.broken)
+        paused_before = params.get_bool('OdysseyPulsePaused')
+        panel._handle_mouse_release(MousePos(100, top + ap.HEAD_H + 100))  # the status strip pauses / resumes
+        time.sleep(.05)
+        self.assertNotEqual(params.get_bool('OdysseyPulsePaused'), paused_before)
 
     finally:
       gui_app.close()

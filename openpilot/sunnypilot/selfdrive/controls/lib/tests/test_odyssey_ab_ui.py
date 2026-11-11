@@ -8,7 +8,7 @@ from openpilot.sunnypilot.selfdrive.controls.lib import odyssey_ab as ab
 class TestOdysseyAB(unittest.TestCase):
   def test_selection(self):
     for e, arms in ab.EXPERIMENTS.items():
-      if e == 'pulse':
+      if e in ab.OWN_RUNTIME:
         self.assertEqual(ab.selection(e, 'bad', True, 99), 'off')
         continue
       for arm in arms:
@@ -20,6 +20,9 @@ class TestOdysseyAB(unittest.TestCase):
     with patch.object(ab, '_config', ('bump', True, 'kick')):
       self.assertEqual(ab.runtime_arm('bump', 0, ab.DEADBAND_ARMS), 'kick')
       self.assertFalse(ab.clock_enabled('lane', True))
+    with patch.object(ab, '_config', ('feel', False, '')):
+      self.assertFalse(ab.clock_enabled('lane', True), 'the clock A/Bs stand still during the feel test')
+      self.assertFalse(ab.manual_experiment('bump'))
 
   def test_reasons(self):
     good = {'active': True, 'speed': 20, 'since_switch': 6, 'lane_probs': (1, 1), 'desired_accel': 0}

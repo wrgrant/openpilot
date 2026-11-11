@@ -23,7 +23,9 @@ def ab_arm(mono_s: float, arms: tuple[str, ...], block_s: float = AB_BLOCK_S) ->
 
 
 # The historical model clock above remains readable for old drives; manual tests exclude S5.
-EXPERIMENTS = {"lane": LANE_ARMS, "bump": DEADBAND_ARMS, "nnlc_model": ("stock", "S3"), "lowspeed": LOWSPEED_ARMS, "pulse": ()}
+EXPERIMENTS = {"lane": LANE_ARMS, "bump": DEADBAND_ARMS, "nnlc_model": ("stock", "S3"), "lowspeed": LOWSPEED_ARMS, "pulse": (),
+               "feel": ()}
+OWN_RUNTIME = ("pulse", "feel")  # experiments with their own runtime, status and records, and no A/B arms
 TARGET_STRAIGHT, TARGET_CURVE = 300, 60
 PARAMS_POLL_S = 0.2  # how often the worker re-reads the experiment and arm: a tap takes effect within this
 TOTALS_SAVE_S = 10.0  # totals go to flash this often; the live status carries them to the screen in between
@@ -37,7 +39,7 @@ def mem_params(params):
 
 
 def selection(experiment, arm, manual, mono_s):
-  if experiment not in EXPERIMENTS or experiment == "pulse":
+  if experiment not in EXPERIMENTS or experiment in OWN_RUNTIME:
     return "off"
   arms = EXPERIMENTS[experiment]
   if manual:
@@ -119,7 +121,7 @@ def manual_experiment(name):
 
 
 def clock_enabled(name, enabled):
-  return _config[0] != "pulse" and (enabled or _config[0] == name) and not (_config[0] and _config[1])
+  return _config[0] not in OWN_RUNTIME and (enabled or _config[0] == name) and not (_config[0] and _config[1])
 
 
 def runtime_arm(name, mono_s, arms, block_s=AB_BLOCK_S):
@@ -200,9 +202,9 @@ class LiveAB:
   def _update(self, now, cs, md, active, desired_accel):
     import queue
     e, manual, arm = _config
-    if e == "pulse":
+    if e in OWN_RUNTIME:
       self.last = None
-      return  # PulseRuntime owns the panel and records; pulse has no A/B arms.
+      return  # PulseRuntime / FeelRuntime own the panel and records; they have no A/B arms.
     if not e:
       self.last = None
       if self.status is not None and self.status["experiment"]:

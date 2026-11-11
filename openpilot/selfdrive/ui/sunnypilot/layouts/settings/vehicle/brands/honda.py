@@ -41,8 +41,8 @@ class HondaSettings(BrandSettings):
 
     names = ["", *EXPERIMENTS]
     self.ab_experiment = multiple_button_item_sp("Odyssey A/B experiment", "Select while parked; lowspeed also needs SteerLowSpeedAngle, models need NNLC.",
-                                               ["None", *(self.LABELS.get(e, e) for e in EXPERIMENTS)], button_width=220,
-                                               callback=lambda i: self._select_experiment(names[i]), inline=False)  # six buttons must fit the page
+                                               ["None", *(self.LABELS.get(e, e) for e in EXPERIMENTS)], button_width=190,
+                                               callback=lambda i: self._select_experiment(names[i]), inline=False)  # seven buttons must fit the page
     self.ab_manual = toggle_item_sp("Driver selects A/B arm", initial_state=ui_state.params.get_bool("OdysseyABManual"),
                                    callback=lambda v: ui_state.params.put_bool("OdysseyABManual", v))
     self.ab_reset = button_item_sp("Odyssey A/B totals", "Reset", callback=reset_totals)
@@ -62,8 +62,8 @@ class HondaSettings(BrandSettings):
   def _select_experiment(name):
     ui_state.params.put("OdysseyABArm", EXPERIMENTS[name][0] if name and EXPERIMENTS[name] else "")
     ui_state.params.put("OdysseyABExperiment", name)
-    if name == "pulse":
-      ui_state.params.put_bool("OdysseyPulsePaused", True)
+    if name in ("pulse", "feel"):
+      ui_state.params.put_bool("OdysseyPulsePaused", True)  # both start paused; feel shares the pulse test's pause
 
 
   def _on_enable_enforce_stock_longitudinal(self, state: bool):

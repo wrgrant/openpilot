@@ -15,6 +15,8 @@ Use OdysseyABExperiment, OdysseyABManual and OdysseyABArm to force one arm, or -
 must equal the output with it off, and with it running there must be shots (stretches of exactly zero command and
 exact pulse heights). The test keeps time on the message clock, so the replay runs it as the road did; the recorded
 van does not react to the pulses, so this proves the wiring and the commands, not the van's response.
+--feel checks the feel test (odyssey_feel.py) the same way on a highway minute: paused equals off, and running starts a
+trial whose extra curvature or torque stays inside the test's caps.
 """
 import argparse
 import json
@@ -90,16 +92,59 @@ def pulse_check(lr: list) -> bool:
   return same and bounded and len(shots) > 0 and len(heights) > 0 and bool(run["torque_controller"][run["active"]].all())
 
 
+def feel_check(lr: list) -> bool:
+  """Paused equals off; then one replay per family, with the progress file set so the first trial is a real one."""
+  import os
+  from openpilot.sunnypilot.selfdrive.controls.lib import odyssey_feel as of
+  off = replay(lr, BASE)
+  paused = replay(lr, {**BASE, "OdysseyABExperiment": "feel", "OdysseyPulsePaused": True})
+  n = min(len(off["torque"]), len(paused["torque"]))
+  same = bool(np.array_equal(off["torque"][:n], paused["torque"][:n]) and np.array_equal(off["curv"][:n], paused["curv"][:n]))
+  print(f"feel off: {n} frames. Selected but paused: output identical to off: {same}")
+  ok = same
+  saved = open(of.PROGRESS_PATH).read() if os.path.exists(of.PROGRESS_PATH) else None
+  try:
+    for family in ("wander", "bump"):
+      plan = of.plan(1)
+      first = next(k for k, (_, stim) in enumerate(plan) if stim.family == family and not stim.sham)
+      with open(of.PROGRESS_PATH, "w") as f:
+        json.dump({"version": of.VERSION, "seed": 1, "done": [i for i, _ in plan[:first]], "trials": 0}, f)
+      run = replay(lr, {**BASE, "OdysseyABExperiment": "feel", "OdysseyPulsePaused": False})
+      # the first trial only: a second can start once the first goes unrated (settle + stimulus + rating timeout)
+      m = min(n, len(run["torque"]), round(100 * (of.SETTLE_S + of.STIM_S + of.RATE_TIMEOUT_S)) - 100)
+      dk, dt = run["curv"][:m] - off["curv"][:m], run["torque"][:m] - off["torque"][:m]
+      finite = bool(np.isfinite(run["torque"]).all() and np.isfinite(run["curv"]).all())
+      # the curvature also carries lane keeping's answer to the sway, so allow a margin over the open-loop cap
+      bounded = float(np.max(np.abs(dk))) <= 1.5 * of.MAX_ACCEL / of.MIN_SPEED ** 2 and float(np.max(np.abs(run["torque"][:m]))) <= 1.
+      if family == "wander":
+        moved = float(np.max(np.abs(dk))) > 1e-5
+      else:  # a bump is torque alone, of the planned size
+        moved = float(np.max(np.abs(dk))) == 0. and float(np.max(np.abs(dt))) >= .9 * plan[first][1].size
+      print(f"{family} trial {plan[first][0]}: largest extra curvature {np.max(np.abs(dk)):.5f} 1/m (open-loop cap "
+            + f"{of.MAX_ACCEL / of.MIN_SPEED ** 2:.5f} at 25 mph), largest torque change {np.max(np.abs(dt)):.3f}, finite {finite}")
+      ok &= finite and bounded and moved and bool(run["torque_controller"][run["active"]].all())
+  finally:
+    if saved is None:
+      os.remove(of.PROGRESS_PATH)
+    else:
+      with open(of.PROGRESS_PATH, "w") as f:
+        f.write(saved)
+  return ok
+
+
 def main():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("rlog")
   parser.add_argument("params", nargs="?", default="{}")
   parser.add_argument("--all-manual", action="store_true", help="replay every safe experiment/arm in manual mode")
   parser.add_argument("--pulse", action="store_true", help="check the pulse test: paused equals off, running produces shots")
+  parser.add_argument("--feel", action="store_true", help="check the feel test: paused equals off, running starts a bounded trial")
   args = parser.parse_args()
   lr = list(LogReader(args.rlog))
   if args.pulse:
     sys.exit(0 if pulse_check(lr) else "FAILED: the pulse test changed the output while paused, sent no shots, or left its bounds")
+  if args.feel:
+    sys.exit(0 if feel_check(lr) else "FAILED: the feel test changed the output while paused, ran no trial, or left its bounds")
   params = json.loads(args.params)
   log = logged(lr)
   runs = {"as driven": replay(lr, BASE), "with params": replay(lr, {**BASE, **params})}
