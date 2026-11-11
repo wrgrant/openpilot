@@ -185,10 +185,11 @@ class OdysseyStripChart:
     for t, torque, angle in self.history.recent(now):
       y = top + (now - t) / HISTORY_SECONDS * height
       x = center - scaled(torque, TORQUE_SCALE) * half
-      rl.draw_line_ex(rl.Vector2(center, y), rl.Vector2(x, y), 3., orange)
+      wheel_x = center - scaled(angle, WHEEL_SCALE) * half
+      if previous is not None and previous[3] - t < .1:
+        # torque as a line, not filled bars, so the wheel trace stays visible
+        rl.draw_line_ex(rl.Vector2(previous[0], previous[1]), rl.Vector2(x, y), 3., orange)
+        rl.draw_line_ex(rl.Vector2(previous[2], previous[1]), rl.Vector2(wheel_x, y), 3., cyan)
       if abs(torque) > TORQUE_SCALE:
         rl.draw_circle(int(x), int(y), 3., rl.WHITE)
-      wheel_x = center - scaled(angle, WHEEL_SCALE) * half
-      if previous is not None and previous[2] - t < .1:
-        rl.draw_line_ex(rl.Vector2(previous[0], previous[1]), rl.Vector2(wheel_x, y), 2., cyan)
-      previous = wheel_x, y, t
+      previous = x, y, wheel_x, t
