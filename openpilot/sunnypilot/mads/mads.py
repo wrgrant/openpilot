@@ -117,6 +117,11 @@ class ModularAssistiveDrivingSystem:
       self.lateral_mismatch_counter += 1
 
   def update_events(self, CS: structs.CarState):
+    if not self.selfdrive.enabled and self.CP.brand == 'honda' and self.CP.pcmCruise:
+      # Odyssey: steering-only engagement below the factory ACC's 25 mph minimum. The car's own cruise still refuses to
+      # engage below it, so this only lets lane keeping start; the EPS's own minimum steering speed still applies.
+      self.events.remove(EventName.belowEngageSpeed)
+
     if not self.selfdrive.enabled and self.enabled:
       if CS.standstill:
         if self.events.has(EventName.doorOpen):
