@@ -1,5 +1,6 @@
 """Odyssey steering history. Raw subscriptions retain samples between UI frames; no new wire schema."""
 import time
+import traceback
 
 import raylib_nb as rl
 
@@ -70,8 +71,31 @@ class OdysseyStripChart:
     self.fine = False
     self.output_source = False
     self.latest = self.received_at = 0.
+    self.failed = False
 
   def update(self, honda_odyssey: bool):
+    # Any failure turns off the precise angle (and then the chart), never the screen process.
+    if self.failed:
+      return
+    try:
+      self._update(honda_odyssey)
+    except Exception:
+      self._fail()
+
+  def _fail(self):
+    if self.parser is not None or self.socks is None or 'can' in (self.socks or {}):
+      self.parser = None
+      if self.socks is not None:
+        self.socks.pop('can', None)
+    else:
+      self.failed = True
+    try:
+      with open('/dev/shm/odyssey_chart_error', 'a') as f:
+        f.write(traceback.format_exc())
+    except Exception:
+      pass
+
+  def _update(self, honda_odyssey: bool):
     if self.socks is None:
       self.socks = {s: messaging.sub_sock(s, conflate=False) for s in ('can', 'carState', 'carControl', 'carOutput')}
     if honda_odyssey and self.parser is None:
@@ -128,9 +152,18 @@ class OdysseyStripChart:
       self.history.append(t, self.torque, self.angle)
 
   def draw(self, rect, font):
+    if self.failed:
+      return
+    try:
+      self._draw(rect, font)
+    except Exception:
+      self.failed = True
+      self._fail()
+
+  def _draw(self, rect, font):
     orange, cyan = rl.Color(255, 155, 45, 230), rl.Color(80, 230, 255, 255)
     grid = rl.Color(255, 255, 255, 60)
-    rl.draw_rectangle_rec(rect, rl.Color(0, 0, 0, 155))
+    rl.draw_rectangle_rec(rect, rl.Color(0, 0, 0, 70))
     labels = ((f'torque +/-{TORQUE_SCALE * 100:g}%', orange),
               (f'wheel +/-{WHEEL_SCALE:g}°', cyan),
               (f'{HISTORY_SECONDS:g} s / {"fine" if self.fine else "coarse"}', rl.WHITE),
@@ -151,11 +184,11 @@ class OdysseyStripChart:
     previous = None
     for t, torque, angle in self.history.recent(now):
       y = top + (now - t) / HISTORY_SECONDS * height
-      x = center + scaled(torque, TORQUE_SCALE) * half
+      x = center - scaled(torque, TORQUE_SCALE) * half
       rl.draw_line_ex(rl.Vector2(center, y), rl.Vector2(x, y), 3., orange)
       if abs(torque) > TORQUE_SCALE:
         rl.draw_circle(int(x), int(y), 3., rl.WHITE)
-      wheel_x = center + scaled(angle, WHEEL_SCALE) * half
+      wheel_x = center - scaled(angle, WHEEL_SCALE) * half
       if previous is not None and previous[2] - t < .1:
         rl.draw_line_ex(rl.Vector2(previous[0], previous[1]), rl.Vector2(wheel_x, y), 2., cyan)
       previous = wheel_x, y, t

@@ -6,47 +6,19 @@ See the LICENSE.md file in the root directory for more details.
 """
 from enum import IntEnum
 
+from openpilot.selfdrive.ui.sunnypilot.onroad.odyssey_strip_chart import OdysseyStripChart
+
 import raylib_nb as rl
 from openpilot.selfdrive.ui.ui_state import ui_state
 from openpilot.selfdrive.ui.sunnypilot.onroad.developer_ui.elements import (
-  SteeringTorquePercentElement, CurveSpeedElement,
-  UiElement, RelDistElement, RelSpeedElement, SteeringAngleElement,
-  DesiredLateralAccelElement, ActualLateralAccelElement, DesiredSteeringAngleElement,
-  AEgoElement, LeadSpeedElement, FrictionCoefficientElement, LatAccelFactorElement,
-  SteeringTorqueEpsElement, BearingDegElement, AltitudeElement, DesiredSteeringPIDElement
+  UiElement, AEgoElement, LeadSpeedElement, FrictionCoefficientElement, LatAccelFactorElement,
+  SteeringTorqueEpsElement, BearingDegElement, AltitudeElement,
 )
 from openpilot.system.ui.lib.application import gui_app, FontWeight
-from openpilot.system.ui.lib.text_measure import measure_text_cached
 from openpilot.system.ui.widgets import Widget
 
 
 RIGHT_COLUMN_WIDTH = 236  # wide enough for a label and its unit side by side
-
-
-def _digit_advance(font: rl.Font, size: int) -> float:
-  return max(measure_text_cached(font, d, size, 0).x for d in "0123456789")
-
-
-def draw_tabular_right(font: rl.Font, text: str, right_x: float, y: float, size: int, color: rl.Color) -> None:
-  """Draw text right-aligned at right_x, giving every digit the same width (tabular figures)."""
-  digit_w = _digit_advance(font, size)
-  x = right_x
-  for ch in reversed(text):
-    ch_w = measure_text_cached(font, ch, size, 0).x
-    cell_w = digit_w if ch.isdigit() else ch_w
-    x -= cell_w
-    rl.draw_text_ex(font, ch, rl.Vector2(x + (cell_w - ch_w) / 2, y), size, 0, color)
-
-
-def draw_unit(font: rl.Font, unit: str, right_x: float, y: float, size: int, color: rl.Color) -> None:
-  """Draw a unit right-aligned at right_x; a trailing ^2 becomes a raised small 2."""
-  base, sup = (unit[:-2], unit[-1]) if unit.endswith("^2") else (unit, "")
-  sup_size = int(size * 0.65)
-  sup_w = measure_text_cached(font, sup, sup_size, 0).x if sup else 0
-  base_w = measure_text_cached(font, base, size, 0).x
-  rl.draw_text_ex(font, base, rl.Vector2(right_x - sup_w - base_w, y), size, 0, color)
-  if sup:
-    rl.draw_text_ex(font, sup, rl.Vector2(right_x - sup_w, y - size * 0.15), sup_size, 0, color)
 
 
 def get_bottom_dev_ui_offset():
@@ -68,14 +40,8 @@ class DeveloperUiRenderer(Widget):
     self._font_bold: rl.Font = gui_app.font(FontWeight.BOLD)
     self._font_semi_bold: rl.Font = gui_app.font(FontWeight.SEMI_BOLD)
     self.dev_ui_mode = DeveloperUiState.OFF
+    self.strip_chart = OdysseyStripChart()
 
-    self.rel_dist_elem = RelDistElement()
-    self.rel_speed_elem = RelSpeedElement()
-    self.steering_angle_elem = SteeringAngleElement()
-    self.desired_lat_accel_elem = DesiredLateralAccelElement()
-    self.actual_lat_accel_elem = ActualLateralAccelElement()
-    self.desired_steer_elem = DesiredSteeringAngleElement()
-    self.desired_pid_steer_elem = DesiredSteeringPIDElement()
     self.a_ego_elem = AEgoElement()
     self.lead_speed_elem = LeadSpeedElement()
     self.friction_elem = FrictionCoefficientElement()
@@ -83,8 +49,6 @@ class DeveloperUiRenderer(Widget):
     self.steering_torque_elem = SteeringTorqueEpsElement()
     self.bearing_elem = BearingDegElement()
     self.altitude_elem = AltitudeElement()
-    self.steer_torque_pct_elem = SteeringTorquePercentElement()
-    self.curve_speed_elem = CurveSpeedElement()
 
   def _update_state(self) -> None:
     self.dev_ui_mode = ui_state.developer_ui
@@ -106,50 +70,12 @@ class DeveloperUiRenderer(Widget):
       self._draw_bottom_dev_ui(rect)
 
   def _draw_right_dev_ui(self, rect: rl.Rectangle) -> None:
-    sm = ui_state.sm
-    controls_state = sm['controlsState']
-
-    UI_BORDER_SIZE = 20
-    container_width = RIGHT_COLUMN_WIDTH
-    x = int(rect.x + rect.width - container_width - UI_BORDER_SIZE * 2)
-    y = int(rect.y + UI_BORDER_SIZE * 1.5)
-
-    # sunnypilot Odyssey: lead distance/speed are on the chevron, so this column shows steering torque and
-    # the curve speed ahead in their place
-    elements = [
-      self.curve_speed_elem.update(sm, ui_state.is_metric),
-      self.steer_torque_pct_elem.update(sm, ui_state.is_metric),
-      self.steering_angle_elem.update(sm, ui_state.is_metric),
-    ]
-    if controls_state.lateralControlState.which() == 'torqueState':
-      elements.append(self.desired_lat_accel_elem.update(sm, ui_state.is_metric))
-    elif controls_state.lateralControlState.which() == 'angleState':
-      elements.append(self.desired_steer_elem.update(sm, ui_state.is_metric))
-    elif controls_state.lateralControlState.which() == 'pidState':
-      elements.append(self.desired_pid_steer_elem.update(sm, ui_state.is_metric))
-
-    elements.append(self.actual_lat_accel_elem.update(sm, ui_state.is_metric))
-
-    current_y = y
-    for element in elements:
-      current_y += self._draw_right_dev_ui_element(x, current_y, element)
-
-  def _draw_right_dev_ui_element(self, x: int, y: int, element: UiElement) -> int:
-    # sunnypilot Odyssey: label and unit read upright on one line, and the value is right-aligned with
-    # fixed-width digits, so the decimal point and last digit stay put as numbers change
-    y += 230
-    container_width = RIGHT_COLUMN_WIDTH
-    label_size = 26
-    value_size = 60
-    label_color = rl.Color(255, 255, 255, 230)
-    unit_color = rl.Color(255, 255, 255, 150)
-
-    rl.draw_text_ex(self._font_bold, element.label, rl.Vector2(x, y), label_size, 0, label_color)
-    if element.unit:
-      draw_unit(self._font_semi_bold, element.unit, x + container_width, y, label_size, unit_color)
-
-    draw_tabular_right(self._font_bold, element.value, x + container_width, y + 34, value_size, element.color)
-    return 130
+    cp = ui_state.CP
+    self.strip_chart.update(cp is not None and cp.carFingerprint == 'HONDA_ODYSSEY')
+    bottom = get_bottom_dev_ui_offset()
+    width = RIGHT_COLUMN_WIDTH + 80  # sticks out about a centimetre left of the old number column
+    self.strip_chart.draw(rl.Rectangle(rect.x + rect.width - width - 40, rect.y + 30,
+                                      width, rect.height - 60 - bottom), self._font_semi_bold)
 
   def _draw_bottom_dev_ui(self, rect: rl.Rectangle) -> None:
     sm = ui_state.sm
