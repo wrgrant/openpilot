@@ -105,7 +105,7 @@ def parse_record(raw):
 
 
 # A single atomic snapshot is read by controllers. Only the worker touches params/log I/O.
-_config = ["", False, ""]
+_config = ("", False, "")
 _model_arms = {"stock"}
 
 
@@ -155,7 +155,7 @@ class LiveAB:
     import time
     totals = validate_totals(self.params.get("OdysseyABTotals"))
     last_record, last_save, last_log, last_poll = None, 0., 0., -1.
-    while not self.stop.is_set() or not self.queue.empty():
+    while not self.stop.is_set():
       if time.monotonic() - last_poll >= PARAMS_POLL_S:  # not once per queued frame: these are file reads
         last_poll = time.monotonic()
         e = self.params.get("OdysseyABExperiment") or ""
@@ -164,11 +164,11 @@ class LiveAB:
         manual = self.params.get_bool("OdysseyABManual")
         if e and e not in EXPERIMENTS:
           e, arm, manual = "lane", "", True
-        _config[:] = (e, manual, arm)
+        _config = (e, manual, arm)
         if self.params.get_bool("OdysseyABReset"):
           totals = validate_totals("{}")
           self.params.put_bool("OdysseyABReset", False)
-          self.params.put("OdysseyABTotals", json.dumps(totals), block=True)
+          self.params.put("OdysseyABTotals", json.dumps(totals))
       try:
         record, dt = self.queue.get(timeout=.1)
       except queue.Empty:
@@ -182,10 +182,8 @@ class LiveAB:
         self.mem.put("OdysseyABStatus", json.dumps({**record, "totals": totals.get(record["experiment"], {})}))
         last_record, last_log = key, now
       if now - last_save >= TOTALS_SAVE_S or not record["experiment"]:
-        self.params.put("OdysseyABTotals", json.dumps(totals), block=True)
+        self.params.put("OdysseyABTotals", json.dumps(totals))
         last_save = now
-
-    self.params.put("OdysseyABTotals", json.dumps(totals), block=True)
 
   def update(self, now, cs, md, active, desired_accel):
     """Called from the 100 Hz controls loop. Counting is bookkeeping: a fault here must never stop steering, so it

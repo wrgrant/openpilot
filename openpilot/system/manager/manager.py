@@ -117,6 +117,9 @@ def manager_cleanup() -> None:
   cloudlog.info("everything is dead")
 
 
+RESTART_FLAG = '/dev/shm/odyssey_restart_controlsd'
+
+
 def manager_thread() -> None:
   cloudlog.bind(daemon="manager")
   cloudlog.info("manager start")
@@ -160,6 +163,16 @@ def manager_thread() -> None:
 
     started_prev = started
     ignition_prev = ignition
+
+    # Odyssey test drives: tools/odyssey_restart_controls.py drops this file to restart controlsd alone on new Python code
+    if os.path.exists(RESTART_FLAG):
+      try:
+        os.remove(RESTART_FLAG)
+      except OSError:
+        pass
+      if 'controlsd' in managed_processes:
+        cloudlog.event('odyssey_restart_controlsd')
+        managed_processes['controlsd'].stop()
 
     ensure_running(managed_processes.values(), started, params=params, CP=sm['carParams'], not_run=ignore)
 

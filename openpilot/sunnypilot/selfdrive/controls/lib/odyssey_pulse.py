@@ -422,17 +422,16 @@ class PulseRuntime:
     try:
       raw = json.loads(self.params.get('OdysseyPulseProgress') or '{}')
       import os
-      if self.params.get('OdysseyABExperiment') == 'pulse' and not os.environ.get('REPLAY') and not getattr(self, 'resuming', False):
+      if self.params.get('OdysseyABExperiment') == 'pulse' and not os.environ.get('REPLAY'):
         self.params.put_bool('OdysseyPulsePaused', True)  # every drive starts paused: the driver taps the panel to begin
-      if not os.environ.get('REPLAY') and not getattr(self, 'resuming', False):  # a queue or a note left from an earlier drive means nothing now
+      if not os.environ.get('REPLAY'):  # a queue or a note left from an earlier drive means nothing now
         self.params.put('OdysseyPulseQueue', '[]')
         mem.put('OdysseyAgentNote', '')
         mem.remove('OdysseyPulseFire')
       queue_raw, queue_read = None, -1.
-      if not getattr(self, 'resuming', False):
-        self.config = (False, True, raw)
+      self.config = (False, True, raw)
       last_poll = -1.
-      while not self.stop.is_set() or not self.queue.empty():
+      while not self.stop.is_set():
         now = time.monotonic()
         self.heartbeat = now
         if now-last_poll >= .1:
