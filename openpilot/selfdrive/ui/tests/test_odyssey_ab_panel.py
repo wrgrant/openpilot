@@ -107,7 +107,7 @@ class TestOdysseyPanel(OpenpilotTestCase):
           params.put('OdysseyABExperiment', 'pulse', block=True)
           params.put('OdysseyABStatus', json.dumps({'experiment': 'pulse', 'mono_s': time.monotonic(),
                      'state': name, 'reason': reason, 'finished': 7, 'total': 78, 'band': '45-70',
-                     'last_result': 'pair 6% 0.1s: wheel +0.30°', 'paused': name == 'paused',
+                     'next_shot': 'square', 'last_result': 'pair 6% 0.1s: wheel +0.30°', 'paused': name == 'paused',
                      'wheel': 920 if name == 'tail' else 140, 'wheel_limit': 800, 'ignore_wheel': name == 'tail'}), block=True)
           panel.last_read = 0
           rl.begin_texture_mode(texture)
@@ -120,7 +120,12 @@ class TestOdysseyPanel(OpenpilotTestCase):
           self.assertFalse(panel.broken)
         params.put_bool('OdysseyPulsePaused', False, block=True)
         top, bottom = panel.shown.y, panel.shown.y + panel.shown.height
-        panel._handle_mouse_release(MousePos(100, top + 200))  # the middle: pause
+        panel._handle_mouse_release(MousePos(100, top + 200))  # middle fires while running
+        time.sleep(.05)
+        self.assertTrue(ab.mem_params(params).get('OdysseyPulseFire'))
+        self.assertFalse(params.get_bool('OdysseyPulsePaused'))
+        self.assertIn('Tap to fire: square', panel.drawn)
+        panel._handle_mouse_release(MousePos(100, top + 100))  # status heading pauses
         time.sleep(.05)
         self.assertTrue(params.get_bool('OdysseyPulsePaused'))
         panel._handle_mouse_release(MousePos(100, bottom - 40))  # the bottom strip: ignore the wheel sensor, and back

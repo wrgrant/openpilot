@@ -1,6 +1,6 @@
-"""Odyssey test panel: which test and arm is running, how much good data there is, and three touch zones.
+"""Odyssey test panel: which test and arm is running, how much good data there is, and touch controls.
   top strip    switch to the next test (pulse, bump, lane), so one trip can run several without parking
-  middle       next arm, or pause / resume the pulse test
+  middle       next arm, or fire the next pulse shot (status heading pauses / resumes)
   bottom strip (pulse test) whether the wheel torque sensor may stop a shot
 It shows the arm controls reports back, never the arm the tap asked for, so the label is always what is steering."""
 import json
@@ -28,13 +28,18 @@ ONROAD_TESTS = ("pulse", "bump", "lane")  # the tests the top strip cycles throu
 def next_arm(params):
   e = params.get("OdysseyABExperiment") or ""
   if e == "pulse":
-    params.put_bool("OdysseyPulsePaused", not params.get_bool("OdysseyPulsePaused"))
+    if not params.get_bool("OdysseyPulsePaused"):
+      mem_params(params).put("OdysseyPulseFire", str(time.monotonic()))
     return
   if e not in EXPERIMENTS or not params.get_bool("OdysseyABManual"):
     return
   arms = EXPERIMENTS[e]
   arm = params.get("OdysseyABArm")
   params.put("OdysseyABArm", arms[(arms.index(arm) + 1) % len(arms)] if arm in arms else arms[0])
+
+
+def toggle_pulse(params):
+  params.put_bool("OdysseyPulsePaused", not params.get_bool("OdysseyPulsePaused"))
 
 
 def next_test(params):
@@ -87,16 +92,18 @@ class OdysseyABPanel(Widget):
     self.broken = False
 
   def zone(self, pos) -> str:
-    """Which touch strip a point is in: 'test', 'wheel' or 'main'."""
+    """Which touch control a point is in: 'test', 'pause', 'wheel' or 'main'."""
     if self.shown is None:
       return ""
     if pos.y < self.shown.y + HEAD_H:
       return "test"
+    if self.e == "pulse" and pos.y < self.shown.y + HEAD_H + 106:
+      return "pause"
     return "wheel" if self.e == "pulse" and pos.y >= self.shown.y + self.shown.height - FOOT_H else "main"
 
   def _handle_mouse_release(self, mouse_pos, /) -> None:
     # totals are reset in settings, parked: no dialogs while driving
-    action = {"test": next_test, "wheel": toggle_wheel_stop, "main": next_arm}.get(self.zone(mouse_pos))
+    action = {"test": next_test, "wheel": toggle_wheel_stop, "main": next_arm, "pause": toggle_pulse}.get(self.zone(mouse_pos))
     if action is not None:
       action(ui_state.params)
 
@@ -157,13 +164,15 @@ class OdysseyABPanel(Widget):
       headline = "paused" if status.get("paused") else state
       reason = str(status.get("reason", "waiting for controls"))
       text(headline, 0, HEAD_H - 4, 86)
-      hint = "tap to start" if status.get("paused") else "tap to pause" if headline in ("pulsing", reason) else reason
-      text(hint, 0, HEAD_H + 96, 36, rl.YELLOW)
+      text("tap to start" if status.get("paused") else "tap to pause", 0, HEAD_H + 80, 24, rl.LIGHTGRAY)
+      hint = "paused" if status.get("paused") else f"Tap to fire: {status.get('next_shot', 'waiting')}"
+      text(hint, 0, HEAD_H + 112, 32, rl.YELLOW)
+      text(reason, 0, HEAD_H + 240, 28, rl.YELLOW)
       shots = f"{status.get('finished', 0)} of {status.get('total', 0)} shots"
-      text(shots + (f"  +  {status.get('queue')} queued" if status.get("queue") else f"  •  {status.get('band', '')} mph"), 0, HEAD_H + 144, 38)
+      text(shots + (f"  +  {status.get('queue')} queued" if status.get("queue") else f"  •  {status.get('band', '')} mph"), 0, HEAD_H + 154, 34)
       if self.note:  # the companion's note takes the place of the last shot's result
         for i, line in enumerate(self.note):
-          text(line, 0, HEAD_H + 192 + 34 * i, 30, NOTE_COLOR)
+          text(line, 0, HEAD_H + 188 + 26 * i, 24, NOTE_COLOR)
       else:
         text(str(status.get("last_result", "")), 0, HEAD_H + 196, 30)
       foot = rect.height - FOOT_H - PAD

@@ -40,6 +40,7 @@ HANDOVER_STEP = .01  # normalized command per frame on the way back to lane keep
 VERSION = 2
 QUEUE_MAX, QUEUE_HEIGHT = 12, .12  # extra shots a drive companion may queue (OdysseyPulseQueue), and their largest command
 KINDS = ('single', 'pair', 'train', 'ramp', 'square', 'chirp', 'sham')
+FIRE_EXPIRE_S = 2.
 ACTIVE = ('lead-in', 'pulse', 'tail')
 
 
@@ -97,12 +98,12 @@ def session():
   ramp = len(RAMP_LEVELS) * RAMP_STEP_S
   square = len(SQUARE_LEVELS) * 2 * SQUARE_HALF_S
   return (
-    ('sham-a', Condition('sham', 0., TRAIN_S, 1)),
     ('square+', Condition('square', SQUARE_LEVELS[-1], square, 1)),  # the EPS map: motor torque at each command level
-    ('pair-6-0.1', pair(.06, .1, 1)),  # the bump mode's own pulse, then its reversal
     ('ramp+', Condition('ramp', RAMP_LEVELS[-1], ramp, 1)),  # the level at which the wheel starts to move
+    ('pair-6-0.1', pair(.06, .1, 1)),  # the bump mode's own pulse, then its reversal
     ('chirp-5', Condition('chirp', .05, CHIRP_S, 1)),  # frequency response at a small size, for the simulator
     ('train-6-30+', train(.06, .3, 1)),  # does pulse-width modulation deliver a small average torque?
+    ('sham-a', Condition('sham', 0., TRAIN_S, 1)),
     ('ramp-', Condition('ramp', RAMP_LEVELS[-1], ramp, -1)),
     ('pair-6-0.2', pair(.06, .2, -1)),
     ('train-6-60-', train(.06, .6, -1)),
@@ -206,6 +207,9 @@ class Pulse:
     self.speed_band = '45-70'
     self.settle_speed = None
     self.base_sum, self.base_n, self.offset_start = 0., 0, 0.
+    self.fire_until = None
+    self.offset_measured = False
+    self.manual_start = None
     self.extra = ()  # queued shots (parse_queue), run before what is left of the plan
     self.aborts = {}  # reason -> count since controls started, for the panel
     self.ignore_wheel = False  # the driver's override: the wheel torque sensor neither blocks nor stops a shot
@@ -222,7 +226,7 @@ class Pulse:
   def queue_left(self):
     return sum(i not in self.done[self.speed_band] for i, _ in self.extra)
 
-  def gate(self, now, x):
+  def gate(self, now, x, manual=False):
     if not x.valid or not all(math.isfinite(v) for v in asdict(x).values()):
       return 'invalid data'
     if not x.active:
@@ -239,24 +243,28 @@ class Pulse:
       return 'lane change'
     if not MIN_SPEED <= x.speed <= MAX_SPEED:
       return 'speed band'
-    if x.lane_prob < MIN_LANE_PROB:
-      return 'lane lines lost'
-    if x.lane_width < MIN_LANE_WIDTH:
-      return 'narrow lane'
-    if abs(x.offset) > ABORT_OFFSET:
-      return 'offset'
-    if x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset) < MIN_EDGE:
-      return 'near the line'
-    if abs(x.heading) > ABORT_HEADING:
-      return 'heading'
-    if abs(x.curve_accel) > MAX_CURVE_ACCEL:
-      return 'curve ahead'
+    if not manual:
+      if x.lane_prob < MIN_LANE_PROB:
+        return 'lane lines lost'
+      if x.lane_width < MIN_LANE_WIDTH:
+        return 'narrow lane'
+      if abs(x.offset) > ABORT_OFFSET:
+        return 'offset'
+      if x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset) < MIN_EDGE:
+        return 'near the line'
+      if abs(x.heading) > ABORT_HEADING:
+        return 'heading'
+      if abs(x.curve_accel) > MAX_CURVE_ACCEL:
+        return 'curve ahead'
     if not self.ignore_wheel and (abs(x.driver_torque) >= HARD_DRIVER_TORQUE or
                                   (self.driver_since is not None and now - self.driver_since >= DRIVER_SECONDS)):
       return "you're steering"
     if self.in_shot and (abs(x.speed - self.record['speed']) > MAX_SPEED_CHANGE or band(x.speed) != self.speed_band):
       return 'speed changed'
-    if self.in_shot and abs(x.offset - self.offset_start) > MAX_DRIFT:
+    measured = x.lane_prob >= MIN_LANE_PROB
+    if manual and self.in_shot and measured and x.lane_width / 2 - VAN_HALF_WIDTH - abs(x.offset) < MIN_EDGE:
+      return 'near the line'
+    if self.in_shot and (not manual or (measured and self.offset_measured)) and abs(x.offset - self.offset_start) > MAX_DRIFT:
       return 'drifted'
     return ''
 
@@ -275,9 +283,16 @@ class Pulse:
         self.aborts[reason] = self.aborts.get(reason, 0) + 1
     self.record, self.stable, self.state = None, None, 'recover'
 
-  def step(self, now, normal, x, selected, paused=False):
+  def step(self, now, normal, x, selected, paused=False, fire=False):
     """Pure bounded computation; caller drains events. Internal fault latches experiment off."""
     try:
+      if fire and selected and not paused and not self.in_shot:
+        self.fire_until = now + FIRE_EXPIRE_S
+      if not selected or paused:
+        self.fire_until = None
+      if self.fire_until is not None and now >= self.fire_until:
+        self.last_result = f'fire expired: {self.reason}'
+        self.fire_until = None
       return self._step(now, normal, x, selected, paused)
     except Exception:
       self.broken = True
@@ -294,7 +309,8 @@ class Pulse:
     self.driver_since = (now if self.driver_since is None else self.driver_since) if abs(x.driver_torque) >= DRIVER_TORQUE else None
     if abs(x.driver_torque) >= self.wheel_peak or now - self.wheel_peak_time > 1.:
       self.wheel_peak, self.wheel_peak_time = abs(x.driver_torque), now
-    reason = self.gate(now, x) if selected else 'not selected'
+    manual = bool(self.record.get('manual')) if self.in_shot else self.fire_until is not None
+    reason = self.gate(now, x, manual) if selected else 'not selected'
     reason = 'paused' if paused else reason
     if self.broken or not math.isfinite(normal) or not math.isfinite(now):
       self.broken = True
@@ -313,6 +329,7 @@ class Pulse:
           self.previous_command += math.copysign(HANDOVER_STEP, normal-self.previous_command)
           self.reason = 're-centring'
           return self.previous_command
+        self.fire_until = None
         self.state, self.reason = 'done', 'done'
         return normal
       if self.settle_speed is None:
@@ -329,11 +346,16 @@ class Pulse:
       self.base_sum, self.base_n = self.base_sum + normal, self.base_n + 1
       if self.stable is not None and now - self.stable >= SETTLE_S and abs(self.base_sum / self.base_n) > MAX_RELEASE:
         self.stable = None  # holding too much torque for a straight: start the settling time over
-      if self.stable is not None and now - self.stable >= SETTLE_S:
+      if manual or (self.stable is not None and now - self.stable >= SETTLE_S):
+        self.fire_until = None
+        self.offset_measured = x.lane_prob >= MIN_LANE_PROB
         self.shot, self.start = candidates[0], now
+        if manual:
+          self.manual_start = now
         self.offset_start = x.offset
-        self.record = {'id': self.shot[0], 'condition': asdict(self.shot[1]), 'baseline': 0., 'released': self.base_sum / self.base_n, 'start': now,
-                       'speed': x.speed, 'band': self.speed_band, 'angle_start': x.angle, 'last_direction': self.last_direction}
+        self.record = {'id': self.shot[0], 'condition': asdict(self.shot[1]), 'baseline': 0.,
+                       'released': normal if manual else self.base_sum / self.base_n, 'start': now,
+                       'manual': manual, 'speed': x.speed, 'band': self.speed_band, 'angle_start': x.angle, 'last_direction': self.last_direction}
         self.events.append({**self.record, 'phase': 'start'})
         self.state = 'lead-in'
       else:
@@ -374,6 +396,8 @@ class PulseRuntime:
     self.controller = Pulse()
     self.config = (False, True, None)
     self.ignore_wheel = False
+    self.fire_request = None
+    self.fire_seen = None
     self.extra = ()
     self.heartbeat = time.monotonic()
     self.queue = queue.Queue(maxsize=512)
@@ -403,6 +427,7 @@ class PulseRuntime:
       if not os.environ.get('REPLAY'):  # a queue or a note left from an earlier drive means nothing now
         self.params.put('OdysseyPulseQueue', '[]')
         mem.put('OdysseyAgentNote', '')
+        mem.remove('OdysseyPulseFire')
       queue_raw, queue_read = None, -1.
       self.config = (False, True, raw)
       last_poll = -1.
@@ -415,6 +440,15 @@ class PulseRuntime:
             raw = {}
             self.params.put_bool('OdysseyPulseReset', False)
           self.ignore_wheel = self.params.get_bool('OdysseyPulseIgnoreWheel')
+          fire_raw = mem.get('OdysseyPulseFire')
+          if fire_raw and fire_raw != self.fire_seen:
+            self.fire_seen = fire_raw
+            try:
+              stamp = float(fire_raw)
+              if 0 <= now - stamp < FIRE_EXPIRE_S:
+                self.fire_request = stamp
+            except ValueError:
+              pass
           if now - queue_read >= 1.:
             queue_read, raw_queue = now, self.params.get('OdysseyPulseQueue') or '[]'
             if raw_queue != queue_raw:
@@ -449,7 +483,14 @@ class PulseRuntime:
             self.queue.put_nowait(('event', event))
         c = self.controller = Pulse(progress)
         self.config = (selected, paused, None)
+      request = getattr(self, 'fire_request', None)
+      fire = request is not None and request != getattr(self, 'fire_consumed', None)
+      if fire:
+        self.fire_consumed = request
+        age = time.monotonic() - request
+        fire = 0 <= age < FIRE_EXPIRE_S
       if not selected and not c.in_shot and c.state != 'recover':
+        c.fire_until = None
         return normal
       if time.monotonic() - self.heartbeat > .5:
         c.broken = True
@@ -479,7 +520,9 @@ class PulseRuntime:
                  model_age=max(model_age, now-self.model_time), valid=valid, angle=cs.steeringAngleDeg, rate=cs.steeringRateDeg)
       c.ignore_wheel = getattr(self, 'ignore_wheel', False)
       c.extra = getattr(self, 'extra', ())
-      result = c.step(now, normal, x, selected, paused)
+      result = c.step(now, normal, x, selected, paused, fire=fire)
+      if fire and c.fire_until is not None:
+        c.fire_until = min(c.fire_until, now + FIRE_EXPIRE_S - age)
       while c.events:
         event = c.events[0]
         self.queue.put_nowait(('event', event))
@@ -488,12 +531,14 @@ class PulseRuntime:
           self.queue.put_nowait(('progress', c.progress()))
       if c.in_shot:
         self.queue.put_nowait(('event', {'phase': 'frame', 'id': c.shot[0], 'start': c.start, 'mono_s': now,
-                                       'command': result, 'carOutput': output, 'state': c.state}))
+                                       'manual': c.record['manual'], 'command': result, 'carOutput': output, 'state': c.state}))
       if selected and now-self.last_status >= .1:
         self.queue.put_nowait(('status', {'experiment': 'pulse', 'mono_s': now, 'state': c.state, 'reason': c.reason,
                                         'finished': len(c.done[c.speed_band] & {i for i, _ in c.plan}), 'total': len(c.plan), 'band': c.speed_band,
                                         'last_result': c.last_result, 'paused': paused, 'wheel': round(c.wheel_peak),
                                         'wheel_limit': DRIVER_TORQUE, 'ignore_wheel': c.ignore_wheel, 'aborts': dict(c.aborts),
+                                        'manual_start': c.manual_start,
+                                        'next_shot': next((shot.label() for i, shot in (*c.extra, *c.plan) if i not in c.done[c.speed_band]), 'done'),
                                         'queue': c.queue_left()}))
         self.last_status = now
       return result

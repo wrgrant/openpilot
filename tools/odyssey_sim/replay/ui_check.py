@@ -166,7 +166,7 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
 
   def strip(which: str) -> tuple[float, float]:
     r = panel.shown
-    return r.x + r.width / 2, {"top": r.y + 30, "middle": r.y + r.height / 2 - 20, "bottom": r.y + r.height - 50}[which]
+    return r.x + r.width / 2, {"top": r.y + 30, "pause": r.y + 110, "middle": r.y + r.height / 2 - 20, "bottom": r.y + r.height - 50}[which]
 
   def script():
     ok = yield from wait(lambda: ui_state.started and panel.shown is not None, 40)
@@ -188,10 +188,21 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
            s.get("paused") is True and "paused" in panel.drawn and "tap to start" in panel.drawn,
            f"status {s.get('state')}, paused={s.get('paused')}, panel says {panel.drawn[1:3]}")
 
-    tap(*strip("middle"))
+    tap(*strip("pause"))
     ok = yield from wait(lambda: not params.get_bool("OdysseyPulsePaused") and status().get("paused") is False, 3)
-    record("middle strip starts the test", ok and not layout._sidebar.is_visible,
+    record("status heading starts the test", ok and not layout._sidebar.is_visible,
            f"paused param={params.get_bool('OdysseyPulsePaused')}, controls paused={status().get('paused')}, sidebar={layout._sidebar.is_visible}")
+
+    yield from wait(lambda: any("Tap to fire:" in line for line in panel.drawn), 2)
+    # The recording begins with driver torque above the hard limit. Fire when that stop clears,
+    # while a soft road gate still holds automatic entry, so the tap proves the manual path.
+    yield from wait(lambda: status().get("state") in ("wait", "recover") and status().get("wheel", 1e9) < 800
+                    and status().get("reason") in ("offset", "heading", "curve ahead", "narrow lane", "lane lines lost",
+                                                  "waiting for a straight", "re-centring"), 25)
+    tap(*strip("middle"))
+    ok = yield from wait(lambda: status().get("manual_start") is not None, 3)
+    record("middle strip fires a manual shot through controls", ok and not layout._sidebar.is_visible,
+           f"manual start={status().get('manual_start')}, reason={status().get('reason')}")
 
     seen = set()
 
@@ -241,7 +252,7 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
     ok = yield from wait(lambda: status().get("experiment") == "pulse" and status().get("paused") is True, 4)
     record("top strip returns to the pulse test, paused", ok, f"experiment={status().get('experiment')}, paused={status().get('paused')}")
     if soak > 0:
-      tap(*strip("middle"))
+      tap(*strip("pause"))
       yield from wait(lambda: status().get("paused") is False, 3)
       peak, reasons, red = 0, {}, False
       end = time.monotonic() + soak

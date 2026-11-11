@@ -23,6 +23,76 @@ def started(condition=None, normal=.02):
 
 
 class TestPulse(unittest.TestCase):
+  def test_manual_fire_bypasses_readiness_and_soft_gates(self):
+    p = Pulse()
+    x = Inputs(lane_prob=.2, lane_width=2.8, offset=.6, heading=.04, curve_accel=2., rate=5.)
+    p.step(0., .12, x, True, fire=True)
+    self.assertTrue(p.in_shot, p.reason)
+    self.assertTrue(p.record['manual'])
+    self.assertEqual(p.shot[1].kind, 'square')
+    for n in range(1, 200):
+      p.step(n * DT, .12, replace(x, offset=.9), True)
+    self.assertTrue(p.events[-1]['completed'])
+    self.assertTrue(p.events[-1]['manual'])
+
+  def test_manual_fire_keeps_hard_stops_and_expires(self):
+    cases = [('steering inactive', {'active': False}), ('invalid data', {'valid': False}),
+             ('stale model', {'model_age': 1.}), ('blinker', {'blinker': True}), ('brake', {'brake': True}),
+             ('lane change', {'lane_change': True}), ('speed band', {'speed': 40.}),
+             ("you're steering", {'driver_torque': 1300.})]
+    for reason, change in cases:
+      with self.subTest(reason=reason):
+        p = Pulse()
+        for n in range(202):
+          p.step(n * DT, .12, replace(Inputs(), **change), True, fire=n == 0)
+        self.assertFalse(p.in_shot)
+        self.assertIn(reason, p.last_result)
+        p.step(2.02, .12, Inputs(), True)
+        self.assertFalse(p.in_shot, 'expired fire cannot start later')
+        q = Pulse()
+        q.step(0., .12, Inputs(lane_prob=.2), True, fire=True)
+        self.assertEqual(q.step(DT, .12, replace(Inputs(), **change), True), .12)
+        self.assertEqual(q.events[-1]['abort'], reason)
+
+  def test_manual_fire_pending_retry_and_remaining_hard_stops(self):
+    p = Pulse()
+    p.step(0., .12, Inputs(brake=True), True, fire=True)
+    p.step(DT, .12, Inputs(lane_prob=.2), True)
+    self.assertTrue(p.in_shot, 'a hard stop clearing within 2 s allows the requested shot')
+    self.assertTrue(p.record['manual'])
+    for reason in ('frame gap', 'speed changed', 'hard timeout', 'internal fault', "you're steering"):
+      with self.subTest(reason=reason):
+        q = Pulse()
+        q.step(0., .12, Inputs(), True, fire=True)
+        if reason == 'hard timeout':
+          q.start = -op.HARD_SHOT_S
+        if reason == 'internal fault':
+          q.broken = True
+        if reason == "you're steering":
+          for n in range(1, 19):
+            q.step(n * DT, .12, Inputs(driver_torque=900.), True)
+        else:
+          q.step(.04 if reason == 'frame gap' else DT, .12,
+                 Inputs(speed=26. if reason == 'speed changed' else 25.), True)
+        self.assertEqual(q.events[-1]['abort'], reason)
+    q = Pulse()
+    q.ignore_wheel = True
+    q.step(0., .12, Inputs(driver_torque=1500.), True, fire=True)
+    self.assertTrue(q.in_shot)
+    q.step(DT, .12, Inputs(brake=True, driver_torque=1500.), True)
+    self.assertEqual(q.events[-1]['abort'], 'brake')
+
+  def test_manual_fire_lane_aborts_require_measurable_lines(self):
+    for change, reason in (({'offset': .21}, 'drifted'), ({'lane_width': 2.4}, 'near the line')):
+      p = Pulse()
+      p.step(0., .12, Inputs(), True, fire=True)
+      p.step(DT, .12, replace(Inputs(), **change), True)
+      self.assertEqual(p.events[-1]['abort'], reason)
+    p = Pulse()
+    p.step(0., .12, Inputs(), True, paused=True, fire=True)
+    p.step(DT, .12, Inputs(), True)
+    self.assertFalse(p.in_shot, 'a paused tap cannot fire on resume')
+
   def test_shot_starts_after_the_settling_time_at_zero_and_records_what_it_released(self):
     p = Pulse()
     for n in range(SETTLE_FRAMES - 1):
@@ -95,8 +165,10 @@ class TestPulse(unittest.TestCase):
     self.assertEqual(len(schedule), 3 * len(shots))
     self.assertEqual(len({i for i, _ in schedule}), len(schedule))
     self.assertLess(sum(op.LEAD_S + c.duration + op.TAIL_S for _, c in shots), 60, "one pass is under a minute of shots")
-    self.assertEqual({name for name, _ in shots[:6]}, {'sham-a', 'square+', 'pair-6-0.1', 'ramp+', 'chirp-5', 'train-6-30+'},
+    self.assertEqual({name for name, _ in shots[:6]}, {'square+', 'pair-6-0.1', 'ramp+', 'chirp-5', 'train-6-30+', 'sham-a'},
                      "a drive cut short after six shots has one of each kind")
+    self.assertEqual([c.kind for _, c in shots[:3]], ['square', 'ramp', 'pair'])
+    self.assertEqual(sum(c.kind == 'sham' for _, c in shots), 3)
     for (_, a), (_, b) in zip(schedule[:len(shots)], schedule[len(shots):2 * len(shots)], strict=True):
       self.assertEqual(b.direction, -a.direction, "the second pass repeats the first with every first push reversed")
     for _, c in schedule:
