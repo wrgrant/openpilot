@@ -103,29 +103,40 @@ class TestOdysseyPanel(OpenpilotTestCase):
         self.assertTrue(worker.status['good'])
         worker.close()
         for name, reason in (('wait', 'waiting for a straight'), ('lead-in', 'lead-in'), ('pulse', 'pulsing'),
-                             ('tail', 'tail'), ('recover', 're-centring'), ('paused', "you're steering"), ('done', 'done')):
+                             ('tail', 'tail'), ('recover', 're-centring'), ('paused', "you're steering"), ('done', 'done'),
+                             ('manual', 'waiting for fire'), ('burst', 'pulsing'), ('auto', 'waiting for a straight')):
           params.put('OdysseyABExperiment', 'pulse', block=True)
           params.put('OdysseyABStatus', json.dumps({'experiment': 'pulse', 'mono_s': time.monotonic(),
-                     'state': name, 'reason': reason, 'finished': 7, 'total': 78, 'band': '45-70',
+                     'state': {'manual': 'wait', 'auto': 'wait', 'burst': 'pulse'}.get(name, name),
+                     'reason': reason, 'finished': 7, 'total': 78, 'band': '45-70',
+                     'mode': name if name in ('manual', 'burst', 'auto') else 'manual', 'burst': 5,
+                     'series_index': 2, 'series_total': 5 if name == 'burst' else 0,
                      'next_shot': 'square', 'last_result': 'pair 6% 0.1s: wheel +0.30°', 'paused': name == 'paused',
                      'wheel': 920 if name == 'tail' else 140, 'wheel_limit': 800, 'ignore_wheel': name == 'tail'}), block=True)
           panel.last_read = 0
           rl.begin_texture_mode(texture)
           rl.clear_background(rl.Color(38, 44, 52, 255))
+          hud._draw_current_speed(rect)
+          hud._draw_set_speed(rect)
           panel.render_in(rl.Rectangle(0, 0, 2160, 1080))
           rl.end_texture_mode()
           image = rl.load_image_from_texture(texture.texture)
           Image.frombytes('RGBA', (2160, 1080), image.to_bytes(2160*1080*4)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(output / f'pulse_{name}.png')
           rl.unload_image(image)
           self.assertFalse(panel.broken)
+          if name in ('manual', 'burst', 'auto'):
+            self.assertIn({'manual': 'Tap to fire: square', 'burst': 'burst 2 of 5', 'auto': 'auto • tap to fire'}[name], panel.drawn)
+          from openpilot.selfdrive.ui.sunnypilot.onroad.odyssey_ab_panel import HEAD_H, PAUSE_H, FOOT_H
+          self.assertGreaterEqual(min(HEAD_H, PAUSE_H, FOOT_H), 200)
+          self.assertEqual(panel.shown.height - HEAD_H - PAUSE_H - FOOT_H, 400)
         params.put_bool('OdysseyPulsePaused', False, block=True)
         top, bottom = panel.shown.y, panel.shown.y + panel.shown.height
-        panel._handle_mouse_release(MousePos(100, top + 200))  # middle fires while running
+        panel._handle_mouse_release(MousePos(100, top + 550))  # middle fires while running
         time.sleep(.05)
         self.assertTrue(ab.mem_params(params).get('OdysseyPulseFire'))
         self.assertFalse(params.get_bool('OdysseyPulsePaused'))
-        self.assertIn('Tap to fire: square', panel.drawn)
-        panel._handle_mouse_release(MousePos(100, top + 100))  # status heading pauses
+        self.assertIn('auto • tap to fire', panel.drawn)
+        panel._handle_mouse_release(MousePos(100, top + 300))  # status heading pauses
         time.sleep(.05)
         self.assertTrue(params.get_bool('OdysseyPulsePaused'))
         panel._handle_mouse_release(MousePos(100, bottom - 40))  # the bottom strip: ignore the wheel sensor, and back

@@ -207,6 +207,10 @@ class Pulse:
     self.speed_band = '45-70'
     self.settle_speed = None
     self.base_sum, self.base_n, self.offset_start = 0., 0, 0.
+    self.mode, self.burst = 'manual', 5
+    self.series_index, self.series_total = 0, 0
+    self.recovery_start = None
+    self.shot_mode = 'manual'
     self.fire_until = None
     self.offset_measured = False
     self.manual_start = None
@@ -281,11 +285,22 @@ class Pulse:
       self.last_result = f'{c.label()}: ' + (f"stopped: {reason}" if reason else f"wheel {self.record['wheel_delta']:+.2f}°")
       if reason:
         self.aborts[reason] = self.aborts.get(reason, 0) + 1
+    self.recovery_start = now
+    if self.series_total and not reason:
+      self.series_total = self.burst if self.mode == 'burst' else 0
+    if reason or self.series_index >= self.series_total:
+      self.series_total = 0
     self.record, self.stable, self.state = None, None, 'recover'
 
   def step(self, now, normal, x, selected, paused=False, fire=False):
     """Pure bounded computation; caller drains events. Internal fault latches experiment off."""
     try:
+      if fire and self.series_total:
+        self.series_total = 0
+        self.fire_until = None
+        if self.in_shot:
+          self.finish(now, x, 'driver ended burst')
+        return normal
       if fire and selected and not paused and not self.in_shot:
         self.fire_until = now + FIRE_EXPIRE_S
       if not selected or paused:
@@ -309,13 +324,16 @@ class Pulse:
     self.driver_since = (now if self.driver_since is None else self.driver_since) if abs(x.driver_torque) >= DRIVER_TORQUE else None
     if abs(x.driver_torque) >= self.wheel_peak or now - self.wheel_peak_time > 1.:
       self.wheel_peak, self.wheel_peak_time = abs(x.driver_torque), now
-    manual = bool(self.record.get('manual')) if self.in_shot else self.fire_until is not None
+    if not self.in_shot and self.series_total:
+      self.series_total = self.burst if self.mode == 'burst' and self.series_index < self.burst else 0
+    manual = bool(self.record.get('manual')) if self.in_shot else self.fire_until is not None or bool(self.series_total)
     reason = self.gate(now, x, manual) if selected else 'not selected'
     reason = 'paused' if paused else reason
     if self.broken or not math.isfinite(normal) or not math.isfinite(now):
       self.broken = True
       reason = 'internal fault'
     if reason:
+      self.series_total = 0
       if self.in_shot:
         self.finish(now, x, reason)
       self.stable, self.reason = None, reason
@@ -330,6 +348,7 @@ class Pulse:
           self.reason = 're-centring'
           return self.previous_command
         self.fire_until = None
+        self.series_total = 0
         self.state, self.reason = 'done', 'done'
         return normal
       if self.settle_speed is None:
@@ -346,7 +365,14 @@ class Pulse:
       self.base_sum, self.base_n = self.base_sum + normal, self.base_n + 1
       if self.stable is not None and now - self.stable >= SETTLE_S and abs(self.base_sum / self.base_n) > MAX_RELEASE:
         self.stable = None  # holding too much torque for a straight: start the settling time over
-      if manual or (self.stable is not None and now - self.stable >= SETTLE_S):
+      recovery_ready = not self.series_total or (now - self.recovery_start >= 1. and abs(x.rate) < .5)
+      if (manual and recovery_ready) or (self.mode == 'auto' and self.stable is not None and now - self.stable >= SETTLE_S):
+        if self.series_total:
+          self.series_index += 1
+        else:
+          self.series_index = 1
+          self.series_total = self.burst if self.mode == 'burst' and manual else 0
+        self.shot_mode = self.mode
         self.fire_until = None
         self.offset_measured = x.lane_prob >= MIN_LANE_PROB
         self.shot, self.start = candidates[0], now
@@ -355,6 +381,7 @@ class Pulse:
         self.offset_start = x.offset
         self.record = {'id': self.shot[0], 'condition': asdict(self.shot[1]), 'baseline': 0.,
                        'released': normal if manual else self.base_sum / self.base_n, 'start': now,
+                       'mode': self.shot_mode, 'series_index': self.series_index,
                        'manual': manual, 'speed': x.speed, 'band': self.speed_band, 'angle_start': x.angle, 'last_direction': self.last_direction}
         self.events.append({**self.record, 'phase': 'start'})
         self.state = 'lead-in'
@@ -395,6 +422,7 @@ class PulseRuntime:
     self.params = params
     self.controller = Pulse()
     self.config = (False, True, None)
+    self.mode, self.burst, self.button = 'manual', 5, False
     self.ignore_wheel = False
     self.fire_request = None
     self.fire_seen = None
@@ -439,6 +467,13 @@ class PulseRuntime:
           if self.params.get_bool('OdysseyPulseReset'):
             raw = {}
             self.params.put_bool('OdysseyPulseReset', False)
+          mode = self.params.get('OdysseyPulseMode')
+          self.mode = mode if mode in ('manual', 'burst', 'auto') else 'manual'
+          try:
+            self.burst = max(1, int(self.params.get('OdysseyPulseBurst') or '5'))
+          except ValueError:
+            self.burst = 5
+          self.button = self.params.get_bool('OdysseyPulseButton')
           self.ignore_wheel = self.params.get_bool('OdysseyPulseIgnoreWheel')
           fire_raw = mem.get('OdysseyPulseFire')
           if fire_raw and fire_raw != self.fire_seen:
@@ -489,6 +524,13 @@ class PulseRuntime:
         self.fire_consumed = request
         age = time.monotonic() - request
         fire = 0 <= age < FIRE_EXPIRE_S
+      from opendbc.car.structs import CarState
+      button_fire = getattr(self, 'button', False) and any(
+        b.pressed and b.type == CarState.ButtonEvent.Type.gapAdjustCruise for b in getattr(cs, 'buttonEvents', ()))
+      fire = fire or button_fire
+      if button_fire:
+        age = 0.
+      c.mode, c.burst = getattr(self, 'mode', 'manual'), getattr(self, 'burst', 5)
       if not selected and not c.in_shot and c.state != 'recover':
         c.fire_until = None
         return normal
@@ -537,7 +579,8 @@ class PulseRuntime:
                                         'finished': len(c.done[c.speed_band] & {i for i, _ in c.plan}), 'total': len(c.plan), 'band': c.speed_band,
                                         'last_result': c.last_result, 'paused': paused, 'wheel': round(c.wheel_peak),
                                         'wheel_limit': DRIVER_TORQUE, 'ignore_wheel': c.ignore_wheel, 'aborts': dict(c.aborts),
-                                        'manual_start': c.manual_start,
+                                        'manual_start': c.manual_start, 'mode': c.shot_mode if c.in_shot else c.mode,
+                                        'burst': c.burst, 'series_index': c.series_index, 'series_total': c.series_total,
                                         'next_shot': next((shot.label() for i, shot in (*c.extra, *c.plan) if i not in c.done[c.speed_band]), 'done'),
                                         'queue': c.queue_left()}))
         self.last_status = now

@@ -165,8 +165,11 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
     return bool(cond())
 
   def strip(which: str) -> tuple[float, float]:
+    from openpilot.selfdrive.ui.sunnypilot.onroad.odyssey_ab_panel import HEAD_H, PAUSE_H, FOOT_H
     r = panel.shown
-    return r.x + r.width / 2, {"top": r.y + 30, "pause": r.y + 110, "middle": r.y + r.height / 2 - 20, "bottom": r.y + r.height - 50}[which]
+    return r.x + r.width / 2, {"top": r.y + HEAD_H / 2, "pause": r.y + HEAD_H + PAUSE_H / 2,
+                            "middle": r.y + HEAD_H + PAUSE_H + 150 if panel.e == "pulse" else r.y + HEAD_H + 150,
+                            "bottom": r.y + r.height - FOOT_H / 2}[which]
 
   def script():
     ok = yield from wait(lambda: ui_state.started and panel.shown is not None, 40)
@@ -204,6 +207,7 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
     record("middle strip fires a manual shot through controls", ok and not layout._sidebar.is_visible,
            f"manual start={status().get('manual_start')}, reason={status().get('reason')}")
 
+    params.put("OdysseyPulseMode", "auto", block=True)
     seen = set()
 
     def shot_done():
@@ -217,10 +221,14 @@ def drive_screen(params, out: Path, procs, hidden: bool, soak: float = 0.) -> li
     record("controls runs a shot on the recorded road and the panel counts it", (ok or soak > 0) and any(count in line for line in panel.drawn),
            f"states seen {sorted(x for x in seen if x)}, last: {s.get('last_result')}, panel says {[line for line in panel.drawn if 'shots' in line]}")
 
+    params.put("OdysseyPulseMode", "manual", block=True)
+    yield from wait(lambda: status().get("mode") == "manual", 4)
     # what a drive companion does from outside: queue an extra shot and leave a note
     note = "3 of 26 good. Wheel moves at 5%.\nNeed: 2 sweeps, ramp left."
     params.put("OdysseyPulseQueue", json.dumps([{"kind": "single", "height": .07, "duration": .1, "direction": 1}]), block=True)
     mem.put("OdysseyAgentNote", note, block=True)
+    yield from wait(lambda: status().get("queue", 0) > 0, 3)
+    tap(*strip("middle"))
     ok = yield from wait(lambda: str(status().get("last_result", "")).startswith("single 7%"), 45)
     shown = all(line in panel.drawn for line in note.splitlines())
     record("a queued shot runs before the plan and the note shows on the panel", (ok or soak > 0) and shown,

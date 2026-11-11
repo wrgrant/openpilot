@@ -117,7 +117,38 @@ def manager_cleanup() -> None:
   cloudlog.info("everything is dead")
 
 
-RESTART_FLAG = '/dev/shm/odyssey_restart_controlsd'
+RESTART_FLAG = '/dev/shm/odyssey_restart'
+LEGACY_RESTART_FLAG = '/dev/shm/odyssey_restart_controlsd'
+
+
+def parse_restart_processes(raw, processes):
+  """Keep requested managed names in order, once; report typos without stopping other requests."""
+  names = []
+  for name in raw.split():
+    if name not in processes:
+      cloudlog.event('odyssey_restart_unknown', process=name)
+    elif name not in names:
+      names.append(name)
+  return names
+
+
+def restart_requested_processes():
+  requested = []
+  for path in (RESTART_FLAG, LEGACY_RESTART_FLAG):
+    try:
+      with open(path) as flag:
+        raw = flag.read() if path == RESTART_FLAG else 'controlsd'
+      os.remove(path)
+    except FileNotFoundError:
+      continue
+    except OSError:
+      cloudlog.exception('odyssey_restart flag read failed')
+      continue
+    requested.extend(parse_restart_processes(raw, managed_processes))
+  for name in dict.fromkeys(requested):
+    cloudlog.event('odyssey_restart', process=name)
+    managed_processes[name].stop()
+
 
 
 def manager_thread() -> None:
@@ -164,15 +195,7 @@ def manager_thread() -> None:
     started_prev = started
     ignition_prev = ignition
 
-    # Odyssey test drives: tools/odyssey_restart_controls.py drops this file to restart controlsd alone on new Python code
-    if os.path.exists(RESTART_FLAG):
-      try:
-        os.remove(RESTART_FLAG)
-      except OSError:
-        pass
-      if 'controlsd' in managed_processes:
-        cloudlog.event('odyssey_restart_controlsd')
-        managed_processes['controlsd'].stop()
+    restart_requested_processes()
 
     ensure_running(managed_processes.values(), started, params=params, CP=sm['carParams'], not_run=ignore)
 

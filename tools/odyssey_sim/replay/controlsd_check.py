@@ -72,7 +72,7 @@ def pulse_check(lr: list) -> bool:
   from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import LEAD_S, MAX_TORQUE, plan
   off = replay(lr, BASE)
   paused = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": True})
-  run = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": False})
+  run = replay(lr, {**BASE, "OdysseyABExperiment": "pulse", "OdysseyPulsePaused": False, "OdysseyPulseMode": "auto"})
   n = min(len(off["torque"]), len(paused["torque"]), len(run["torque"]))
   same = bool(np.array_equal(off["torque"][:n], paused["torque"][:n]))
   tq = run["torque"][:n]

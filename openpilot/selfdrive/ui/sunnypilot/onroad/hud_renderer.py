@@ -82,6 +82,8 @@ class HudRendererSP(HudRenderer):
 
     set_speed_width = UI_CONFIG.set_speed_width_metric if ui_state.is_metric else UI_CONFIG.set_speed_width_imperial
     x = rect.x + 60 + (UI_CONFIG.set_speed_width_imperial - set_speed_width) // 2
+    if self.odyssey_ab_panel.shown is not None:
+      x = rect.x + 1250  # right of the central speed readout, clear of the large test panel
     y = rect.y + 45
 
     set_speed_rect = rl.Rectangle(x, y, set_speed_width, UI_CONFIG.set_speed_height)
@@ -143,7 +145,10 @@ class HudRendererSP(HudRenderer):
     self.odyssey_ab_panel.render_in(rect)
     self.developer_ui.render(rect)
     self.road_name_renderer.render(rect)
-    self.speed_limit_renderer.render(rect)
+    speed_limit_rect = rect
+    if self.odyssey_ab_panel.shown is not None:
+      speed_limit_rect = rl.Rectangle(rect.x + 1190, rect.y, rect.width, rect.height)
+    self.speed_limit_renderer.render(speed_limit_rect)
     self.smart_cruise_control_renderer.render(rect)
     self.turn_signal_controller.render(rect)
     self.circular_alerts_renderer.render(rect)

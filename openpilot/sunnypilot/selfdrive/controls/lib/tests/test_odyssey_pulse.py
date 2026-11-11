@@ -14,6 +14,7 @@ SETTLE_FRAMES = round(op.SETTLE_S / DT) + 1  # frames from the first ready one u
 
 def started(condition=None, normal=.02):
   p = Pulse()
+  p.mode = 'auto'
   if condition is not None:
     p.plan = (('0:0', condition),)
   for n in range(SETTLE_FRAMES):
@@ -23,8 +24,70 @@ def started(condition=None, normal=.02):
 
 
 class TestPulse(unittest.TestCase):
+  def test_default_manual_waits_for_fire(self):
+    p = Pulse()
+    for n in range(300):
+      p.step(n * DT, .02, Inputs(), True)
+    self.assertFalse(p.in_shot)
+    p.step(3., .02, Inputs(), True, fire=True)
+    self.assertTrue(p.in_shot)
+    self.assertEqual(p.record['mode'], 'manual')
+
+  def test_burst_recovers_and_finishes(self):
+    p = Pulse()
+    p.mode = 'auto'
+    p.mode, p.burst = 'burst', 3
+    for n in range(1100):
+      p.step(n * DT, .02, Inputs(rate=.6 if 190 <= n < 350 else 0.), True, fire=n == 0)
+    starts = [e for e in p.events if e.get('phase') == 'start']
+    ends = [e for e in p.events if e.get('completed')]
+    self.assertEqual([e['series_index'] for e in starts], [1, 2, 3])
+    self.assertEqual(len(ends), 3)
+    self.assertGreaterEqual(starts[1]['start'], 3.5)
+    for start, end in zip(starts[1:], ends, strict=False):
+      self.assertGreaterEqual(start['start'] - end['end'], 1.)
+
+  def test_burst_tap_and_hard_stop_end_series(self):
+    for stop_at in (1, 200):  # during the shot, and during lane-keeping recovery
+      for change, tap in (({}, True), ({'brake': True}, False), ({'active': False}, False)):
+        p = Pulse()
+        p.mode = 'burst'
+        for n in range(600):
+          x = replace(Inputs(), **change) if n == stop_at else Inputs()
+          p.step(n * DT, .02, x, True, fire=n == 0 or (n == stop_at and tap))
+        self.assertFalse(p.in_shot)
+        self.assertEqual(p.series_total, 0)
+        self.assertEqual(len([e for e in p.events if e.get('phase') == 'start']), 1)
+
+  def test_live_mode_change_preserves_shot_then_stops_burst(self):
+    p = Pulse()
+    p.mode = 'burst'
+    p.step(0., .02, Inputs(), True, fire=True)
+    p.mode = 'manual'
+    for n in range(1, 600):
+      p.step(n * DT, .02, Inputs(), True)
+    self.assertTrue(p.events[-1]['completed'])
+    self.assertEqual(p.events[-1]['mode'], 'burst')
+    self.assertEqual(p.series_total, 0)
+    p.mode = 'auto'
+    p.step(6., .02, Inputs(), True)
+    self.assertTrue(p.in_shot)
+    self.assertEqual(p.record['mode'], 'auto')
+
+  def test_live_burst_count_applies_after_current_shot(self):
+    p = Pulse()
+    p.mode, p.burst = 'burst', 5
+    p.step(0., .02, Inputs(), True, fire=True)
+    p.burst = 2
+    self.assertEqual(p.series_total, 5)
+    for n in range(1, 800):
+      p.step(n * DT, .02, Inputs(), True)
+    self.assertEqual(len([e for e in p.events if e.get('completed')]), 2)
+    self.assertEqual(p.series_total, 0)
+
   def test_manual_fire_bypasses_readiness_and_soft_gates(self):
     p = Pulse()
+    p.mode = 'auto'
     x = Inputs(lane_prob=.2, lane_width=2.8, offset=.6, heading=.04, curve_accel=2., rate=5.)
     p.step(0., .12, x, True, fire=True)
     self.assertTrue(p.in_shot, p.reason)
@@ -43,6 +106,7 @@ class TestPulse(unittest.TestCase):
     for reason, change in cases:
       with self.subTest(reason=reason):
         p = Pulse()
+        p.mode = 'auto'
         for n in range(202):
           p.step(n * DT, .12, replace(Inputs(), **change), True, fire=n == 0)
         self.assertFalse(p.in_shot)
@@ -56,6 +120,7 @@ class TestPulse(unittest.TestCase):
 
   def test_manual_fire_pending_retry_and_remaining_hard_stops(self):
     p = Pulse()
+    p.mode = 'auto'
     p.step(0., .12, Inputs(brake=True), True, fire=True)
     p.step(DT, .12, Inputs(lane_prob=.2), True)
     self.assertTrue(p.in_shot, 'a hard stop clearing within 2 s allows the requested shot')
@@ -85,16 +150,19 @@ class TestPulse(unittest.TestCase):
   def test_manual_fire_lane_aborts_require_measurable_lines(self):
     for change, reason in (({'offset': .21}, 'drifted'), ({'lane_width': 2.4}, 'near the line')):
       p = Pulse()
+      p.mode = 'auto'
       p.step(0., .12, Inputs(), True, fire=True)
       p.step(DT, .12, replace(Inputs(), **change), True)
       self.assertEqual(p.events[-1]['abort'], reason)
     p = Pulse()
+    p.mode = 'auto'
     p.step(0., .12, Inputs(), True, paused=True, fire=True)
     p.step(DT, .12, Inputs(), True)
     self.assertFalse(p.in_shot, 'a paused tap cannot fire on resume')
 
   def test_shot_starts_after_the_settling_time_at_zero_and_records_what_it_released(self):
     p = Pulse()
+    p.mode = 'auto'
     for n in range(SETTLE_FRAMES - 1):
       self.assertEqual(p.step(n * DT, .04, Inputs(), True), .04, "lane keeping steers until the shot starts")
     self.assertFalse(p.in_shot)
@@ -205,11 +273,13 @@ class TestPulse(unittest.TestCase):
   def test_ignoring_the_wheel_sensor_lets_a_shot_start_and_finish_with_torque_on_it(self):
     hands = Inputs(driver_torque=op.HARD_DRIVER_TORQUE + 500)
     p = Pulse()
+    p.mode = 'auto'
     for n in range(3 * SETTLE_FRAMES):
       p.step(n * DT, .02, hands, True)
     self.assertFalse(p.in_shot, "obeyed: torque on the wheel keeps the test waiting")
     self.assertGreaterEqual(p.wheel_peak, op.HARD_DRIVER_TORQUE, "the panel can show the reading that blocked it")
     p = Pulse()
+    p.mode = 'auto'
     p.ignore_wheel = True
     for n in range(SETTLE_FRAMES + round(2.5 / DT)):
       p.step(n * DT, .02, hands, True)
@@ -241,6 +311,7 @@ class TestPulse(unittest.TestCase):
       self.assertEqual(op.parse_queue(raw), ())
     self.assertEqual(len(op.parse_queue(json.dumps(good * 10))), op.QUEUE_MAX)
     p = Pulse()
+    p.mode = 'auto'
     p.extra = queue
     ran = []
     for n in range(round(12 / DT)):
@@ -254,6 +325,7 @@ class TestPulse(unittest.TestCase):
 
   def test_fault_latches_and_inactive_is_passthrough(self):
     p = Pulse()
+    p.mode = 'auto'
     for n in range(100):
       self.assertEqual(p.step(n * DT, .33, Inputs(), False), .33)
     self.assertEqual(p.step(1., .42, None, True), .42)
@@ -286,6 +358,7 @@ def runtime(controller=None, queue_size=512):
   import queue
   r = PulseRuntime.__new__(PulseRuntime)
   r.controller = controller or Pulse()
+  r.mode = 'auto'
   r.config = (True, False, None)
   r.heartbeat = time.monotonic()
   r.queue = queue.Queue(maxsize=queue_size)
@@ -323,6 +396,44 @@ class TestPulseRuntime(unittest.TestCase):
     self.assertNotEqual(out[-1], .02, "lane keeping's command is replaced during the shot")
     self.assertLessEqual(abs(out[-1]), op.MAX_TORQUE)
     self.assertAlmostEqual(r.width, 3.7, places=5)
+
+  def test_worker_reads_mode_count_and_button_live(self):
+    from openpilot.common.params import Params
+    from openpilot.common.prefix import OpenpilotPrefix
+    with OpenpilotPrefix():
+      params = Params()
+      r = PulseRuntime(params)
+      try:
+        for mode, burst, button in (('burst', 3, True), ('auto', 7, False), ('manual', 0, True)):
+          params.put('OdysseyPulseMode', mode, block=True)
+          params.put('OdysseyPulseBurst', burst, block=True)
+          params.put_bool('OdysseyPulseButton', button, block=True)
+          deadline = time.monotonic() + 1.
+          expected = (mode, max(1, burst) if burst else 5, button)
+          while (r.mode, r.burst, r.button) != expected and time.monotonic() < deadline:
+            time.sleep(.01)
+          self.assertEqual((r.mode, r.burst, r.button), expected)
+      finally:
+        r.close()
+
+  def test_gap_button_requests_fire_only_on_press_when_enabled(self):
+    from opendbc.car.structs import CarState
+    from types import SimpleNamespace as NS
+    for enabled, pressed, kind, expected in (
+      (False, True, CarState.ButtonEvent.Type.gapAdjustCruise, False),
+      (True, False, CarState.ButtonEvent.Type.gapAdjustCruise, False),
+      (True, True, CarState.ButtonEvent.Type.accelCruise, False),
+      (True, True, CarState.ButtonEvent.Type.gapAdjustCruise, True),
+    ):
+      r = runtime()
+      r.mode, r.button = 'manual', enabled
+      r.pose, r.model_time, r.curve, r.width = (0., 0.), 10., 0., 3.7
+      cs = NS(vEgo=25., steeringAngleDeg=0., steeringRateDeg=0., steeringTorque=0., leftBlinker=False,
+              rightBlinker=False, brakePressed=False, buttonEvents=[NS(type=kind, pressed=pressed)])
+      md = NS(laneLineProbs=[1.] * 4, meta=NS(laneChangeState=0))
+      r.update(10., .02, cs, md, True, False, True, 0., 0.)
+      self.assertEqual(r.controller.in_shot, expected)
+      self.assertEqual(cs.buttonEvents[0].pressed, pressed)
 
   def test_lane_pose_is_smoothed_and_restarts_after_a_gap(self):
     from types import SimpleNamespace as NS
