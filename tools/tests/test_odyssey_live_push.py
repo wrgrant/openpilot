@@ -40,7 +40,7 @@ class TestLivePush(unittest.TestCase):
         return json.dumps({'head': 'abc', 'dirty': [], 'hashes': hashes})
     device = Device()
     with patch('tools.odyssey_live_push.git', side_effect=lambda *args: 'abcdef' if args[0] == 'rev-parse' else ''):
-      self.assertTrue(push(device, now=True))
+      self.assertTrue(push(device))
     self.assertEqual(set(device.payload['files']), {changed})
-    self.assertTrue(device.payload['stamp'].endswith(':now'))
+    self.assertFalse(device.payload['stamp'].endswith(':now'))
     self.assertEqual(device.payload['source']['hashes'][changed], hashlib.sha256((ROOT/changed).read_bytes()).hexdigest())

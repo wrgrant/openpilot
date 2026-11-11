@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Local real-time replay proof: run real controlsd, change Python mid-minute, restore it on exit.
 
+The recorded drive must disengage and then reengage between 6 and 20 seconds into the segment.
 Uses comma's replay binary and local logs, without a vehicle or UI. Checks publication-time frame gaps around
 reload against the pulse controller's MAX_FRAME_GAP. This measures the Mac scheduler, not the comma scheduler.
 """
@@ -60,7 +61,7 @@ def check(rlog):
             raise RuntimeError((state/'controlsd.log').read_text())
           if time.monotonic() - begin > 6 and not fired:
             source.write_text(original.replace(original_return, f'return {sentinel}'))
-            (state/'request').write_text('replay-proof:now')
+            (state/'request').write_text('replay-proof')
             fired = True
           for message in messaging.drain_sock(socket):
             rows.append((message.logMonoTime * 1e-9, message.carControl.actuators.torque, message.carControl.latActive))

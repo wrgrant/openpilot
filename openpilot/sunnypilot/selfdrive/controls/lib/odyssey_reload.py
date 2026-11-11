@@ -231,7 +231,7 @@ class ReloadManager:
     pulse = self.owner.odyssey_pulse
     if pulse is not None and pulse.controller.in_shot:
       return False
-    if lat_active and not result['stamp'].endswith(':now'):
+    if lat_active:
       return False
     old = bundle.swap(self.owner) if hasattr(bundle, 'swap') else None
     previous, self.current = self.current, bundle

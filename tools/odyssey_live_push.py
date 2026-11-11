@@ -32,7 +32,7 @@ def git(*args):
   return subprocess.check_output(['git', '-C', str(ROOT), *args], text=True).strip()
 
 
-def push(remote, now=False):
+def push(remote):
   allowed = {str(FOLDER / f'{name}.py') for name in scope()}
   sources = {path: (ROOT/path).read_bytes() for path in sorted(allowed)}
   with tempfile.TemporaryDirectory() as d:
@@ -59,7 +59,7 @@ print(json.dumps({'head': git('rev-parse', 'HEAD'),
   hashes = {p: hashlib.sha256(source).hexdigest() for p, source in sources.items()}
   files = {p: sources[p].decode() for p in allowed if inventory['hashes'].get(p) != hashes[p]}
   digest = hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest()[:12]
-  stamp = f"{git('rev-parse', '--short', 'HEAD')}-{digest}-{uuid.uuid4().hex[:8]}" + (':now' if now else '')
+  stamp = f"{git('rev-parse', '--short', 'HEAD')}-{digest}-{uuid.uuid4().hex[:8]}"
   print(f'Uploading {len(files)} files; source {stamp}', flush=True)
   remote.python('''
 import fcntl, hashlib, json, os, pathlib, tempfile
@@ -103,7 +103,7 @@ with (state/'upload.lock').open('w') as lock:
       print(json.dumps(result, indent=2))
       return result['status'] == 'ok'
     time.sleep(.1)
-  print('Reload pending: use --status. Default waits for lateral inactive; --now requests supervised immediate swap.')
+  print('Reload pending: use --status. Activation waits for steering to be disengaged.')
   return False
 
 
@@ -116,7 +116,6 @@ def main():
   parser.add_argument('--host', default='comma@100.66.59.37')
   parser.add_argument('--identity', default='~/.ssh/id_ed25519_comma')
   parser.add_argument('--status', action='store_true')
-  parser.add_argument('--now', action='store_true', help='supervised swap while lateral is active; still waits for pulse shot to finish')
   parser.add_argument('--restart-openpilot', action='store_true')
   args = parser.parse_args()
   remote = Remote(args.host, args.identity)
@@ -126,7 +125,7 @@ def main():
   elif args.status:
     print(json.dumps(status(remote), indent=2))
   else:
-    raise SystemExit(0 if push(remote, args.now) else 1)
+    raise SystemExit(0 if push(remote) else 1)
 
 
 if __name__ == '__main__':

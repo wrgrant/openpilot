@@ -8,7 +8,7 @@ from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_reload import ReloadMan
 
 
 class TestReload(unittest.TestCase):
-  def test_swap_gates_and_state(self):
+  def test_no_stamp_can_bypass_disengagement_or_pulse_gate(self):
     with tempfile.TemporaryDirectory() as d:
       root = Path(d)
       owner = SimpleNamespace(odyssey_pulse=SimpleNamespace(controller=SimpleNamespace(in_shot=True)))
@@ -20,8 +20,10 @@ class TestReload(unittest.TestCase):
         (root / 'request').write_text('abc:now')
         time.sleep(.15)
         self.assertFalse(manager.poll(True))
+        self.assertFalse(manager.poll(False))
         owner.odyssey_pulse.controller.in_shot = False
-        self.assertTrue(manager.poll(True))
+        self.assertFalse(manager.poll(True))
+        self.assertTrue(manager.poll(False))
         self.assertIs(manager.current, replacement)
         time.sleep(.15)
         self.assertEqual(reports[-1]['status'], 'ok')
