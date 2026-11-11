@@ -35,7 +35,7 @@ MIN_LANE_PROB = .5
 PRESS_S = .3  # a press must last this long to abort a running trial: shorter ones are torque-sensor blips (ODYSSEY.md)
 MAX_MODEL_AGE = .2
 MAX_MISSES = 3  # aborts or unrated timeouts before a trial is skipped for this session
-BLOCKS = 6  # each block holds every condition once: 20 trials, about 10 minutes
+BLOCKS = 2  # each block holds every condition once: 20 trials, about 10 minutes; two blocks fit a 20-minute session
 FRAME_LOG_S = .1  # stimulus frame records, 10 Hz
 VERSION = 1
 
