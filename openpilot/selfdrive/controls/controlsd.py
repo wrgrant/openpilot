@@ -24,6 +24,7 @@ from openpilot.selfdrive.controls.lib.longcontrol import LongControl
 from openpilot.selfdrive.modeld.modeld import LAT_SMOOTH_SECONDS
 from openpilot.selfdrive.locationd.helpers import PoseCalibrator, Pose
 
+from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_reload import ReloadManager
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import LiveAB
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_pulse import PulseRuntime
 from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_lane import LaneCentering
@@ -86,6 +87,10 @@ class Controls(ControlsExt):
         cloudlog.exception("odyssey_pulse initialization disabled")
     self.odyssey_lane = LaneCentering()  # Odyssey lane-centring correction on the model's curvature (off by default)
 
+    self.odyssey_reload = ReloadManager(self) if self.CP.carFingerprint == HONDA_CAR.HONDA_ODYSSEY else None
+    if self.odyssey_reload is not None:
+      self.odyssey_reload.start()
+
   def update(self):
     self.sm.update(15)
     if self.sm.updated["extrinsicsCalibration"]:
@@ -135,6 +140,9 @@ class Controls(ControlsExt):
                    (not standstill or self.CP.steerAtStandstill)
     CC.longActive = CC.enabled and not any(e.overrideLongitudinal for e in self.sm['onroadEvents']) and \
                     (self.CP.openpilotLongitudinalControl or not self.CP_SP.pcmCruiseSpeed)
+
+    if self.odyssey_reload is not None:
+      self.odyssey_reload.poll(CC.latActive)
 
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
