@@ -15,6 +15,7 @@ import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FLAG = '/dev/shm/odyssey_restart_controlsd'
+PID = "ps -eo pid,args | grep '[s]elfdrive.controls.controlsd' | awk '{print $1}' | head -1"  # [s]: never match this shell
 
 
 def run(*cmd, **kw):
@@ -43,12 +44,12 @@ def main():
 
   env = {**os.environ, 'GIT_LFS_SKIP_SMUDGE': '1'}
   run('git', '-C', ROOT, 'push', '-q', '--no-verify', 'wrgrant', f'{sha}:refs/heads/odyssey-agnos20', env=env)
-  before = run(*ssh, 'pgrep -f selfdrive.controls.controlsd | head -1 || true')
+  before = run(*ssh, PID)
   run(*ssh, f'cd /data/openpilot && git fetch -q origin odyssey-agnos20 && git reset -q --hard {sha} && touch {FLAG}')
   print(f'comma on {sha[:9]} ({len(changed)} Python files changed); restarting controlsd', flush=True)
   for _ in range(40):
     time.sleep(.5)
-    now = run(*ssh, 'pgrep -f selfdrive.controls.controlsd | head -1 || true')
+    now = run(*ssh, PID)
     if now and now != before:
       print(f'controlsd restarted (pid {before or "-"} -> {now})')
       return
