@@ -320,6 +320,30 @@ def summarize_pieces(pieces: list[tuple[str, dict, np.ndarray]], arms: tuple[str
       print(f"{arm} - {arms[0]} {metric}: {delta:+.2f} {interval} {unit}")
   if arms == ("stock", "S3", "S5"):
     forecast_report(pieces, block_s or 180.0)
+  heights = {"off": 0.0, "bump": 6.0, "bump9": 9.0}  # the kick is a different mechanism, so it is not on the ladder
+  if "bump9" in arms:
+    for metric, unit in (("wander", "cm rms"), ("sway", "m/s2")):
+      slope, ci = dose_slope({heights[a]: values[a][metric] for a in heights if a in values})
+      interval = f"[{ci[0]:+.3f}, {ci[1]:+.3f}]" if ci is not None else "[too few levels for an interval]"
+      print(f"bump ladder {metric} per 1% of pulse height (off = 0): {slope:+.3f} {interval} {unit}")
+
+
+def dose_slope(levels: dict[float, np.ndarray]) -> tuple[float, np.ndarray | None]:
+  """Least-squares slope of a block metric against pulse height over every block of every level, with a bootstrap
+  that resamples blocks within each level. Uses all the data at once, unlike pairwise differences."""
+  levels = {h: v for h, v in levels.items() if len(v)}
+  if len(levels) < 2:
+    return np.nan, None
+  def fit(groups):
+    x = np.concatenate([np.full(len(v), h) for h, v in groups.items()])
+    y = np.concatenate(list(groups.values()))
+    return float(np.polyfit(x, y, 1)[0])
+  slope = fit(levels)
+  if len(levels) < 3 or min(len(v) for v in levels.values()) < 2:
+    return slope, None
+  rng = np.random.default_rng(0)
+  samples = [fit({h: rng.choice(v, len(v)) for h, v in levels.items()}) for _ in range(2000)]
+  return slope, np.percentile(samples, [2.5, 97.5])
 
 
 def nudges(d: dict[str, np.ndarray], arms: tuple[str, ...], block_s: float, settle_s: float, min_mph: float) -> dict[str, tuple[int, float]]:
@@ -375,10 +399,14 @@ def ab_report(d: dict[str, np.ndarray], runs: list[np.ndarray], min_s: float, ar
 def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: float, min_s: float, force: bool = False) -> None:
   """Pool an A/B test over drives, using each drive's own record of which tests were on."""
   from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import (AB_BLOCK_S, DEADBAND_ARMS, LANE_ARMS, NNLC_ARMS,
-                                                                      NNLC_MODEL_ARMS, WANDER_ARMS, WANDER_BLOCK_S, ab_arm)
+                                                                      NNLC_MODEL_ARMS, WANDER_ARMS, WANDER_BLOCK_S, ab_arm,
+                                                                      LEGACY_DEADBAND_ARMS)
   tests = {"deadband": (DEADBAND_ARMS, AB_BLOCK_S), "nnlc": (NNLC_ARMS, AB_BLOCK_S), "wander": (WANDER_ARMS, WANDER_BLOCK_S),
            "nnlc_model": (NNLC_MODEL_ARMS, WANDER_BLOCK_S), "lane": (LANE_ARMS, WANDER_BLOCK_S)}
   arms, block = tests[name]
+  route_arms = arms
+  if name == "deadband":  # the rotation changed (off/kick/bump, then the bump ladder): each drive scores with its own
+    arms = tuple(dict.fromkeys(LEGACY_DEADBAND_ARMS + DEADBAND_ARMS))
   pieces: list[tuple[str, dict, np.ndarray]] = []
   pressed = {a: [0, 0.0] for a in arms}
   shakes: dict[str, list[float]] = {a: [] for a in arms}
@@ -390,7 +418,10 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
       print(f"{label}: skipped, {AB_FLAGS[name]} was not on (on: {', '.join(sorted(on)) or 'none'})")
       continue
     d["_experiment"] = "bump" if name == "deadband" else name if name in ("lane", "nnlc_model") else "bump"
-    got = ab_pieces(d, stretches(d, min_mph, min_s), min_s, arms, block)
+    if name == "deadband":
+      logged = {r.get("arm") for _, r in d.get("records", []) if r.get("experiment") == "bump"}
+      route_arms = DEADBAND_ARMS if "bump9" in logged else LEGACY_DEADBAND_ARMS
+    got = ab_pieces(d, stretches(d, min_mph, min_s), min_s, route_arms, block)
     note = "" if name in on else " (forced: a null test, the arms are only time blocks)"
     if name == "nnlc_model" and "lane" in on:
       kept = [p for p in got if ab_arm(d["t"][p[2][0]], LANE_ARMS, WANDER_BLOCK_S) == "off"]
@@ -406,10 +437,10 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
       note += f"; also rotating: {', '.join(sorted(on - {name}))}"
     print(f"{label}: {len(got)} pieces{note}")
     pieces += got
-    for a, (count, minutes) in nudges(d, arms, block, 30.0 if block >= 120 else 0.0, min_mph).items():
+    for a, (count, minutes) in nudges(d, route_arms, block, 30.0 if block >= 120 else 0.0, min_mph).items():
       pressed[a][0] += count
       pressed[a][1] += minutes
-    for a, values in shake(d, arms, block, min_mph).items():
+    for a, values in shake(d, route_arms, block, min_mph).items():
       shakes[a] += values
   print()
   summarize_pieces(pieces, arms, block)

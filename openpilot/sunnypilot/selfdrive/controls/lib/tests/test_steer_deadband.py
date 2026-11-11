@@ -36,7 +36,7 @@ class TestSteerDeadband(OpenpilotTestCase):
     y = np.array([deadband_comp(t, 0.037) for t in x])
     assert np.all(np.diff(y) > 0)
 
-  def test_ab_mode_rotates_off_kick_bump(self):
+  def test_ab_mode_rotates_the_bump_ladder(self):
     from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import AB_BLOCK_S
     from openpilot.sunnypilot.selfdrive.controls.lib.steer_deadband import AB_KICK, SteerDeadbandComp
 
@@ -49,9 +49,10 @@ class TestSteerDeadband(OpenpilotTestCase):
 
     comp = SteerDeadbandComp()
     comp._params = FakeParams()
-    off = comp.update(0.05, 1.0, mono_s=0.5 * AB_BLOCK_S)
+    off = comp.update(0.02, 1.0, mono_s=0.5 * AB_BLOCK_S)
     kick = comp.update(0.05, 1.0, mono_s=1.5 * AB_BLOCK_S)
-    bump = [comp.update(0.02, 1.0, mono_s=2.5 * AB_BLOCK_S) for _ in range(25)]
-    assert off == 0.05
+    levels = [set(np.round([comp.update(0.02, 1.0, mono_s=(k + .5) * AB_BLOCK_S) for _ in range(25)], 6)) for k in (2, 3)]
+    assert off == 0.02
     assert abs(kick - (0.05 + AB_KICK * np.tanh(5))) < 1e-9
-    assert set(np.round(bump, 6)) == {0.0, 0.06}
+    assert levels == [{0.0, 0.06}, {0.0, 0.09}]
+    assert comp.update(0.10, 1.0, mono_s=3.5 * AB_BLOCK_S) == 0.10, "requests above the pulse height pass through"

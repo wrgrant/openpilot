@@ -4,7 +4,8 @@ AB_BLOCK_S = 60.0  # each block holds three or four of the 15-20 s swings the wa
 
 WANDER_BLOCK_S = 180.0  # wander needs long blocks: score the last 150 s of each (the wander worker's A/B plan)
 
-DEADBAND_ARMS = ("off", "kick", "bump")  # SteerDeadbandCompAB
+DEADBAND_ARMS = ("off", "kick", "bump", "bump9")  # SteerDeadbandCompAB: kick 3 %, bump pulses of 6 % and 9 %
+LEGACY_DEADBAND_ARMS = ("off", "kick", "bump")  # the rotation on drives up to 000001ba; the scorer picks by the logged arms
 NNLC_ARMS = ("on", "off")  # NnlcAB
 WANDER_ARMS = ("off", "inverse")  # OdysseyWanderAB
 # NnlcModelAB: stock HONDA_ODYSSEY NNLC vs the van-specific models (report_nnlc_smooth.md), WANDER_BLOCK_S blocks

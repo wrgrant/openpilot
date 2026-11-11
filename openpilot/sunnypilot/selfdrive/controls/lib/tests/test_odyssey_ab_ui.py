@@ -17,8 +17,8 @@ class TestOdysseyAB(unittest.TestCase):
       self.assertEqual(ab.selection(e, '', False, 0), arms[0])
     self.assertEqual(ab.selection('bad', 'bad', True, 0), 'off')
     self.assertEqual(ab.selection('bump', '', False, 60), 'kick')
-    with patch.object(ab, '_config', ('bump', True, 'kick')):
-      self.assertEqual(ab.runtime_arm('bump', 0, ab.DEADBAND_ARMS), 'kick')
+    with patch.object(ab, '_config', ('bump', True, 'bump9')):
+      self.assertEqual(ab.runtime_arm('bump', 0, ab.DEADBAND_ARMS), 'bump9')
       self.assertFalse(ab.clock_enabled('lane', True))
     with patch.object(ab, '_config', ('feel', False, '')):
       self.assertFalse(ab.clock_enabled('lane', True), 'the clock A/Bs stand still during the feel test')

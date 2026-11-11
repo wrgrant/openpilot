@@ -10,7 +10,8 @@ pulses of |value|, on for a share of each BUMP_PERIOD_FRAMES equal to the reques
 torque matches the request but each pulse is big enough to break the wheel free. Larger requests pass through.
 
 SteerDeadbandCompAB rotates through odyssey_ab.DEADBAND_ARMS in odyssey_ab.AB_BLOCK_S blocks of the monotonic clock (the clock behind
-logMonoTime): no compensation, the kick at AB_KICK, bump mode at AB_BUMP, ignoring SteerDeadbandComp. One drive then
+logMonoTime): no compensation, the kick at AB_KICK, and bump mode at pulse heights AB_BUMPS (6 and 9%), ignoring
+SteerDeadbandComp. One drive then
 compares all three on the same roads; tools/odyssey_wander.py --ab scores them.
 """
 import math
@@ -26,6 +27,7 @@ BUMP_MIN = 0.003  # below this a request is treated as zero, so noise around zer
 
 
 AB_KICK, AB_BUMP = 0.03, 0.06
+AB_BUMPS = {"bump4": 0.04, "bump": AB_BUMP, "bump9": 0.09}  # arm -> pulse height; "bump" keeps its name so old logs score
 
 
 def deadband_comp(torque: float, amount: float, width: float = SMOOTH_WIDTH) -> float:
@@ -61,6 +63,7 @@ class SteerDeadbandComp:
     self._frame += 1
     amount = self.amount
     if clock_enabled("bump", self.ab) or manual_experiment("bump"):
-      amount = {"off": 0.0, "kick": AB_KICK, "bump": -AB_BUMP}[runtime_arm("bump", time.monotonic() if mono_s is None else mono_s, DEADBAND_ARMS)]
+      arm = runtime_arm("bump", time.monotonic() if mono_s is None else mono_s, DEADBAND_ARMS)
+      amount = AB_KICK if arm == "kick" else -AB_BUMPS.get(arm, 0.0)
     out = bump_comp(torque, -amount, self._frame) if amount < 0 else deadband_comp(torque, amount)
     return max(-steer_max, min(steer_max, out))
