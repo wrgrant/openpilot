@@ -202,7 +202,7 @@ def run(device, out, queue=False, max_minutes=None, poll_seconds=3., analyzer=an
   state_path = out/'companion-state.json'
   state = json.loads(state_path.read_text()) if state_path.exists() else {'issued': []}
   issued = set(state['issued'])
-  exit_reason, pause_pending = None, False
+  exit_reason, pause_pending, passes_reported = None, False, 0
   while True:
     if max_minutes is not None and clock()-started >= max_minutes*60:
       exit_reason = exit_reason or 'max minutes reached'
@@ -210,8 +210,8 @@ def run(device, out, queue=False, max_minutes=None, poll_seconds=3., analyzer=an
     if not analyzed and clock()-started >= wait_minutes*60:
       exit_reason = exit_reason or 'no drive started'
       break
-    if analyzed and clock()-last_new >= 180:
-      exit_reason = exit_reason or 'nothing new for three minutes'
+    if analyzed and clock()-last_new >= 600:
+      exit_reason = exit_reason or 'nothing new for ten minutes: the drive has ended'
       break
     try:
       snapshot = device.snapshot(since)
@@ -256,13 +256,15 @@ def run(device, out, queue=False, max_minutes=None, poll_seconds=3., analyzer=an
         pause_pending = False
         summary['exit_reason'] = exit_reason
         device.write('OdysseyAgentNote', note(summary))
-        break
+        print(f'{clock()-started:.0f}s paused the test: {exit_reason}; still following', file=stream, flush=True)
+        exit_reason = None
       # A live 'done' status may precede closure of the current segment. Do not claim
       # those final shots were analyzed: the handoff reports both status and log coverage.
       complete = any(c['good'] == c['total'] for c in summary['coverage'])
-      if complete or status.get('state') == 'done':
-        exit_reason = 'pass complete'
-        break
+      passes = sum(c['good'] == c['total'] for c in summary['coverage'])
+      if (complete or status.get('state') == 'done') and passes != passes_reported:
+        passes_reported = passes
+        print(f"{clock()-started:.0f}s pass complete ({passes} band-passes); still following", file=stream, flush=True)
       if queue and route and not snapshot['queue'] and not status.get('queue', 0):
         candidates = suggest(summary)
         shots = []

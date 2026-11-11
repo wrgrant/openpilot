@@ -49,7 +49,7 @@ def main():
   device = run(*ssh, 'cd /data/openpilot && git rev-parse HEAD')
   run('git', '-C', ROOT, 'fetch', '-q', 'wrgrant')
   changed = run('git', '-C', ROOT, 'diff', '--name-only', device, sha).split()
-  blocked = [f for f in changed if not f.endswith('.py') or f in ('openpilot/system/manager/manager.py',)]
+  blocked = [f for f in changed if not f.endswith(('.py', '.md')) or f in ('openpilot/system/manager/manager.py',)]
   submodules = run('git', '-C', ROOT, 'diff', '--submodule=short', '--name-only', device, sha, '--', *[
     line.split()[1] for line in run('git', '-C', ROOT, 'config', '-f', '.gitmodules', '--get-regexp', 'path').splitlines()])
   if blocked or submodules:
