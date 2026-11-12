@@ -24,6 +24,37 @@ class TestOdysseyAB(unittest.TestCase):
       self.assertFalse(ab.clock_enabled('lane', True), 'the clock A/Bs stand still during the feel test')
       self.assertFalse(ab.manual_experiment('bump'))
 
+  def test_planned_delay(self):
+    class FakeParams(dict):
+      def get(self, k):
+        return super().get(k)
+      def get_bool(self, k):
+        return bool(super().get(k))
+    p = FakeParams()
+    d = ab.PlannedDelay(p)
+    self.assertEqual(d.update(.32, 0.), .32, 'no experiment: the learned delay, untouched')
+    self.assertEqual(d.update(.35, .05), .35, 'it follows lagd while the test is off')
+    p.update(OdysseyABExperiment='delay')
+    t = 60. + 1.  # block 1 of the clock is d50
+    self.assertEqual(ab.selection('delay', '', False, t), 'd50')
+    out = [d.update(.32, t + .05 * i) for i in range(60)]
+    self.assertLessEqual(out[0] - .35, ab.PlannedDelay.SLEW_S_PER_S * .2 + 1e-9, 'a switch slews, it does not step the plan')
+    self.assertTrue(all(b - a <= ab.PlannedDelay.SLEW_S_PER_S * .05 + 1e-9 for a, b in zip(out, out[1:], strict=False)))
+    self.assertAlmostEqual(out[-1], .50)
+    self.assertEqual(ab.selection('delay', '', False, 121.), 'd65')
+    self.assertEqual(ab.selection('delay', '', False, 181.), 'learned')
+    p.update(OdysseyABManual=True, OdysseyABArm='d65')
+    out = [d.update(.32, 200. + .05 * i) for i in range(80)]
+    self.assertAlmostEqual(out[-1], .65, msg='manual mode holds the tapped arm')
+    self.assertLessEqual(max(out), .65, "no arm goes past lagd's own 0.65 s ceiling")
+    p.update(OdysseyABExperiment='bump')
+    out = [d.update(.30, 300. + .05 * i) for i in range(80)]
+    self.assertAlmostEqual(out[-1], .30, msg='another experiment: back to the learned delay')
+    d.params = None  # a fault falls back to the learned delay for the rest of the drive
+    d.polled = -1e9
+    self.assertEqual(d.update(.31, 400.), .31)
+    self.assertTrue(d.broken)
+
   def test_reasons(self):
     good = {'active': True, 'speed': 20, 'since_switch': 6, 'lane_probs': (1, 1), 'desired_accel': 0}
     self.assertEqual(ab.good_data('lane', **good), (True, 'counting', 'straight'))

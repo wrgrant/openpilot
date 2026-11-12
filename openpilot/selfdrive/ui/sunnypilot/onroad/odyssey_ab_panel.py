@@ -22,7 +22,7 @@ HEAD_H, PAUSE_H, FOOT_H = 200, 200, 200
 ROWS_Y, ROW_H, COL_STRAIGHT, COL_CURVES = HEAD_H + 340, 70, 230, 460
 PULSE_H = 1000  # fire strip gets 400 px; the other three tap targets get 200 px each
 NOTE_CHARS, NOTE_COLOR = 34, rl.Color(120, 200, 255, 255)  # a drive companion's note (OdysseyAgentNote): two short lines
-ONROAD_TESTS = ("pulse", "bump", "lane", "feel")  # the tests the top strip cycles through; the model test needs its models loaded at start
+ONROAD_TESTS = ("pulse", "bump", "delay", "lane", "feel")  # the tests the top strip cycles through; the model test needs its models loaded at start
 
 
 FEEL_ROW_H = 150  # four rows under the status strip: 0|1, 2|3, 4|felt that, then redo across the full width

@@ -20,7 +20,7 @@ it reports, in the 7-20 s band:
   sway     body lateral accel swing (v x yaw rate, m/s^2 rms). It does not use the lane lines, so it cross-checks
            wander: a change that only makes the van chase the model's lane estimate lowers wander but not sway
 
---ab deadband|nnlc|wander|nnlc_model|lane scores an A/B drive: it splits the stretches at the arm switches and compares
+--ab deadband|nnlc|wander|nnlc_model|lane|delay scores an A/B drive: it splits the stretches at the arm switches and compares
 the arms. Give several route directories to pool drives; one half-hour drive yields only 3-5 scored blocks per arm,
 and blocks differ by about 3 cm rms from road alone, so a 2 cm effect needs about 25 blocks per arm. Each route's
 initData says which A/B tests were on: a route without the requested test is skipped (--force scores it anyway, as a
@@ -158,10 +158,10 @@ def peak_period(x: np.ndarray) -> float:
 
 
 def stretches(d: dict[str, np.ndarray], min_mph: float, min_s: float) -> list[np.ndarray]:
-  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS
+  from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import EXPERIMENTS, FAST_BLOCK
   experiment = d.get("_experiment", "lane")
   arms = EXPERIMENTS.get(experiment, ("off", "on"))
-  ok = np.array([g[0] for g in good_frames(d, experiment, arms, 60 if experiment in ("bump", "lowspeed") else 180)]) & (d["v"] > min_mph / 2.237)
+  ok = np.array([g[0] for g in good_frames(d, experiment, arms, 60 if experiment in FAST_BLOCK else 180)]) & (d["v"] > min_mph / 2.237)
   idx = np.where(ok)[0]
   if not len(idx):
     return []
@@ -400,8 +400,8 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
   """Pool an A/B test over drives, using each drive's own record of which tests were on."""
   from openpilot.sunnypilot.selfdrive.controls.lib.odyssey_ab import (AB_BLOCK_S, DEADBAND_ARMS, LANE_ARMS, NNLC_ARMS,
                                                                       NNLC_MODEL_ARMS, WANDER_ARMS, WANDER_BLOCK_S, ab_arm,
-                                                                      LEGACY_DEADBAND_ARMS)
-  tests = {"deadband": (DEADBAND_ARMS, AB_BLOCK_S), "nnlc": (NNLC_ARMS, AB_BLOCK_S), "wander": (WANDER_ARMS, WANDER_BLOCK_S),
+                                                                      LEGACY_DEADBAND_ARMS, DELAY_ARMS)
+  tests = {"delay": (DELAY_ARMS, AB_BLOCK_S), "deadband": (DEADBAND_ARMS, AB_BLOCK_S), "nnlc": (NNLC_ARMS, AB_BLOCK_S), "wander": (WANDER_ARMS, WANDER_BLOCK_S),
            "nnlc_model": (NNLC_MODEL_ARMS, WANDER_BLOCK_S), "lane": (LANE_ARMS, WANDER_BLOCK_S)}
   arms, block = tests[name]
   route_arms = arms
@@ -415,9 +415,9 @@ def ab_report_routes(paths: list[str], routes: list[dict], name: str, min_mph: f
     on.update("deadband" if r["experiment"] == "bump" else r["experiment"] for _, r in d.get("records", []) if r["experiment"])
     label = os.path.basename(os.path.normpath(path))
     if name not in on and not force:
-      print(f"{label}: skipped, {AB_FLAGS[name]} was not on (on: {', '.join(sorted(on)) or 'none'})")
+      print(f"{label}: skipped, {AB_FLAGS.get(name, name)} was not on (on: {', '.join(sorted(on)) or 'none'})")
       continue
-    d["_experiment"] = "bump" if name == "deadband" else name if name in ("lane", "nnlc_model") else "bump"
+    d["_experiment"] = "bump" if name == "deadband" else name if name in ("lane", "nnlc_model", "delay") else "bump"
     if name == "deadband":
       logged = {r.get("arm") for _, r in d.get("records", []) if r.get("experiment") == "bump"}
       route_arms = DEADBAND_ARMS if "bump9" in logged else LEGACY_DEADBAND_ARMS
@@ -454,7 +454,7 @@ def main():
   ap.add_argument("route_dir", nargs="+")
   ap.add_argument("--min-mph", type=float, default=25)
   ap.add_argument("--min-s", type=float, default=45)
-  ap.add_argument("--ab", choices=("deadband", "nnlc", "wander", "nnlc_model", "lane"),
+  ap.add_argument("--ab", choices=("deadband", "nnlc", "wander", "nnlc_model", "lane", "delay"),
                   help="compare the arms of an A/B test, pooled over the given drives")
   ap.add_argument("--road-matched", action="store_true", help="pair push by 50 m GPS cell and heading")
   ap.add_argument("--force", action="store_true", help="score drives where the A/B test was not on, as a null test")

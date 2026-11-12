@@ -16,6 +16,11 @@ LANE_ARMS = ("off", "on")
 # SteerLowSpeedAngleAB: low-speed angle steering's error gain, K_ERR vs K_ERR_FIRM (low_speed_angle.py), AB_BLOCK_S blocks.
 # It acts below 18 mph and the lane and model tests are scored above 25 mph, so they don't disturb each other.
 LOWSPEED_ARMS = ("base", "firm")
+# OdysseyDelay: the lateral delay the driving model plans for (modeld's action_t), AB_BLOCK_S blocks. "learned" is lagd's
+# live estimate; the others are fixed. lagd itself publishes 0.15-0.65 s, so no arm feeds the model a delay outside that.
+DELAY_ARMS = ("learned", "d50", "d65")
+DELAY_S = {"d50": 0.50, "d65": 0.65}
+FAST_BLOCK = ("bump", "lowspeed", "delay")  # experiments on AB_BLOCK_S blocks; the rest use WANDER_BLOCK_S
 NNLC_MODEL_FILES = {"S3": "HONDA_ODYSSEY_WILLIAM_S3.json", "S5": "HONDA_ODYSSEY_WILLIAM_S5.json"}
 
 
@@ -24,8 +29,8 @@ def ab_arm(mono_s: float, arms: tuple[str, ...], block_s: float = AB_BLOCK_S) ->
 
 
 # The historical model clock above remains readable for old drives; manual tests exclude S5.
-EXPERIMENTS = {"lane": LANE_ARMS, "bump": DEADBAND_ARMS, "nnlc_model": ("stock", "S3"), "lowspeed": LOWSPEED_ARMS, "pulse": (),
-               "feel": ()}
+EXPERIMENTS = {"lane": LANE_ARMS, "bump": DEADBAND_ARMS, "nnlc_model": ("stock", "S3"), "lowspeed": LOWSPEED_ARMS,
+               "delay": DELAY_ARMS, "pulse": (), "feel": ()}
 OWN_RUNTIME = ("pulse", "feel")  # experiments with their own runtime, status and records, and no A/B arms
 TARGET_STRAIGHT, TARGET_CURVE = 300, 60
 PARAMS_POLL_S = 0.2  # how often the worker re-reads the experiment and arm: a tap takes effect within this
@@ -45,7 +50,7 @@ def selection(experiment, arm, manual, mono_s):
   arms = EXPERIMENTS[experiment]
   if manual:
     return arms[arms.index(arm)] if arm in arms else arms[0]
-  return ab_arm(mono_s, arms, AB_BLOCK_S if experiment in ("bump", "lowspeed") else WANDER_BLOCK_S)
+  return ab_arm(mono_s, arms, AB_BLOCK_S if experiment in FAST_BLOCK else WANDER_BLOCK_S)
 
 
 def good_data(experiment, *, active, speed, blinker=False, lane_change=False, since_switch=0.,
@@ -105,6 +110,56 @@ def parse_record(raw):
     return d
   except (ValueError, TypeError, AttributeError):
     return None
+
+
+class PlannedDelay:
+  """modeld's side of the delay test. modeld has no LiveAB worker, so it re-reads the experiment params itself, once a
+  second, and works out the arm from the same monotonic block clock controlsd logs. It slews toward the arm's delay, so a
+  block switch eases the plan over about 1.5 s instead of stepping it. Any fault returns the learned delay for good."""
+  SLEW_S_PER_S = 0.2
+  POLL_S = 1.0
+
+  def __init__(self, params):
+    self.params = params
+    self.config = ("", False, "")
+    self.polled = -1e9
+    self.value = None
+    self.last = None
+    self.arm = None
+    self.tracking = False
+    self.broken = False
+
+  def update(self, learned: float, mono_s: float) -> float:
+    if self.broken:
+      return learned
+    try:
+      return self._update(learned, mono_s)
+    except Exception:
+      self.broken = True
+      from openpilot.common.swaglog import cloudlog
+      cloudlog.exception("odyssey_delay: override stopped, planning with the learned delay")
+      return learned
+
+  def _update(self, learned, mono_s):
+    if mono_s - self.polled >= self.POLL_S:
+      self.polled = mono_s
+      self.config = (self.params.get("OdysseyABExperiment") or "", self.params.get_bool("OdysseyABManual"),
+                     self.params.get("OdysseyABArm") or "")
+    e, manual, arm = self.config
+    arm = selection(e, arm, manual, mono_s) if e == "delay" else None
+    target = DELAY_S.get(arm, learned)
+    if self.value is None or (arm is None and self.tracking):
+      self.value = target  # test off and settled: exactly what stock modeld plans with
+    else:
+      step = self.SLEW_S_PER_S * min(max(mono_s - self.last, 0.), 0.2)
+      self.value += max(-step, min(step, target - self.value))
+    self.tracking = arm is None and self.value == target
+    self.last = mono_s
+    if arm != self.arm:
+      from openpilot.common.swaglog import cloudlog
+      cloudlog.event("odyssey_delay", arm=arm or "", target=round(float(target), 3), learned=round(float(learned), 3))
+      self.arm = arm
+    return self.value
 
 
 # A single atomic snapshot is read by controllers. Only the worker touches params/log I/O.
@@ -216,7 +271,7 @@ class LiveAB:
         except queue.Full:
           pass
       return
-    arm = runtime_arm(e, now, EXPERIMENTS[e], AB_BLOCK_S if e in ("bump", "lowspeed") else WANDER_BLOCK_S)
+    arm = runtime_arm(e, now, EXPERIMENTS[e], AB_BLOCK_S if e in FAST_BLOCK else WANDER_BLOCK_S)
     previous = self.status
     if previous is None or (e, arm, manual) != (previous["experiment"], previous["arm"], previous["manual"]):
       self.switched = now

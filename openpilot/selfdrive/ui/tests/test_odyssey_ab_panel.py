@@ -147,12 +147,13 @@ class TestOdysseyPanel(OpenpilotTestCase):
         time.sleep(.05)
         self.assertFalse(params.get_bool('OdysseyPulseIgnoreWheel'))
         seen = []
-        for _ in range(4):  # the top strip: pulse -> bump -> lane -> feel -> pulse, each arriving safe
+        for _ in range(5):  # the top strip: pulse -> bump -> delay -> lane -> feel -> pulse, each arriving safe
           panel._handle_mouse_release(MousePos(100, top + 20))
           time.sleep(.05)
           seen.append((params.get('OdysseyABExperiment'), params.get('OdysseyABArm') or '', params.get_bool('OdysseyABManual')))
           panel.e = seen[-1][0]
-        self.assertEqual(seen, [('bump', 'off', True), ('lane', 'off', True), ('feel', '', True), ('pulse', '', True)])
+        self.assertEqual(seen, [('bump', 'off', True), ('delay', 'learned', True), ('lane', 'off', True), ('feel', '', True),
+                                ('pulse', '', True)])
         self.assertTrue(params.get_bool('OdysseyPulsePaused'), 'the pulse test arrives paused')
         from openpilot.selfdrive.ui.sunnypilot.layouts.settings.vehicle.brands.honda import HondaSettings
         params.put_bool('OdysseyPulsePaused', False, block=True)
